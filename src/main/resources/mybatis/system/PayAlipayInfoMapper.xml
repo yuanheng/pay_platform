@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.system.dao.PayAlipayInfoDao">
+
+	<select id="get" resultType="com.bootdo.system.domain.PayAlipayInfoDO">
+		select `id`,`mid`,`name`,`status`,`img_url`,`min_amount`,`max_amount`,`account`,`remark` from rs_pay_alipay_info where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.system.domain.PayAlipayInfoDO">
+		select `id`,`mid`,`name`,`status`,`img_url`,`min_amount`,`max_amount`,`account`,`remark` from rs_pay_alipay_info
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="name != null and name != ''"> and name = #{name} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="imgUrl != null and imgUrl != ''"> and img_url = #{imgUrl} </if>
+		  		  <if test="minAmount != null and minAmount != ''"> and min_amount = #{minAmount} </if>
+		  		  <if test="maxAmount != null and maxAmount != ''"> and max_amount = #{maxAmount} </if>
+		  		  <if test="account != null and account != ''"> and account = #{account} </if>
+		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from rs_pay_alipay_info
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="name != null and name != ''"> and name = #{name} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="imgUrl != null and imgUrl != ''"> and img_url = #{imgUrl} </if>
+		  		  <if test="minAmount != null and minAmount != ''"> and min_amount = #{minAmount} </if>
+		  		  <if test="maxAmount != null and maxAmount != ''"> and max_amount = #{maxAmount} </if>
+		  		  <if test="account != null and account != ''"> and account = #{account} </if>
+		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.system.domain.PayAlipayInfoDO">
+		insert into rs_pay_alipay_info
+		(
+			`id`, 
+			`mid`, 
+			`name`, 
+			`status`, 
+			`img_url`, 
+			`min_amount`, 
+			`max_amount`, 
+			`account`, 
+			`remark`
+		)
+		values
+		(
+			#{id}, 
+			#{mid}, 
+			#{name}, 
+			#{status}, 
+			#{imgUrl}, 
+			#{minAmount}, 
+			#{maxAmount}, 
+			#{account}, 
+			#{remark}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.system.domain.PayAlipayInfoDO">
+		update rs_pay_alipay_info 
+		<set>
+			<if test="mid != null">`mid` = #{mid}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="imgUrl != null">`img_url` = #{imgUrl}, </if>
+			<if test="minAmount != null">`min_amount` = #{minAmount}, </if>
+			<if test="maxAmount != null">`max_amount` = #{maxAmount}, </if>
+			<if test="account != null">`account` = #{account}, </if>
+			<if test="remark != null">`remark` = #{remark}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from rs_pay_alipay_info where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from rs_pay_alipay_info where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

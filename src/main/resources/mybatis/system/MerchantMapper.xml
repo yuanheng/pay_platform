@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.system.dao.MerchantDao">
+
+	<select id="get" resultType="com.bootdo.system.domain.MerchantDO">
+		select `id`,`merchant_no`,`mid`,`secret_key`,`callback_url`,`return_url`,`create_time` from rs_merchant where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.system.domain.MerchantDO">
+		select `id`,`merchant_no`,`mid`,`secret_key`,`callback_url`,`return_url`,`create_time` from rs_merchant
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="merchantNo != null and merchantNo != ''"> and merchant_no = #{merchantNo} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="secretKey != null and secretKey != ''"> and secret_key = #{secretKey} </if>
+		  		  <if test="callbackUrl != null and callbackUrl != ''"> and callback_url = #{callbackUrl} </if>
+		  		  <if test="returnUrl != null and returnUrl != ''"> and return_url = #{returnUrl} </if>
+		  		  <if test="createTime != null and createTime != ''"> and create_time = #{createTime} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from rs_merchant
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="merchantNo != null and merchantNo != ''"> and merchant_no = #{merchantNo} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="secretKey != null and secretKey != ''"> and secret_key = #{secretKey} </if>
+		  		  <if test="callbackUrl != null and callbackUrl != ''"> and callback_url = #{callbackUrl} </if>
+		  		  <if test="returnUrl != null and returnUrl != ''"> and return_url = #{returnUrl} </if>
+		  		  <if test="createTime != null and createTime != ''"> and create_time = #{createTime} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.system.domain.MerchantDO">
+		insert into rs_merchant
+		(
+			`id`, 
+			`merchant_no`, 
+			`mid`, 
+			`secret_key`, 
+			`callback_url`, 
+			`return_url`, 
+			`create_time`
+		)
+		values
+		(
+			#{id}, 
+			#{merchantNo}, 
+			#{mid}, 
+			#{secretKey}, 
+			#{callbackUrl}, 
+			#{returnUrl}, 
+			#{createTime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.system.domain.MerchantDO">
+		update rs_merchant 
+		<set>
+			<if test="merchantNo != null">`merchant_no` = #{merchantNo}, </if>
+			<if test="mid != null">`mid` = #{mid}, </if>
+			<if test="secretKey != null">`secret_key` = #{secretKey}, </if>
+			<if test="callbackUrl != null">`callback_url` = #{callbackUrl}, </if>
+			<if test="returnUrl != null">`return_url` = #{returnUrl}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from rs_merchant where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from rs_merchant where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>
