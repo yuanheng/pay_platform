@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.coin.dao.CoinTaskInfoDao">
+
+	<select id="get" resultType="com.bootdo.coin.domain.CoinTaskInfoDO">
+		select `id`,`mid`,`total_amount`,`total_position`,`current_order_num`,`avg_price`,`current_price`,`total_profit`,`profit_loss_ratio`,`current_profit_loss_amount`,`deal_num`,`first_amount`,`plan_order_num`,`cover_ratio`,`cover_reset_ratio`,`cover_add_ratio`,`cover_callback_ratio`,`profit_ratio`,`profit_callback_ratio`,`create_time`,`modify_time`,`status`,`deleted`,`symbol` ,`type`,`first_price` from zwl_coin_task_info where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.coin.domain.CoinTaskInfoDO">
+		select `id`,`mid`,`total_amount`,`total_position`,`current_order_num`,`avg_price`,`current_price`,`total_profit`,`profit_loss_ratio`,`current_profit_loss_amount`,`deal_num`,`first_amount`,`plan_order_num`,`cover_ratio`,`cover_reset_ratio`,`cover_add_ratio`,`cover_callback_ratio`,`profit_ratio`,`profit_callback_ratio`,`create_time`,`modify_time`,`status`,`deleted`,`symbol`,`type`,`first_price` from zwl_coin_task_info
+        <where>  
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="deleted != null and deleted != ''"> and deleted = #{deleted} </if>
+		  		  <if test="symbol != null and symbol != ''"> and symbol = #{symbol} </if>
+			      <if test="symbol != null and symbol != ''"> and type = #{type} </if>
+		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from zwl_coin_task_info
+		 <where>
+			 <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+			 <if test="status != null and status != ''"> and status = #{status} </if>
+			 <if test="deleted != null and deleted != ''"> and deleted = #{deleted} </if>
+			 <if test="symbol != null and symbol != ''"> and symbol = #{symbol} </if>
+			 <if test="symbol != null and symbol != ''"> and type = #{type} </if>
+		 </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.coin.domain.CoinTaskInfoDO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into zwl_coin_task_info
+		(
+			`id`, 
+			`mid`, 
+			`total_amount`, 
+			`total_position`, 
+			`current_order_num`, 
+			`avg_price`, 
+			`current_price`, 
+			`total_profit`, 
+			`profit_loss_ratio`, 
+			`current_profit_loss_amount`, 
+			`deal_num`, 
+			`first_amount`, 
+			`plan_order_num`, 
+			`cover_ratio`, 
+			`cover_reset_ratio`, 
+			`cover_add_ratio`, 
+			`cover_callback_ratio`, 
+			`profit_ratio`, 
+			`profit_callback_ratio`, 
+			`create_time`, 
+			`modify_time`, 
+			`status`, 
+			`deleted`, 
+			`symbol`,
+		    `type`,
+		    `first_price`
+		)
+		values
+		(
+			#{id}, 
+			#{mid}, 
+			#{totalAmount}, 
+			#{totalPosition}, 
+			#{currentOrderNum}, 
+			#{avgPrice}, 
+			#{currentPrice}, 
+			#{totalProfit}, 
+			#{profitLossRatio}, 
+			#{currentProfitLossAmount}, 
+			#{dealNum}, 
+			#{firstAmount}, 
+			#{planOrderNum}, 
+			#{coverRatio}, 
+			#{coverResetRatio}, 
+			#{coverAddRatio}, 
+			#{coverCallbackRatio}, 
+			#{profitRatio}, 
+			#{profitCallbackRatio}, 
+			#{createTime}, 
+			#{modifyTime}, 
+			#{status}, 
+			#{deleted}, 
+			#{symbol},
+		    #{type},
+		    #{firstPrice}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.coin.domain.CoinTaskInfoDO">
+		update zwl_coin_task_info 
+		<set>
+			<if test="totalAmount != null">`total_amount` = #{totalAmount}, </if>
+			<if test="totalPosition != null">`total_position` = #{totalPosition}, </if>
+			<if test="currentOrderNum != null">`current_order_num` = #{currentOrderNum}, </if>
+			<if test="avgPrice != null">`avg_price` = #{avgPrice}, </if>
+			<if test="currentPrice != null">`current_price` = #{currentPrice}, </if>
+			<if test="totalProfit != null">`total_profit` = #{totalProfit}, </if>
+			<if test="profitLossRatio != null">`profit_loss_ratio` = #{profitLossRatio}, </if>
+			<if test="currentProfitLossAmount != null">`current_profit_loss_amount` = #{currentProfitLossAmount}, </if>
+			<if test="dealNum != null">`deal_num` = #{dealNum}, </if>
+			<if test="firstAmount != null">`first_amount` = #{firstAmount}, </if>
+			<if test="planOrderNum != null">`plan_order_num` = #{planOrderNum}, </if>
+			<if test="coverRatio != null">`cover_ratio` = #{coverRatio}, </if>
+			<if test="coverResetRatio != null">`cover_reset_ratio` = #{coverResetRatio}, </if>
+			<if test="coverAddRatio != null">`cover_add_ratio` = #{coverAddRatio}, </if>
+			<if test="coverCallbackRatio != null">`cover_callback_ratio` = #{coverCallbackRatio}, </if>
+			<if test="profitRatio != null">`profit_ratio` = #{profitRatio}, </if>
+			<if test="profitCallbackRatio != null">`profit_callback_ratio` = #{profitCallbackRatio}, </if>
+			<if test="modifyTime != null">`modify_time` = #{modifyTime}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="deleted != null">`deleted` = #{deleted}, </if>
+			<if test="firstPrice != null">`first_price` = #{firstPrice}, </if>
+
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		update zwl_coin_task_info set deleted = 1 where id = #{id}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from zwl_coin_task_info where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+
+	<update id="enableTaskInfo" parameterType="com.bootdo.coin.domain.CoinTaskInfoDO">
+		update zwl_coin_task_info
+		<set>
+			`status` = 'enable'
+		</set>
+		where id = #{id} and mid = #{mid} and `status` = 'closed' and deleted = 0
+	</update>
+
+	<update id="closeTaskInfo" parameterType="com.bootdo.coin.domain.CoinTaskInfoDO">
+		update zwl_coin_task_info
+		<set>
+			`status` = 'closed'
+		</set>
+		where id = #{id} and mid = #{mid} and `status` = 'enable' and deleted = 0
+	</update>
+
+	<select id="listRuningTask" resultType="com.bootdo.coin.domain.CoinTaskInfoDO">
+		select `id`,`mid`,`total_amount`,`total_position`,`current_order_num`,`avg_price`,`current_price`,`total_profit`,`profit_loss_ratio`,`current_profit_loss_amount`,`deal_num`,`first_amount`,`plan_order_num`,`cover_ratio`,`cover_reset_ratio`,`cover_add_ratio`,`cover_callback_ratio`,`profit_ratio`,`profit_callback_ratio`,`create_time`,`modify_time`,`status`,`deleted`,`symbol`,`type`,`first_price` from zwl_coin_task_info
+		<where>
+			status != #{status} and deleted = #{deleted}
+		</where>
+	</select>
+</mapper>

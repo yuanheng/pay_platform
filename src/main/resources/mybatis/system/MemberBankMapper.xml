@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.system.dao.MemberBankDao">
+
+	<select id="get" resultType="com.bootdo.system.domain.MemberBankDO">
+		select `id`,`back_name`,`branch_name`,`card_no`,`create_time`,`status`,`remark`,`mid`,`username` from zwl_member_bank where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.system.domain.MemberBankDO">
+		select `id`,`back_name`,`branch_name`,`card_no`,`create_time`,`status`,`remark`,`mid`,`username` from zwl_member_bank
+        <where>
+		  		  <if test="cardNo != null and cardNo != ''"> and card_no = #{cardNo} </if>
+
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+ 	<select id="count" resultType="int">
+		select count(*) from zwl_member_bank
+		 <where>
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="backName != null and backName != ''"> and back_name = #{backName} </if>
+		  		  <if test="branchName != null and branchName != ''"> and branch_name = #{branchName} </if>
+		  		  <if test="cardNo != null and cardNo != ''"> and card_no = #{cardNo} </if>
+		  		  <if test="createTime != null and createTime != ''"> and create_time = #{createTime} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="username != null and username != ''"> and username = #{username} </if>
+		  		</where>
+	</select>
+
+	<insert id="save" parameterType="com.bootdo.system.domain.MemberBankDO">
+		insert into zwl_member_bank
+		(
+			`id`,
+			`back_name`,
+			`branch_name`,
+			`card_no`,
+			`create_time`,
+			`status`,
+			`remark`,
+			`mid`,
+			`username`
+		)
+		values
+		(
+			#{id},
+			#{backName},
+			#{branchName},
+			#{cardNo},
+			#{createTime},
+			#{status},
+			#{remark},
+			#{mid},
+			#{username}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.bootdo.system.domain.MemberBankDO">
+		update zwl_member_bank  set status = #{status}  where id = #{id} and mid = #{mid}
+	</update>
+
+	<delete id="remove">
+		delete from zwl_member_bank where id = #{value}
+	</delete>
+
+	<delete id="batchRemove">
+		delete from zwl_member_bank where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+
+	<select id="listEnableBank" parameterType="com.bootdo.system.domain.MemberBankDO" resultType="com.bootdo.system.domain.MemberBankDO">
+		select `id`,`back_name`,`branch_name`,`card_no`,`create_time`,`status`,`remark`,`mid`,`username` from zwl_member_bank
+		<where>
+			mid = #{mid} and status = #{status}
+		</where>
+	</select>
+
+
+</mapper>

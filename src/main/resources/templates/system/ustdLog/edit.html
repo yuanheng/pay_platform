@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+						<input id="id" name="id" th:value="${ustdLog.id}"  type="hidden">
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">会员id：</label>
+								<div class="col-sm-8">
+									<input id="mid" name="mid" th:value="${ustdLog.mid}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">订单号：</label>
+								<div class="col-sm-8">
+									<input id="no" name="no" th:value="${ustdLog.no}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">u币个数：</label>
+								<div class="col-sm-8">
+									<input id="amount" name="amount" th:value="${ustdLog.amount}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">状态：</label>
+								<div class="col-sm-8">
+									<input id="status" name="status" th:value="${ustdLog.status}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">备注：</label>
+								<div class="col-sm-8">
+									<input id="remark" name="remark" th:value="${ustdLog.remark}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">来源地址：</label>
+								<div class="col-sm-8">
+									<input id="source" name="source" th:value="${ustdLog.source}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">目标地址：</label>
+								<div class="col-sm-8">
+									<input id="target" name="target" th:value="${ustdLog.target}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">创建时间：</label>
+								<div class="col-sm-8">
+									<input id="createTime" name="createTime" th:value="${ustdLog.createTime}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">完成时间：</label>
+								<div class="col-sm-8">
+									<input id="finishedTime" name="finishedTime" th:value="${ustdLog.finishedTime}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">指导价格：</label>
+								<div class="col-sm-8">
+									<input id="cnyPrice" name="cnyPrice" th:value="${ustdLog.cnyPrice}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">总u币数：</label>
+								<div class="col-sm-8">
+									<input id="totalAmount" name="totalAmount" th:value="${ustdLog.totalAmount}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">奖励金额：</label>
+								<div class="col-sm-8">
+									<input id="profileAmount" name="profileAmount" th:value="${ustdLog.profileAmount}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">返现的总利润：</label>
+								<div class="col-sm-8">
+									<input id="backTotalAmount" name="backTotalAmount" th:value="${ustdLog.backTotalAmount}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">操作者：</label>
+								<div class="col-sm-8">
+									<input id="operator" name="operator" th:value="${ustdLog.operator}" class="form-control" type="text">
+								</div>
+							</div>
+																					<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="submit" class="btn btn-primary">提交</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+	</div>
+	</div>
+	<div th:include="include::footer"></div>
+	<script type="text/javascript" src="/js/appjs/system/ustdLog/edit.js">
+	</script>
+</body>
+</html>

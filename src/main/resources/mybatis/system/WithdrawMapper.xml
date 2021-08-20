@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.system.dao.WithdrawDao">
+
+	<select id="get" resultType="com.bootdo.system.domain.WithdrawDO">
+		select `id`,`mid`,`amount`,`bank_no`,`bank_name`,`third_account`,`third_type`,`create_time`,`finished_time`,`remark`,`trade_id`,`status`,`fact_amount` from zwl_withdraw where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.system.domain.WithdrawDO">
+		select `id`,`mid`,`amount`,`bank_no`,`bank_name`,`third_account`,`third_type`,`create_time`,`finished_time`,`remark`,`trade_id`,`status`,`fact_amount` from zwl_withdraw
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="amount != null and amount != ''"> and amount = #{amount} </if>
+		  		  <if test="bankNo != null and bankNo != ''"> and bank_no = #{bankNo} </if>
+		  		  <if test="bankName != null and bankName != ''"> and bank_name = #{bankName} </if>
+		  		  <if test="thirdAccount != null and thirdAccount != ''"> and third_account = #{thirdAccount} </if>
+		  		  <if test="thirdType != null and thirdType != ''"> and third_type = #{thirdType} </if>
+		  		  <if test="createTime != null and createTime != ''"> and create_time = #{createTime} </if>
+		  		  <if test="finishedTime != null and finishedTime != ''"> and finished_time = #{finishedTime} </if>
+		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
+		  		  <if test="tradeId != null and tradeId != ''"> and trade_id = #{tradeId} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from zwl_withdraw
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="amount != null and amount != ''"> and amount = #{amount} </if>
+		  		  <if test="bankNo != null and bankNo != ''"> and bank_no = #{bankNo} </if>
+		  		  <if test="bankName != null and bankName != ''"> and bank_name = #{bankName} </if>
+		  		  <if test="thirdAccount != null and thirdAccount != ''"> and third_account = #{thirdAccount} </if>
+		  		  <if test="thirdType != null and thirdType != ''"> and third_type = #{thirdType} </if>
+		  		  <if test="createTime != null and createTime != ''"> and create_time = #{createTime} </if>
+		  		  <if test="finishedTime != null and finishedTime != ''"> and finished_time = #{finishedTime} </if>
+		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
+		  		  <if test="tradeId != null and tradeId != ''"> and trade_id = #{tradeId} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.system.domain.WithdrawDO">
+		insert into zwl_withdraw
+		(
+			`id`, 
+			`mid`, 
+			`amount`, 
+			`bank_no`, 
+			`bank_name`, 
+			`third_account`, 
+			`third_type`, 
+			`create_time`, 
+			`finished_time`, 
+			`remark`, 
+			`trade_id`,
+		 	`status`,
+		 	`fact_amount`
+		)
+		values
+		(
+			#{id}, 
+			#{mid}, 
+			#{amount}, 
+			#{bankNo}, 
+			#{bankName}, 
+			#{thirdAccount}, 
+			#{thirdType}, 
+			#{createTime}, 
+			#{finishedTime}, 
+			#{remark}, 
+			#{tradeId},
+		 	#{status},
+		 	#{factAmount}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.system.domain.WithdrawDO">
+		update zwl_withdraw 
+		<set>
+			<if test="mid != null">`mid` = #{mid}, </if>
+			<if test="amount != null">`amount` = #{amount}, </if>
+			<if test="bankNo != null">`bank_no` = #{bankNo}, </if>
+			<if test="bankName != null">`bank_name` = #{bankName}, </if>
+			<if test="thirdAccount != null">`third_account` = #{thirdAccount}, </if>
+			<if test="thirdType != null">`third_type` = #{thirdType}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="finishedTime != null">`finished_time` = #{finishedTime}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="tradeId != null">`trade_id` = #{tradeId},</if>
+			<if test="status != null">`status` = #{status}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from zwl_withdraw where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from zwl_withdraw where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,70 @@
+server:
+  session-timeout: 9000
+  #    tomcat:
+  #        max-threads: 1000
+  #        min-spare-threads: 30
+  port: 80
+#    uri-encoding: utf-8
+#security:
+#  basic:
+#    enabled: false
+bootdo:
+  uploadPath: /root/bootdo/uploaded_files/
+  username: admin
+  password: 111111
+logging:
+  level:
+    root: info
+    com.bootdo: debug
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://117.78.11.231:3306/bootdo?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true
+    username: root
+    password: 12323
+    initialSize: 1
+    minIdle: 3
+    maxActive: 20
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # 打开PSCache，并且指定每个连接上PSCache的大小
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: stat,wall,slf4j
+    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    # 合并多个DruidDataSource的监控数据
+    #useGlobalDataSourceStat: true
+  redis:
+    host: 117.78.11.231
+    port: 6379
+    password: 383241
+    # 连接超时时间（毫秒）
+    timeout: 10000
+    jedis:
+      pool:
+        # 连接池中的最大空闲连接
+        max-idle: 8
+        # 连接池中的最小空闲连接
+        min-idle: 10
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: 100
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1
+
+sell_nofity_url: http://117.78.11.231:8080/zwl/nofitfy
+pay_nofity_url: http://117.78.11.231(:8080/api/notify
+MERCHANT_NAME: xgww213
+MERCHANT_PRIVATE_KEY: MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAJE17mFgJ0jd3E4gHBy68JH7XJp8uNt50MYv2ZWaonhJk37i7a/f8ufHOW2SmGQ8Hhn1xHpXbqkwrftQs+WXtMaFhf8+3WY9VeGESvVrkgGkkJePmYoBslUKFjO/1zd8qZ+YWtCvSGSAzOmKM7IFGfFwCV6uCRb1t7awCSc/h7nJAgMBAAECgYBdFqK7v+VPPBMH7mO3M0wXeXlS/BORd1UUSAaHdnsi+5/XXuiar8lLNpclHC4fS77MS5ZqC3TAd5mBG6pHy+oxw/5nmxblKduoRlR5iWlXgQ6Nlnd+nFtyMO7Q1HDjkbNv6KUq6E8NI7CAhEiSIboZzG7doIV/xdPH4Mg5mu9+xQJBAN8YiJCBIMZLGiV3eJqMjSyh4/b2M+ZkqsYuALnLE2v65DGX30YyLKbnHjeiytY9CTRweSr3XucY4w/LE4qsmFcCQQCmoKywhtBHd1+q8JDbtCVRyzW+eJ2KOGbs4bk41+PsRlS3Otap82Xk5GjnbRPk7kzsFL/oVXga+v8azCWv3WrfAkEAzBnQzoskJeWNjRto3dOaUGvneAe0YaJVTivGBDQSl6YX4Hs2DC1ZBnTJA1NOyINciXogkDtxunDdQpSiUyslzwJAKFy1WBFf9F/LMboSLNYHUDfcLeZDqw6ch/bpigZptHsY3EWJaCOIZBib/KskbYj34xvnnJzPeiGgl9opqt8EmwJBAKPFxFGgkNgnHkLfL2uzrlgOQJ9E4/EdaIswRY1TSAOp7wKaPIgU8gn+NtPBYc32hraT55TmbJeEAhNN05JXsHM=
+QAPPLE_PUBLIC_KEY: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCX9BKjV4Nb/hjJwxS2QB942mv7PKXZIifDhVxgx6tqkQDGnd7Wsu2AtHnR4eBSzg/wxdQeKE2VlJNYOiRe98+GFAQih/OGSC5w3boQQIz8ZQ+23nsu9Gg2Yo4mlF0xyoisV+4fhpekabyhq9d3FJpjf05wmaR/kj7VgpYIP4uLEwIDAQAB
+QAPPLE_SERVER_URL: https://api.qapple.io/v2/api

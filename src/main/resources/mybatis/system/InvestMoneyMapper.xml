@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.system.dao.InvestMoneyDao">
+
+	<select id="get" resultType="com.bootdo.system.domain.InvestMoneyDO">
+		select `id`,`mid`,`status`,`amount`,`create_time`,`finished_time`,`trade_id`,`remark`,`mobile` from zwl_invest_money where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.system.domain.InvestMoneyDO">
+		select `id`,`mid`,`status`,`amount`,`create_time`,`finished_time`,`trade_id`,`remark`,`mobile` from zwl_invest_money
+        <where>
+			<if test="tradeId != null and tradeId != ''"> and trade_id = #{tradeId} </if>
+		</where>
+
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from zwl_invest_money
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="amount != null and amount != ''"> and amount = #{amount} </if>
+		  		  <if test="createTime != null and createTime != ''"> and create_time = #{createTime} </if>
+		  		  <if test="finishedTime != null and finishedTime != ''"> and finished_time = #{finishedTime} </if>
+		  		  <if test="tradeId != null and tradeId != ''"> and trade_id = #{tradeId} </if>
+		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
+		  		  <if test="mobile != null and mobile != ''"> and mobile = #{mobile} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.system.domain.InvestMoneyDO" useGeneratedKeys="true" keyProperty="id">
+		insert into zwl_invest_money
+		(
+			`mid`, 
+			`status`, 
+			`amount`, 
+			`create_time`, 
+			`finished_time`, 
+			`trade_id`, 
+			`remark`, 
+			`mobile`
+		)
+		values
+		(
+			#{mid}, 
+			#{status}, 
+			#{amount}, 
+			#{createTime}, 
+			#{finishedTime}, 
+			#{tradeId}, 
+			#{remark}, 
+			#{mobile}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.system.domain.InvestMoneyDO">
+		update zwl_invest_money 
+		<set>
+			<if test="mid != null">`mid` = #{mid}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="amount != null">`amount` = #{amount}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="finishedTime != null">`finished_time` = #{finishedTime}, </if>
+			<if test="tradeId != null">`trade_id` = #{tradeId}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from zwl_invest_money where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from zwl_invest_money where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

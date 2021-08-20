@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.system.dao.PayGatewayDao">
+
+	<select id="get" resultType="com.bootdo.system.domain.PayGatewayDO">
+		select `id`,`name`,`mch_id`,`key`,`type`,`logo`,`notify`,`result`,`remark`,`status`,`description` from zwl_pay_gateway where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.system.domain.PayGatewayDO">
+		select `id`,`name`,`mch_id`,`key`,`type`,`logo`,`notify`,`result`,`remark`,`status`,`description` from zwl_pay_gateway
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="name != null and name != ''"> and name = #{name} </if>
+		  		  <if test="mchId != null and mchId != ''"> and mch_id = #{mchId} </if>
+		  		  <if test="key != null and key != ''"> and key = #{key} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="logo != null and logo != ''"> and logo = #{logo} </if>
+		  		  <if test="notify != null and notify != ''"> and notify = #{notify} </if>
+		  		  <if test="result != null and result != ''"> and result = #{result} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from zwl_pay_gateway
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="name != null and name != ''"> and name = #{name} </if>
+		  		  <if test="mchId != null and mchId != ''"> and mch_id = #{mchId} </if>
+		  		  <if test="key != null and key != ''"> and key = #{key} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="logo != null and logo != ''"> and logo = #{logo} </if>
+		  		  <if test="notify != null and notify != ''"> and notify = #{notify} </if>
+		  		  <if test="result != null and result != ''"> and result = #{result} </if>
+		 </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.system.domain.PayGatewayDO">
+		insert into zwl_pay_gateway
+		(
+			`id`, 
+			`name`, 
+			`mch_id`, 
+			`key`, 
+			`type`, 
+			`logo`, 
+			`notify`, 
+			`result`,
+		 	`status`,
+		 	`remark`,
+		 	`description`
+		)
+		values
+		(
+			#{id}, 
+			#{name}, 
+			#{mchId}, 
+			#{key}, 
+			#{type}, 
+			#{logo}, 
+			#{notify}, 
+			#{result},
+		 	#{status},
+		 	#{remark},
+		 	#{description}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.system.domain.PayGatewayDO">
+		update zwl_pay_gateway 
+		<set>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="mchId != null">`mch_id` = #{mchId}, </if>
+			<if test="key != null">`key` = #{key}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="logo != null">`logo` = #{logo}, </if>
+			<if test="notify != null">`notify` = #{notify}, </if>
+			<if test="result != null">`result` = #{result},</if>
+			<if test="remark != null">`remark` = #{remark},</if>
+			<if test="status != null">`status` = #{status},</if>
+			<if test="description != null">`description` = #{description}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from zwl_pay_gateway where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from zwl_pay_gateway where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.system.dao.MemberDao">
+
+	<select id="get" resultType="com.bootdo.system.domain.MemberDO">
+		select `id`,`nick_name`,`username`,`password`,`create_time`,`owner_invite_code`,`source_invite_code`,`total_amount`,`free_amount`,`lock_amount`,`profit_amount`,`transit_amount`,`level`,`commission_rate`,`bank_no`,`bank_name`,`card_no`,`really_name`,`bank_address`,`bank_branch_name` ,`team_profit_amount`,`day_profit_amount`,`wallet_address`,`ai_free_amount` from zwl_member where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.system.domain.MemberDO">
+		select `id`,`nick_name`,`username`,`password`,`create_time`,`owner_invite_code`,`source_invite_code`,`total_amount`,`free_amount`,`lock_amount`,`profit_amount`,`transit_amount`,`level`,`commission_rate`,`bank_no`,`bank_name`,`card_no` ,`really_name`,`bank_address`,`bank_branch_name` ,`team_profit_amount`,`day_profit_amount`,`wallet_address`,`ai_free_amount` from zwl_member
+        <where>
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="reallyName != null and reallyName != ''"> and really_name = #{reallyName} </if>
+		  		  <if test="username != null and username != ''"> and username = #{username} </if>
+		  		  <if test="password != null"> and password = #{password} </if>
+		  		  <if test="ownerInviteCode != null and ownerInviteCode != ''"> and owner_invite_code = #{ownerInviteCode} </if>
+		  		  <if test="sourceInviteCode != null and sourceInviteCode != ''"> and source_invite_code = #{sourceInviteCode} </if>
+		  		  <if test="totalAmount != null and totalAmount != ''"> and total_amount = #{totalAmount} </if>
+		  		  <if test="freeAmount != null and freeAmount != ''"> and free_amount = #{freeAmount} </if>
+		  		  <if test="lockAmount != null and lockAmount != ''"> and lock_amount = #{lockAmount} </if>
+		  		  <if test="profitAmount != null and profitAmount != ''"> and profit_amount = #{profitAmount} </if>
+		  		  <if test="transitAmount != null and transitAmount != ''"> and transit_amount = #{transitAmount} </if>
+		  		  <if test="level != null and level != ''"> and level = #{level} </if>
+		  		  <if test="commissionRate != null and commissionRate != ''"> and commission_rate = #{commissionRate} </if>
+		  		  <if test="bankNo != null and bankNo != ''"> and bank_no = #{bankNo} </if>
+		  		  <if test="bankName != null and bankName != ''"> and bank_name = #{bankName} </if>
+		  		  <if test="cardNo != null and cardNo != ''"> and card_no = #{cardNo} </if>
+				  <if test="walletAddress != null and walletAddress != ''"> and wallet_address = #{walletAddress} </if>
+		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+ 	<select id="count" resultType="int">
+		select count(*) from zwl_member
+		 <where>
+
+		  		  <if test="nickName != null and nickName != ''"> and nick_name = #{nickName} </if>
+		  		  <if test="username != null and username != ''"> and username = #{username} </if>
+		 </where>
+	</select>
+
+	<insert id="save" parameterType="com.bootdo.system.domain.MemberDO" useGeneratedKeys="true" keyProperty="id">
+		insert into zwl_member
+		(
+			`id`,
+			`nick_name`,
+			`username`,
+			`password`,
+			`create_time`,
+			`owner_invite_code`,
+			`source_invite_code`,
+			`level`,
+			`commission_rate`,
+			`bank_no`,
+			`bank_name`,
+			`card_no`,
+		 	`bank_branch_name`,
+		 	`bank_address`,
+		 	`really_name`
+		)
+		values
+		(
+			#{id},
+			#{nickName},
+			#{username},
+			#{password},
+			#{createTime},
+			#{ownerInviteCode},
+			#{sourceInviteCode},
+			#{level},
+			#{commissionRate},
+			#{bankNo},
+			#{bankName},
+			#{cardNo},
+		 	#{bankBranchName},
+			#{bankAddress},
+			#{reallyName}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.bootdo.system.domain.MemberDO">
+		update zwl_member
+		<set>
+			<if test="nickName != null">`nick_name` = #{nickName}, </if>
+			<if test="username != null">`username` = #{username}, </if>
+			<if test="password != null">`password` = #{password}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="ownerInviteCode != null">`owner_invite_code` = #{ownerInviteCode}, </if>
+			<if test="sourceInviteCode != null">`source_invite_code` = #{sourceInviteCode}, </if>
+			<if test="totalAmount != null">`total_amount` = #{totalAmount}, </if>
+			<if test="freeAmount != null">`free_amount` = #{freeAmount}, </if>
+			<if test="lockAmount != null">`lock_amount` = #{lockAmount}, </if>
+			<if test="profitAmount != null">`profit_amount` = #{profitAmount}, </if>
+			<if test="transitAmount != null">`transit_amount` = #{transitAmount}, </if>
+			<if test="commissionRate != null">`commission_rate` = #{commissionRate}, </if>
+			<if test="bankNo != null">`bank_no` = #{bankNo}, </if>
+			<if test="bankName != null">`bank_name` = #{bankName}, </if>
+			<if test="cardNo != null">`card_no` = #{cardNo},</if>
+			<if test="reallyName != null">`really_name` = #{reallyName},</if>
+			<if test="bankAddress != null">`bank_address` = #{bankAddress},</if>
+			<if test="bankBranchName != null">`bank_branch_name` = #{bankBranchName},</if>
+			<if test="teamProfitAmount != null">`team_profit_amount` = #{teamProfitAmount},</if>
+			<if test="dayProfitAmount != null">`day_profit_amount` = #{dayProfitAmount},</if>
+			<if test="walletAddress != null and walletAddress != ''">wallet_address = #{walletAddress} </if>
+			<if test="aiFreeAmount != null and aiFreeAmount != ''">ai_free_amount = #{aiFreeAmount} </if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<delete id="remove">
+		delete from zwl_member where id = #{value}
+	</delete>
+
+	<delete id="batchRemove">
+		delete from zwl_member where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<update id="updateMemberMoney" parameterType="com.bootdo.system.domain.MemberDO">
+		update zwl_member set total_amount = total_amount + #{amount},  free_amount = free_amount + #{amount}
+		where id = #{mid}
+	</update>
+
+
+	<update id="updateMemberAiFreeAmount" parameterType="com.bootdo.system.domain.MemberDO">
+		update zwl_member set ai_free_amount = ai_free_amount - #{amount}
+		where id = #{mid}
+	</update>
+
+	<select id="getTotalIncome" resultType="string">
+		select sum(amount) from zwl_trade_log where type = 'invest_money' and status = 'finished' and mid = #{mid};
+	</select>
+
+	<select id="getTotalOutcome" resultType="string">
+		select sum(amount) from zwl_trade_log where type = 'withdraw' and status = 'finished' and mid = #{mid};
+	</select>
+</mapper>

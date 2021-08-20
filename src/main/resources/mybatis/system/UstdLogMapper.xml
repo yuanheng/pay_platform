@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.system.dao.UstdLogDao">
+
+	<select id="get" resultType="com.bootdo.system.domain.UstdLogDO">
+		select `id`,`mid`,`no`,`amount`,`status`,`remark`,`source`,`target`,`create_time`,`finished_time`,`cny_price`,`total_amount`,`profile_amount`,`back_total_amount`,`operator`,`username`, `bank_name`, `bank_branch`, `bank_no`,`really_name` from zwl_ustd_log where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.system.domain.UstdLogDO">
+		select `id`,`mid`,`no`,`amount`,`status`,`remark`,`source`,`target`,`create_time`,`finished_time`,`cny_price`,`total_amount`,`profile_amount`,`back_total_amount`,`operator`,`username`, `bank_name`, `bank_branch`, `bank_no`,`really_name`  from zwl_ustd_log
+        <where>
+			<if test="mid != null and mid != ''"> and mid = #{mid} </if>
+			<if test="no != null and no != ''"> and no = #{no} </if>
+			<if test="username != null and username != ''"> and username = #{username} </if>
+			<if test="reallyName != null and reallyName != ''"> and really_name = #{reallyName} </if>
+			<if test="app != null and app == 'app'">and current_date =  #{currentDate}</if>
+		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+ 	<select id="count" resultType="int">
+		select count(*) from zwl_ustd_log
+		 <where>
+			 <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+			 <if test="no != null and no != ''"> and no = #{no} </if>
+			 <if test="username != null and username != ''"> and username = #{username} </if>
+			 <if test="reallyName != null and reallyName != ''"> and really_name = #{reallyName} </if>
+		 </where>
+	</select>
+
+	<insert id="save" parameterType="com.bootdo.system.domain.UstdLogDO">
+		insert into zwl_ustd_log
+		(
+			`mid`,
+			`no`,
+			`amount`,
+			`status`,
+			`source`,
+			`target`,
+			`create_time`,
+			`cny_price`,
+			`total_amount`,
+			`profile_amount`,
+			`operator`,
+			`username`,
+			`bank_name`,
+			`bank_branch`,
+			`bank_no`,
+			`really_name`,
+			`current_date`
+		)
+		values
+		(
+			#{mid},
+			#{no},
+			#{amount},
+			#{status},
+			#{source},
+			#{target},
+			#{createTime},
+			#{cnyPrice},
+			#{totalAmount},
+			#{profileAmount},
+			#{operator},
+			#{username},
+			#{bankName},
+			#{bankBranch},
+			#{bankNo},
+			#{reallyName},
+		    #{currentDate}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.bootdo.system.domain.UstdLogDO">
+		update zwl_ustd_log
+		<set>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="operator != null">`operator` = #{operator}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<update id="auditing" parameterType="com.bootdo.system.domain.UstdLogDO">
+		update zwl_ustd_log set  status = #{status} + 1,  operator = #{operator} where id = #{id} and status = #{status}
+	</update>
+
+	<delete id="remove">
+		delete from zwl_ustd_log where id = #{value}
+	</delete>
+
+	<delete id="batchRemove">
+		delete from zwl_ustd_log where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

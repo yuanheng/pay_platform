@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.system.dao.MemberLevelDao">
+
+	<select id="get" resultType="com.bootdo.system.domain.MemberLevelDO">
+		select `id`,`mid`,`parent_mid`,`grand_mid`,`great_mid`,`status`,`remark`,`type`,`level1`,`level2`,`level3` from zwl_member_level where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.system.domain.MemberLevelDO">
+		select `id`,`mid`,`parent_mid`,`grand_mid`,`great_mid`,`status`,`remark`,`type`,`level1`,`level2`,`level3` from zwl_member_level
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="parentMid != null and parentMid != ''"> and parent_mid = #{parentMid} </if>
+		  		  <if test="grandMid != null and grandMid != ''"> and grand_mid = #{grandMid} </if>
+				  <if test="greatMid != null and greatMid != ''"> and great_mid = #{greatMid} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="level1 != null and level1 != ''"> and level1 = #{level1} </if>
+		  		  <if test="level2 != null and level2 != ''"> and level2 = #{level2} </if>
+			      <if test="level3 != null and level3 != ''"> and level3 = #{level3} </if>
+		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from zwl_member_level
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="parentMid != null and parentMid != ''"> and parent_mid = #{parentMid} </if>
+		  		  <if test="grandMid != null and grandMid != ''"> and grand_mid = #{grandMid} </if>
+			 	  <if test="greatMid != null and greatMid != ''"> and great_mid = #{greatMid} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="level1 != null and level1 != ''"> and level1 = #{level1} </if>
+		  		  <if test="level2 != null and level2 != ''"> and level2 = #{level2} </if>
+			     <if test="level3 != null and level3 != ''"> and level3 = #{level3} </if>
+		 </where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.system.domain.MemberLevelDO" useGeneratedKeys="true" keyProperty="id">
+		insert into zwl_member_level
+		(
+			`mid`, 
+			`parent_mid`, 
+			`grand_mid`,
+		 	`great_mid`,
+			`status`, 
+			`remark`, 
+			`type`
+		)
+		values
+		(
+			#{mid}, 
+			#{parentMid}, 
+			#{grandMid},
+		 	#{greatMid},
+			#{status}, 
+			#{remark}, 
+			#{type}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.system.domain.MemberLevelDO">
+		update zwl_member_level 
+		<set>
+			<if test="mid != null">`mid` = #{mid}, </if>
+			<if test="parentMid != null">`parent_mid` = #{parentMid}, </if>
+			<if test="grandMid != null">`grand_mid` = #{grandMid}, </if>
+			<if test="greatMid != null">`great_mid` = #{grandMid}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="level1 != null">`level1` = #{level1}, </if>
+			<if test="level2 != null">`level2` = #{level2},</if>
+			<if test="level3 != null">`level3` = #{level3}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from zwl_member_level where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from zwl_member_level where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<update id="updateMemberLevel" parameterType="com.bootdo.system.domain.MemberLevelDO">
+		update zwl_member_level set status = #{status} where mid = #{mid};
+	</update>
+
+	<update id="updateLeve1Num" parameterType="com.bootdo.system.domain.MemberLevelDO">
+		update zwl_member_level set level1 = level1 + 1 where mid = #{parentMid};
+	</update>
+
+	<update id="updateLeve2Num" parameterType="com.bootdo.system.domain.MemberLevelDO">
+		update zwl_member_level set level2 = level2 + 1 where mid = #{grandMid};
+	</update>
+
+	<update id="updateLeve3Num" parameterType="com.bootdo.system.domain.MemberLevelDO">
+		update zwl_member_level set level3 = level3 + 1 where mid = #{greatMid};
+	</update>
+
+
+
+	<select id="getChildrenMember" resultType="com.bootdo.system.domain.MemberLevelDO">
+		select `id`,`mid`,`parent_mid`,`grand_mid`,`great_mid`,`status`,`remark`,`type`,`level1`,`level2`,`level3` from zwl_member_level
+		<where>
+			(parent_mid = #{mid} or grand_mid = #{mid} or great_mid = #{mid}) and status = 'enable'
+		</where>
+
+	</select>
+
+
+	<update id="updateMemberVipLevel" parameterType="com.bootdo.system.domain.MemberDO">
+		update zwl_member set level = #{level} where id = #{id};
+	</update>
+</mapper>

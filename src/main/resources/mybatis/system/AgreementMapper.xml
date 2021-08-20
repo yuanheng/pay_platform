@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.system.dao.AgreementDao">
+
+	<select id="get" resultType="com.bootdo.system.domain.AgreementDO">
+		select `id`,`mid`,`type`,`start_time`,`end_time`,`percent`,`mobile`,`status`,`amount`,`free_amount` from zwl_agreement where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.system.domain.AgreementDO">
+		select `id`,`mid`,`type`,`start_time`,`end_time`,`percent`,`mobile`,`status`,`amount`,`free_amount` from zwl_agreement
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="startTime != null"> and start_time = #{startTime} </if>
+		  		  <if test="endTime != null"> and end_time &gt; #{endTime} </if>
+		  		  <if test="percent != null and percent != ''"> and percent = #{percent} </if>
+		  		  <if test="mobile != null and mobile != ''"> and mobile = #{mobile} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="amount != null and amount != ''"> and amount = #{amount} </if>
+		  		  <if test="freeAmount != null and freeAmount != ''"> and free_amount = #{freeAmount} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from zwl_agreement
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="startTime != null and startTime != ''"> and start_time = #{startTime} </if>
+		  		  <if test="endTime != null and endTime != ''"> and end_time = #{endTime} </if>
+		  		  <if test="percent != null and percent != ''"> and percent = #{percent} </if>
+		  		  <if test="mobile != null and mobile != ''"> and mobile = #{mobile} </if>
+		  		  <if test="status != null and status != ''"> and status = #{status} </if>
+		  		  <if test="amount != null and amount != ''"> and amount = #{amount} </if>
+		  		  <if test="freeAmount != null and freeAmount != ''"> and free_amount = #{freeAmount} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.system.domain.AgreementDO" useGeneratedKeys="true" keyProperty="id">
+		insert into zwl_agreement
+		(
+			`mid`, 
+			`type`, 
+			`start_time`, 
+			`end_time`, 
+			`percent`, 
+			`mobile`, 
+			`status`, 
+			`amount`, 
+			`free_amount`
+		)
+		values
+		(
+			#{mid}, 
+			#{type}, 
+			#{startTime}, 
+			#{endTime}, 
+			#{percent}, 
+			#{mobile}, 
+			#{status}, 
+			#{amount}, 
+			#{freeAmount}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.system.domain.AgreementDO">
+		update zwl_agreement 
+		<set>
+			<if test="mid != null">`mid` = #{mid}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="startTime != null">`start_time` = #{startTime}, </if>
+			<if test="endTime != null">`end_time` = #{endTime}, </if>
+			<if test="percent != null">`percent` = #{percent}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="amount != null">`amount` = #{amount}, </if>
+			<if test="freeAmount != null">`free_amount` = #{freeAmount}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from zwl_agreement where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from zwl_agreement where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+
+
+	<select id="getExpireAgreements" resultType="com.bootdo.system.domain.AgreementDO">
+		select `id`,`mid`,`type`,`start_time`,`end_time`,`percent`,`mobile`,`status`,`amount`,`free_amount` from zwl_agreement
+		<where>
+			end_time &lt;=  #{endTime}
+			and status = 'enable'
+		</where>
+
+	</select>
+
+
+	<select id="getMemberAgreement" resultType="com.bootdo.system.domain.AgreementDO">
+		select `id`,`mid`,`type`,`start_time`,`end_time`,`percent`,`mobile`,`status`,`amount`,`free_amount` from zwl_agreement
+		<where>
+			end_time &gt;  #{endTime}
+			and status = 'enable'
+			and mid = #{mid}
+		</where>
+
+	</select>
+
+
+</mapper>

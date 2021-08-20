@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+						<input id="id" name="id" th:value="${withdraw.id}"  type="hidden">
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">会员id：</label>
+								<div class="col-sm-8">
+									<input id="mid" name="mid" th:value="${withdraw.mid}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">提现额度：</label>
+								<div class="col-sm-8">
+									<input id="amount" name="amount" th:value="${withdraw.amount}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">银行卡号：</label>
+								<div class="col-sm-8">
+									<input id="bankNo" name="bankNo" th:value="${withdraw.bankNo}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">收款人姓名：</label>
+								<div class="col-sm-8">
+									<input id="bankName" name="bankName" th:value="${withdraw.bankName}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">第三方账号：</label>
+								<div class="col-sm-8">
+									<input id="thirdAccount" name="thirdAccount" th:value="${withdraw.thirdAccount}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">微信或支付宝：</label>
+								<div class="col-sm-8">
+									<input id="thirdType" name="thirdType" th:value="${withdraw.thirdType}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">提现时间：</label>
+								<div class="col-sm-8">
+									<input id="createTime" name="createTime" th:value="${withdraw.createTime}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">完成时间：</label>
+								<div class="col-sm-8">
+									<input id="finishedTime" name="finishedTime" th:value="${withdraw.finishedTime}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">备注：</label>
+								<div class="col-sm-8">
+									<input id="remark" name="remark" th:value="${withdraw.remark}" class="form-control" type="text">
+								</div>
+							</div>
+														<div class="form-group">	
+								<label class="col-sm-3 control-label">交易id：</label>
+								<div class="col-sm-8">
+									<input id="tradeId" name="tradeId" th:value="${withdraw.tradeId}" class="form-control" type="text">
+								</div>
+							</div>
+																					<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="submit" class="btn btn-primary">提交</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+	</div>
+	</div>
+	<div th:include="include::footer"></div>
+	<script type="text/javascript" src="/js/appjs/system/withdraw/edit.js">
+	</script>
+</body>
+</html>
