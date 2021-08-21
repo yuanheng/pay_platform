@@ -13,12 +13,18 @@ public class Constant {
     public static String OA_NOTIFY_READ_NO = "0";
     //通知公告阅读状态-已读
     public static int OA_NOTIFY_READ_YES = 1;
+
+    /**
+     * 常规肯定
+     */
+    public static int YES = 1;
+
     //部门根节点id
     public static Long DEPT_ROOT_ID = 0l;
     //缓存方式
-    public static String CACHE_TYPE_REDIS ="redis";
+    public static String CACHE_TYPE_REDIS = "redis";
 
     public static String LOG_ERROR = "error";
 
-    
+
 }

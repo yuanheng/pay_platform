@@ -70,7 +70,6 @@ public class Result<T> implements Serializable {
 	}
 
 
-
 	public static Result ok(Object data){
     	return new Result(data, SUCCESS_MSG, SUCCESS_CODE);
 	}

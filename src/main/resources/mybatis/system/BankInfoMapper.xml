@@ -55,8 +55,7 @@
 	<insert id="save" parameterType="com.bootdo.system.domain.BankInfoDO">
 		insert into rs_bank_info
 		(
-			`id`, 
-			`mid`, 
+			`mid`,
 			`name`, 
 			`status`, 
 			`min_amount`, 
@@ -69,8 +68,7 @@
 		)
 		values
 		(
-			#{id}, 
-			#{mid}, 
+			#{mid},
 			#{name}, 
 			#{status}, 
 			#{minAmount}, 

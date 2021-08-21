@@ -43,7 +43,7 @@ public class NumberUtil {
         }
         BigDecimal num1 = new BigDecimal(str1);
         BigDecimal num2 = new BigDecimal(str2);
-        BigDecimal result = num1.divide(num2, 4,BigDecimal.ROUND_DOWN);
+        BigDecimal result = num1.divide(num2, 2,BigDecimal.ROUND_DOWN);
         return result.toPlainString();
     }
 

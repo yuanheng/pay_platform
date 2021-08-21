@@ -3,6 +3,7 @@ package com.bootdo.system.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.bootdo.common.utils.ShiroUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -73,7 +74,8 @@ public class BankInfoController {
 	@ResponseBody
 	@PostMapping("/save")
 	@RequiresPermissions("system:bankInfo:add")
-	public R save( BankInfoDO bankInfo){
+	public R save(BankInfoDO bankInfo){
+		bankInfo.setMid(ShiroUtils.getUserId());
 		if(bankInfoService.save(bankInfo)>0){
 			return R.ok();
 		}

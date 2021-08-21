@@ -16,7 +16,7 @@ public class OrderDO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	//
-	private Integer id;
+	private Long id;
 	//
 	private String orderNo;
 	//商户No
@@ -27,32 +27,49 @@ public class OrderDO implements Serializable {
 	private String reallyAmount;
 	//创建时间
 	private Date createTime;
+
 	//支付完成
 	private Date finishTime;
-	//状态 
-待支付 pre_pay
-已支付 finished_pay
-已取消 cancel
-回调成功 callback_success
-回调失败 callback_failed
+	//状态
 	private String status;
+
 	//收款信息
 	private String paymentInfo;
+
 	//备注信息
 	private String remark;
 
-	/**
-	 * 设置：
-	 */
-	public void setId(Integer id) {
-		this.id = id;
+	private Long mid;
+
+	private String payType;
+
+	private String merchantOrderNo;
+
+
+	public String getPayType() {
+		return payType;
 	}
-	/**
-	 * 获取：
-	 */
-	public Integer getId() {
+
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+
+	public Long getId() {
 		return id;
 	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getMid() {
+		return mid;
+	}
+
+	public void setMid(Long mid) {
+		this.mid = mid;
+	}
+
 	/**
 	 * 设置：
 	 */
@@ -170,5 +187,13 @@ public class OrderDO implements Serializable {
 	 */
 	public String getRemark() {
 		return remark;
+	}
+
+	public String getMerchantOrderNo() {
+		return merchantOrderNo;
+	}
+
+	public void setMerchantOrderNo(String merchantOrderNo) {
+		this.merchantOrderNo = merchantOrderNo;
 	}
 }

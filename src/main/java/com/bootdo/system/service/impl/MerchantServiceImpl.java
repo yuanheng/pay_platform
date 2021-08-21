@@ -1,8 +1,12 @@
 package com.bootdo.system.service.impl;
 
+import com.bootdo.app.zwlenum.StatusEnum;
+import com.bootdo.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +38,8 @@ public class MerchantServiceImpl implements MerchantService {
 	
 	@Override
 	public int save(MerchantDO merchant){
+		merchant.setCreateTime(new Date());
+		merchant.setStatus(StatusEnum.ENABLE.getKey());
 		return merchantDao.save(merchant);
 	}
 	
@@ -51,5 +57,35 @@ public class MerchantServiceImpl implements MerchantService {
 	public int batchRemove(Integer[] ids){
 		return merchantDao.batchRemove(ids);
 	}
-	
+
+	@Override
+	public MerchantDO getByMerchantNo(String merchantNo) {
+		if (StringUtils.isEmpty(merchantNo)) {
+			throw new IllegalArgumentException("merchantNo must be not empty");
+		}
+		Map<String, Object> params = new HashMap();
+		params.put("merchantNo",merchantNo);
+		params.put("status", StatusEnum.ENABLE.getKey());
+		List<MerchantDO> list = list(params);
+		if (list != null && list.size() > 0) {
+			return list.get(0);
+		}
+		return null;
+	}
+
+	@Override
+	public MerchantDO getByMid(Long userId) {
+		if (userId == null || userId < 0) {
+			throw new IllegalArgumentException("merchantNo must be not empty");
+		}
+		Map<String, Object> params = new HashMap();
+		params.put("mid",userId);
+		params.put("status", StatusEnum.ENABLE.getKey());
+		List<MerchantDO> list = list(params);
+		if (list != null && list.size() > 0) {
+			return list.get(0);
+		}
+		return null;
+	}
+
 }

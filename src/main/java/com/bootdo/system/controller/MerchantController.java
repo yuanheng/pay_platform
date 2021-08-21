@@ -73,7 +73,7 @@ public class MerchantController {
 	@ResponseBody
 	@PostMapping("/save")
 	@RequiresPermissions("system:merchant:add")
-	public R save( MerchantDO merchant){
+	public R save(MerchantDO merchant){
 		if(merchantService.save(merchant)>0){
 			return R.ok();
 		}

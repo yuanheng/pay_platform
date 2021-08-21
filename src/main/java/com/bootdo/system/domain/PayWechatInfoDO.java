@@ -16,9 +16,9 @@ public class PayWechatInfoDO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	//主键
-	private Integer id;
+	private Long id;
 	//码商id
-	private Integer mid;
+	private Long mid;
 	//收款人
 	private String name;
 	//
@@ -35,30 +35,22 @@ public class PayWechatInfoDO implements Serializable {
 
 	private String remark;
 
-	/**
-	 * 设置：主键
-	 */
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	/**
-	 * 获取：主键
-	 */
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
-	/**
-	 * 设置：码商id
-	 */
-	public void setMid(Integer mid) {
-		this.mid = mid;
+
+	public void setId(Long id) {
+		this.id = id;
 	}
-	/**
-	 * 获取：码商id
-	 */
-	public Integer getMid() {
+
+	public Long getMid() {
 		return mid;
 	}
+
+	public void setMid(Long mid) {
+		this.mid = mid;
+	}
+
 	/**
 	 * 设置：收款人
 	 */

@@ -16,11 +16,11 @@ public class MerchantDO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	//主键
-	private Integer id;
+	private Long id;
 	//商户号
 	private String merchantNo;
 	//用户id
-	private Integer mid;
+	private Long mid;
 	//秘钥
 	private String secretKey;
 	//回调接口
@@ -30,18 +30,32 @@ public class MerchantDO implements Serializable {
 	//创新时间
 	private Date createTime;
 
-	/**
-	 * 设置：主键
-	 */
-	public void setId(Integer id) {
-		this.id = id;
+  private String status;
+
+	public String getStatus() {
+		return status;
 	}
-	/**
-	 * 获取：主键
-	 */
-	public Integer getId() {
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public Long getId() {
 		return id;
 	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getMid() {
+		return mid;
+	}
+
+	public void setMid(Long mid) {
+		this.mid = mid;
+	}
+
 	/**
 	 * 设置：商户号
 	 */
@@ -54,18 +68,7 @@ public class MerchantDO implements Serializable {
 	public String getMerchantNo() {
 		return merchantNo;
 	}
-	/**
-	 * 设置：用户id
-	 */
-	public void setMid(Integer mid) {
-		this.mid = mid;
-	}
-	/**
-	 * 获取：用户id
-	 */
-	public Integer getMid() {
-		return mid;
-	}
+
 	/**
 	 * 设置：秘钥
 	 */

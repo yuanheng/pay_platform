@@ -27,4 +27,8 @@ public interface MerchantService {
 	int remove(Integer id);
 	
 	int batchRemove(Integer[] ids);
+
+  MerchantDO getByMerchantNo(String merchantNo);
+
+  MerchantDO getByMid(Long userId);
 }

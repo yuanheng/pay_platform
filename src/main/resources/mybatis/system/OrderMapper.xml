@@ -4,23 +4,20 @@
 <mapper namespace="com.bootdo.system.dao.OrderDao">
 
 	<select id="get" resultType="com.bootdo.system.domain.OrderDO">
-		select `id`,`order_no`,`merchant_no`,`amount`,`really_amount`,`create_time`,`finish_time`,`status`,`payment_info`,`remark` from rs_order where id = #{value}
+		select `id`,`order_no`,`merchant_no`,`amount`,`really_amount`,`create_time`,`finish_time`,`status`,`payment_info`,`remark`,`merchant_order_no`,`mid`, `pay_type` from rs_order where id = #{value}
 	</select>
 
 	<select id="list" resultType="com.bootdo.system.domain.OrderDO">
-		select `id`,`order_no`,`merchant_no`,`amount`,`really_amount`,`create_time`,`finish_time`,`status`,`payment_info`,`remark` from rs_order
-        <where>  
-		  		  <if test="id != null and id != ''"> and id = #{id} </if>
-		  		  <if test="orderNo != null and orderNo != ''"> and order_no = #{orderNo} </if>
-		  		  <if test="merchantNo != null and merchantNo != ''"> and merchant_no = #{merchantNo} </if>
-		  		  <if test="amount != null and amount != ''"> and amount = #{amount} </if>
-		  		  <if test="reallyAmount != null and reallyAmount != ''"> and really_amount = #{reallyAmount} </if>
-		  		  <if test="createTime != null and createTime != ''"> and create_time = #{createTime} </if>
-		  		  <if test="finishTime != null and finishTime != ''"> and finish_time = #{finishTime} </if>
-		  		  <if test="status != null and status != ''"> and status = #{status} </if>
-		  		  <if test="paymentInfo != null and paymentInfo != ''"> and payment_info = #{paymentInfo} </if>
-		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
-		  		</where>
+		select `id`,`order_no`,`merchant_no`,`amount`,`really_amount`,`create_time`,`finish_time`,`status`,`payment_info`,`remark`,`merchant_order_no`,`mid`, `pay_type` from rs_order
+        <where>
+			<if test="id != null and id != ''"> and id = #{id} </if>
+			<if test="orderNo != null and orderNo != ''"> and order_no = #{orderNo} </if>
+			<if test="merchantNo != null and merchantNo != ''"> and merchant_no = #{merchantNo} </if>
+			<if test="merchantOrderNo != null and merchantOrderNo != ''"> and merchant_order_no = #{merchantOrderNo} </if>
+			<if test="status != null and status != ''"> and status = #{status} </if>
+			<if test="roleId != null and app == 60">and merchant_no = #{merchantNo}</if>
+			<if test="roleId != null and app == 61">and mid = #{mid}</if>
+		</where>
         <choose>
             <when test="sort != null and sort.trim() != ''">
                 order by ${sort} ${order}
@@ -36,24 +33,20 @@
 	
  	<select id="count" resultType="int">
 		select count(*) from rs_order
-		 <where>  
-		  		  <if test="id != null and id != ''"> and id = #{id} </if>
-		  		  <if test="orderNo != null and orderNo != ''"> and order_no = #{orderNo} </if>
-		  		  <if test="merchantNo != null and merchantNo != ''"> and merchant_no = #{merchantNo} </if>
-		  		  <if test="amount != null and amount != ''"> and amount = #{amount} </if>
-		  		  <if test="reallyAmount != null and reallyAmount != ''"> and really_amount = #{reallyAmount} </if>
-		  		  <if test="createTime != null and createTime != ''"> and create_time = #{createTime} </if>
-		  		  <if test="finishTime != null and finishTime != ''"> and finish_time = #{finishTime} </if>
-		  		  <if test="status != null and status != ''"> and status = #{status} </if>
-		  		  <if test="paymentInfo != null and paymentInfo != ''"> and payment_info = #{paymentInfo} </if>
-		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
-		  		</where>
+		 <where>
+			 <if test="id != null and id != ''"> and id = #{id} </if>
+			 <if test="orderNo != null and orderNo != ''"> and order_no = #{orderNo} </if>
+			 <if test="merchantNo != null and merchantNo != ''"> and merchant_no = #{merchantNo} </if>
+			 <if test="merchantOrderNo != null and merchantOrderNo != ''"> and merchant_order_no = #{merchantOrderNo} </if>
+			 <if test="status != null and status != ''"> and status = #{status} </if>
+			 <if test="roleId != null and app == 60">and merchant_no = #{merchantNo}</if>
+			 <if test="roleId != null and app == 61">and mid = #{mid}</if>
+		</where>
 	</select>
 	 
 	<insert id="save" parameterType="com.bootdo.system.domain.OrderDO">
 		insert into rs_order
 		(
-			`id`, 
 			`order_no`, 
 			`merchant_no`, 
 			`amount`, 
@@ -62,11 +55,14 @@
 			`finish_time`, 
 			`status`, 
 			`payment_info`, 
-			`remark`
+			`remark`,
+		 	`mid`,
+			`merchant_order_no`,
+			`pay_type`
+
 		)
 		values
 		(
-			#{id}, 
 			#{orderNo}, 
 			#{merchantNo}, 
 			#{amount}, 
@@ -75,7 +71,10 @@
 			#{finishTime}, 
 			#{status}, 
 			#{paymentInfo}, 
-			#{remark}
+			#{remark},
+			#{mid},
+			#{merchantOrderNo},
+			#{payType}
 		)
 	</insert>
 	 

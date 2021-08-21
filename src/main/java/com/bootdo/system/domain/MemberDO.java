@@ -1,10 +1,6 @@
 package com.bootdo.system.domain;
 
 
-import com.bootdo.coin.model.account.Account;
-import com.bootdo.coin.model.account.AccountBalance;
-import com.bootdo.coin.model.account.Balance;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;

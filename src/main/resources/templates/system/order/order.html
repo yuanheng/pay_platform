@@ -8,21 +8,17 @@
 			<div class="ibox">
 				<div class="ibox-body">
 					<div class="fixed-table-toolbar">
+
+						<div class="columns pull-left col-md-2 nopadding">
+							平台订单号：<input id="searchOrderNo" type="text" class="form-control"
+								   placeholder="">
+						</div>
+						<div class="columns pull-left col-md-2 nopadding">
+							商户订单号：<input id="searchMechantOrderNo" type="text" class="form-control"
+										 placeholder="">
+						</div>
 						<div class="columns pull-left">
-							<button shiro:hasPermission="system:order:add" type="button" class="btn  btn-primary" onclick="add()">
-								<i class="fa fa-plus" aria-hidden="true"></i>添加
-							</button>
-							<button shiro:hasPermission="system:order:batchRemove" type="button" class="btn  btn-danger"
-								onclick="batchRemove()">
-								<i class="fa fa-trash" aria-hidden="true"></i>删除
-							</button>
-						</div>
-						<div class="columns pull-right">
 							<button class="btn btn-success" onclick="reLoad()">查询</button>
-						</div>
-						<div class="columns pull-right col-md-2 nopadding">
-							<input id="searchName" type="text" class="form-control"
-								placeholder="">
 						</div>
 					</div>
 					<table id="exampleTable" data-mobile-responsive="true">

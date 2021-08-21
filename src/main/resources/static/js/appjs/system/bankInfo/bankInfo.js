@@ -61,15 +61,15 @@ function load() {
 								},
 																{
 									field : 'status', 
-									title : '' 
+									title : '状态'
 								},
 																{
 									field : 'minAmount', 
-									title : '' 
+									title : '最小收款金额（元）'
 								},
 																{
 									field : 'maxAmount', 
-									title : '' 
+									title : '最大收款金额（元）'
 								},
 																{
 									field : 'account', 

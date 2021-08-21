@@ -32,81 +32,89 @@ function load() {
 							return {
 								//说明：传入后台的参数包括offset开始索引，limit步长，sort排序列，order：desc或者,以及所有列的键值对
 								limit: params.limit,
-								offset:params.offset
-					           // name:$('#searchName').val(),
-					           // username:$('#searchName').val()
+								offset:params.offset,
+								orderNo:$('#searchOrderNo').val(),
+								merchantOrderNo:$('#searchMechantOrderNo').val()
 							};
 						},
-						// //请求服务器数据时，你可以通过重写参数的方式添加一些额外的参数，例如 toolbar 中的参数 如果
-						// queryParamsType = 'limit' ,返回参数必须包含
-						// limit, offset, search, sort, order 否则, 需要包含:
-						// pageSize, pageNumber, searchText, sortName,
-						// sortOrder.
-						// 返回false将会终止请求
 						columns : [
 								{
 									checkbox : true
-								},
-																{
+								}, {
 									field : 'id', 
-									title : '' 
-								},
-																{
+									title : '序号'
+								}, {
 									field : 'orderNo', 
-									title : '' 
-								},
-																{
-									field : 'merchantNo', 
-									title : '商户No' 
-								},
-																{
+									title : '平台订单No'
+								}, {
+									field : 'merchantOrderNo',
+									title : '商户订单No'
+								}, {
 									field : 'amount', 
-									title : '订单额度' 
-								},
-																{
+									title : '订单额度(元)',
+									formatter : function(value, row, index) {
+										return value * 1.0/100;
+									}
+								}, {
 									field : 'reallyAmount', 
-									title : '实际支付额度' 
-								},
-																{
+									title : '实际支付额度(元)',
+									formatter : function(value, row, index) {
+										return value * 1.0/100;
+									}
+								}, {
 									field : 'createTime', 
 									title : '创建时间' 
-								},
-																{
+								}, {
 									field : 'finishTime', 
 									title : '支付完成' 
-								},
-																{
+								}, {
 									field : 'status', 
-									title : '状态 
-待支付 pre_pay
-已支付 finished_pay
-已取消 cancel
-回调成功 callback_success
-回调失败 callback_failed' 
-								},
-																{
+									title : '状态',
+									formatter : function(value, row, index) {
+										if (value == "pre_pay"){
+											return "待支付";
+										} else if (value == "finished_pay") {
+											return "支付完成";
+										} else if (value == "callback_success") {
+											return "回调成功";
+										} else if (value == "callback_failed") {
+											return "回调失败";
+										} else if (value == "canceled") {
+											return "已取消";
+										}
+									}
+								}, {
+									field : 'payType',
+									title : '收款方式',
+									formatter : function(value, row, index) {
+										if (value == 'bank') {
+											return "银行卡";
+										} else if (value == "wechat"){
+											return "微信扫码";
+										} else if (value == "alipay") {
+											return  "支付宝扫码";
+										}
+									}
+								}, {
 									field : 'paymentInfo', 
-									title : '收款信息' 
-								},
-																{
-									field : 'remark', 
-									title : '备注信息' 
-								},
-																{
+									title : '收款信息' ,
+									formatter : function(value, row, index) {
+										var text = '<span title="'+value+'">查看收款信息</span>'
+										return text;
+									}
+								}, {
 									title : '操作',
 									field : 'id',
 									align : 'center',
 									formatter : function(value, row, index) {
 										var e = '<a class="btn btn-primary btn-sm '+s_edit_h+'" href="#" mce_href="#" title="编辑" onclick="edit(\''
 												+ row.id
-												+ '\')"><i class="fa fa-edit"></i></a> ';
-										var d = '<a class="btn btn-warning btn-sm '+s_remove_h+'" href="#" title="删除"  mce_href="#" onclick="remove(\''
-												+ row.id
-												+ '\')"><i class="fa fa-remove"></i></a> ';
+												+ '\')"><i class="fa fa-edit"></i>确认收款</a> ';
+
 										var f = '<a class="btn btn-success btn-sm" href="#" title="备用"  mce_href="#" onclick="resetPwd(\''
 												+ row.id
-												+ '\')"><i class="fa fa-key"></i></a> ';
-										return e + d ;
+												+ '\')"><i class="fa fa-key"></i>发起回调</a> ';
+										return e +f;
 									}
 								} ]
 					});

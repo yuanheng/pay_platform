@@ -1,8 +1,15 @@
 package com.bootdo.system.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.bootdo.common.utils.ShiroUtils;
+import com.bootdo.system.domain.MerchantDO;
+import com.bootdo.system.domain.RoleDO;
+import com.bootdo.system.domain.UserDO;
+import com.bootdo.system.service.MerchantService;
+import com.bootdo.system.service.RoleService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -33,8 +40,12 @@ import com.bootdo.common.utils.R;
 @RequestMapping("/system/order")
 public class OrderController {
 	@Autowired
+	private RoleService roleService;
+	@Autowired
 	private OrderService orderService;
-	
+	@Autowired
+	private MerchantService merchantService;
+
 	@GetMapping()
 	@RequiresPermissions("system:order:order")
 	String Order(){
@@ -45,8 +56,15 @@ public class OrderController {
 	@GetMapping("/list")
 	@RequiresPermissions("system:order:order")
 	public PageUtils list(@RequestParam Map<String, Object> params){
+		//获取当前用户的角色
+		UserDO userDO = ShiroUtils.getUser();
+		List<RoleDO> roles = roleService.list(userDO.getUserId());
+		//暂时通过id 来判断 是否是管理员，商户，码商
+		for (RoleDO role : roles) {
+			params.put("roleId", role.getRoleId());
+		}
 		//查询列表数据
-        Query query = new Query(params);
+		Query query = new Query(params);
 		List<OrderDO> orderList = orderService.list(query);
 		int total = orderService.count(query);
 		PageUtils pageUtils = new PageUtils(orderList, total);

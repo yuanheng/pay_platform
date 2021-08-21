@@ -11,6 +11,8 @@ server:
 
 bootdo:
   uploadPath: /Users/dingbaosheng/uploaded_files/
+  #uploadPath: /Users/charles/provisional/customer/pay_platform/
+  veriCodeNeeded: 0
   username: admin
   password: 111111
 logging:
@@ -21,7 +23,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://140.143.244.246:3306/pay_db?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true
+    url: jdbc:mysql://140.143.244.246:3306/pay_db?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
     username: pay_db
     password: TMeFkzwYxNHARpRk
     initialSize: 1

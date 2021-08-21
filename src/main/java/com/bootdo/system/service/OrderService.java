@@ -1,5 +1,7 @@
 package com.bootdo.system.service;
 
+import com.bootdo.app.global.NotPayInfoException;
+import com.bootdo.app.model.PaymentInfo;
 import com.bootdo.system.domain.OrderDO;
 
 import java.util.List;
@@ -27,4 +29,12 @@ public interface OrderService {
 	int remove(Integer id);
 	
 	int batchRemove(Integer[] ids);
+
+	OrderDO createWechatOrder(PaymentInfo paymentInfo) throws NotPayInfoException;
+
+	OrderDO createAlipayOrder(PaymentInfo paymentInfo) throws NotPayInfoException;
+
+	OrderDO createBankOrder(PaymentInfo paymentInfo) throws NotPayInfoException;
+
+
 }

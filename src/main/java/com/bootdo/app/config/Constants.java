@@ -8,6 +8,15 @@ import java.util.Map;
 
 public class Constants {
 
+    public final static String ORDER_TIMER_KEY = "order_time_key";
+
+    public final static String ORDER_PAY_URL = "order_pay_url";
+
+
+    public final static String PAYMENTINFO_LIST = "{payType}_code_list";
+
+
+
     public final static String PRODUCT_TASK_INFO_QUEUE = "product_task_info_queue";
     public final static String CURRENT_SYMBOL_PRICE_PRE = "current_symbol_price_pre_";
     public final static String COIN_TASK_STATUS_PRE = "coin_task_status_pre_";

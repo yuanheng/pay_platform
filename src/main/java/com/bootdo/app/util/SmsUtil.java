@@ -188,7 +188,7 @@ public class SmsUtil {
 			redisUtils.set(smsCodeKey,dynamicCode,60 * 10);
 			redisUtils.set(mobile,"sending",60);
 			LOGGER.info("已发送短信:内容:" + key + " code :" +dynamicCode +",手机号:" + mobile );
-			String code = AliyunDayuSmsUitl.sendSms(mobile,"潘多拉科技", smsCode, jsonObject.toJSONString());
+			String code = "";
 			if (!code.equals("OK")) {
 				throw new RuntimeException("发送失败");
 			}

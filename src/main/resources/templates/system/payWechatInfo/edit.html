@@ -3,75 +3,80 @@
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
 <body class="gray-bg">
-	<div class="wrapper wrapper-content ">
-		<div class="row">
-			<div class="col-sm-12">
-				<div class="ibox float-e-margins">
-					<div class="ibox-content">
-						<form class="form-horizontal m-t" id="signupForm">
-						<input id="id" name="id" th:value="${payWechatInfo.id}"  type="hidden">
-							<div class="form-group">	
-								<label class="col-sm-3 control-label">码商id：</label>
-								<div class="col-sm-8">
-									<input id="mid" name="mid" th:value="${payWechatInfo.mid}" class="form-control" type="text">
-								</div>
-							</div>
-														<div class="form-group">	
-								<label class="col-sm-3 control-label">收款人：</label>
-								<div class="col-sm-8">
-									<input id="name" name="name" th:value="${payWechatInfo.name}" class="form-control" type="text">
-								</div>
-							</div>
-														<div class="form-group">	
-								<label class="col-sm-3 control-label">：</label>
-								<div class="col-sm-8">
-									<input id="status" name="status" th:value="${payWechatInfo.status}" class="form-control" type="text">
-								</div>
-							</div>
-														<div class="form-group">	
-								<label class="col-sm-3 control-label">二维码地址：</label>
-								<div class="col-sm-8">
-									<input id="imgUrl" name="imgUrl" th:value="${payWechatInfo.imgUrl}" class="form-control" type="text">
-								</div>
-							</div>
-														<div class="form-group">	
-								<label class="col-sm-3 control-label">：</label>
-								<div class="col-sm-8">
-									<input id="minAmount" name="minAmount" th:value="${payWechatInfo.minAmount}" class="form-control" type="text">
-								</div>
-							</div>
-														<div class="form-group">	
-								<label class="col-sm-3 control-label">：</label>
-								<div class="col-sm-8">
-									<input id="maxAmount" name="maxAmount" th:value="${payWechatInfo.maxAmount}" class="form-control" type="text">
-								</div>
-							</div>
-														<div class="form-group">	
-								<label class="col-sm-3 control-label">账号：</label>
-								<div class="col-sm-8">
-									<input id="account" name="account" th:value="${payWechatInfo.account}" class="form-control" type="text">
-								</div>
-							</div>
-														<div class="form-group">	
-								<label class="col-sm-3 control-label">备注
-：</label>
-								<div class="col-sm-8">
-									<input id="remark" name="remark" th:value="${payWechatInfo.remark}" class="form-control" type="text">
-								</div>
-							</div>
-																					<div class="form-group">
-								<div class="col-sm-8 col-sm-offset-3">
-									<button type="submit" class="btn btn-primary">提交</button>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-	</div>
-	</div>
-	<div th:include="include::footer"></div>
-	<script type="text/javascript" src="/js/appjs/system/payWechatInfo/edit.js">
-	</script>
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="signupForm">
+                        <input id="id" name="id" th:value="${payWechatInfo.id}" type="hidden">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">收款人：</label>
+                            <div class="col-sm-8">
+                                <input id="name" name="name" th:value="${payWechatInfo.name}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">状态：</label>
+                            <div class="col-sm-8">
+                                <select id="status" name="status" class="form-control"
+                                        th:field="${payWechatInfo.status}" th:switch="${payWechatInfo.status}">
+                                    <option value="valid" th:selected="${payWechatInfo.status}=='enable'">启用</option>
+                                    <option value="invalid" th:selected="${payWechatInfo.status}=='disable'">禁用</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">收款码（收款码不支持编辑，如需更换，请删除后重新添加）：</label>
+                            <div class="col-sm-8">
+                                <input id="imgUrl" name="imgUrl" th:value="${payWechatInfo.imgUrl}" class="form-control"
+                                       type="hidden">
+                                <img alt="image" class="img-responsive" th:src="${payWechatInfo.imgUrl}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">最小收款金额：</label>
+                            <div class="col-sm-8">
+                                <input id="minAmount" name="minAmount" th:value="${payWechatInfo.minAmount}"
+                                       class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">最大收款金额：</label>
+                            <div class="col-sm-8">
+                                <input id="maxAmount" name="maxAmount" th:value="${payWechatInfo.maxAmount}"
+                                       class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">账号：</label>
+                            <div class="col-sm-8">
+                                <input id="account" name="account" th:value="${payWechatInfo.account}"
+                                       class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">备注
+                                ：</label>
+                            <div class="col-sm-8">
+                                <input id="remark" name="remark" th:value="${payWechatInfo.remark}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <button type="submit" class="btn btn-primary">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript" src="/js/appjs/system/payWechatInfo/edit.js">
+</script>
 </body>
 </html>

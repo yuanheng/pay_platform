@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<style type="text/css">
+	body ,h1{
+		margin: 0;
+		padding: 0;
+	}
+	.title{
+		width: 100%;
+		text-align: center;
+		margin-top: 10px;
+	}
+	.img_box {
+		width: 100%;
+		text-align: center;
+
+	}
+	.img_box img{
+		margin: 0 auto;
+		width: 300px;
+	}
+	.info {
+		text-align: left;
+		width: 90%;
+		margin: 0 auto;
+	}
+	.btn {
+		text-align: center;
+		margin: 0 auto;
+	}
+	.btn a {
+		border: 1px solid #00a3ff;
+		background-color: #00A3FF;
+		color: #fff;
+		border-radius: 1px;
+		width: 90%;
+		height: 40px;
+		line-height: 40px;
+		display: block;
+		margin: 0 auto;
+		text-decoration: none;
+	}
+</style>
+<body>
+	<h1 class="title" th:text="${title}"></h1>
+	<input type="hidden" id="pay_time_second" th:value="${second}">
+	<div th:if="${order.payType eq 'wechat' || order.payType eq 'alipay'}" >
+		<div class="img_box">
+			<img src="http://www.jinjukeji.com/data/upload/image/20190329/1553868824535057.jpg">
+		</div>
+		<div class="info">
+			<p>收款人：<span th:text="${payInfo.name}"</p>
+			<p>转账金额：<span th:text="${reallyAmount}"></span>元</p>
+			<p>请在<span th:text="${minute}"></span>分钟之内支付<p>
+			<p>剩余支付时间：<span id="pay_time"></span><p>
+		</div>
+
+	</div>
+	<div th:if="${order.payType eq 'bank'}" >
+		<div class="info">
+			<p>收款人：<span th:text="${payInfo.name}"></span></p>
+			<p>转账金额：<span th:text="${reallyAmount}"></span>元</p>
+			<p>银行号：<span th:text="${payInfo.account}"></span></p>
+			<p>银行：<span th:text="${payInfo.bankName}"></span></p>
+			<p>请在<span th:text="${minute}"></span>分钟之内支付</p>
+			<p>剩余支付时间：<span id="pay_time"></span><p>
+		</div>
+	</div>
+
+	<div class="btn">
+		<a class="" href="javascript:void(0)" onclick="finished()">我已支付</a>
+	</div>
+	<div class="info">
+		<p>请务必在规定时间内按照指定金额进行转账，以免给您带来不必要的损失。</p>
+	</div>
+<script type="text/javascript">
+	function finished() {
+		if (navigator.userAgent.indexOf("Firefox") != -1 || navigator.userAgent.indexOf("Chrome") !=-1) {
+			window.location.href="about:blank";
+			window.close();
+		} else {
+			window.opener = null;
+			window.open("", "_self");
+			window.close();
+		}
+	}
+	var payTime = document.getElementById('pay_time_second').value;
+
+	function resetTime(timetamp){
+		var timer=null;
+		var t=timetamp;
+		var m=0;
+		var s=0;
+		m=Math.floor(t/60%60);
+		m<10&&(m='0'+m);
+		s=Math.floor(t%60);
+		function countDown(){
+			s--;
+			s<10&&(s='0'+s);
+			if(s.length>=3){
+				s=59;
+				m="0"+(Number(m)-1);
+			}
+			if(m.length>=3){
+				m='00';
+				s='00';
+				clearInterval(timer);
+			}
+			document.getElementById("pay_time").innerHTML = (m+"分"+s+"秒");
+			if(m==0 && s==0){
+				clearInterval(timer);
+			}
+		}
+		timer=setInterval(countDown,1000);
+	}
+	resetTime(payTime);
+</script>
+
+</body>
+</html>

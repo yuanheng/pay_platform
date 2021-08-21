@@ -1,5 +1,6 @@
 package com.bootdo.app.util;
 
+import com.bootdo.app.model.PaymentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,44 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisUtils {
 
+
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
+
+    /**
+     * 放入支付方式
+     *
+     * @param key   键
+     * @return true成功 false失败
+     */
+    public Object getPaymentInfo(String key) {
+        try {
+            Object object = redisTemplate.opsForList().rightPop(key);
+            return object;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    /**
+     * 放入支付方式
+     *
+     * @param key   键
+     * @return true成功 false失败
+     */
+    public boolean addPaymentInfo(String key, Object paymentInfo) {
+        try {
+            redisTemplate.opsForList().leftPush(key, paymentInfo);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
 
 
@@ -703,7 +740,7 @@ public class RedisUtils {
      *
      * @param key   键
      * @param value 值
-     * @param time  时间(秒)
+     * @param
      * @return
      */
 
