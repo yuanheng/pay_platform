@@ -10,31 +10,102 @@
 <body onload="load()">
 <div class="panel panel-default">
 
-    <div style="padding: 10px 0 20px 10px;">
-        <h3>&nbsp;&nbsp;&nbsp;商户信息</h3>
-        <ul>
-            <li>今日收款
-                <span style="color: #00B83F;" id="daily_received"></span>
-            </li>
-            <li>累计收款
-                <span style="color: #3e8f3e;" id="total_received"></span>
-            </li>
-        </ul>
+    <div th:if="${roleType.code == 0}">
+        <div style="padding: 10px 0 20px 10px;">
+            <h3>&nbsp;&nbsp;&nbsp;商户信息</h3>
+            <ul>
+                <li>今日收款
+                    <span style="color: #00B83F;margin-left: 25px;" id="daily_received"></span>
+                </li>
+                <li>累计收款
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="m_total_received"></span>
+                </li>
+            </ul>
 
-        <h3>&nbsp;&nbsp;&nbsp;商户的基本信息</h3>
-        <ul>
-            <li>商户号：
-            </li>
-            <li>
-                秘钥：
-            </li>
-            <li>
-                回调地址：
-            </li>
+            <h4>&nbsp;&nbsp;&nbsp;商户的基本信息</h4>
+            <ul>
+                <li>商户号：
+                    <span style="color: #00B83F;margin-left: 25px;" th:text="${merchantInfo.merchantNo}">商户号</span>
+                </li>
+                <li>
+                    秘钥：
+                    <span style="color: #00B83F;margin-left: 25px;" th:text="${merchantInfo.secretKey}">秘钥</span>
+                </li>
+                <li>
+                    回调地址：
+                    <span style="color: #00B83F;margin-left: 25px;" th:text="${merchantInfo.callbackUrl}">回调地址</span>
+                </li>
+            </ul>
+        </div>
 
-        </ul>
+        <hr>
 
+        <div style="padding: 10px 0 20px 10px;">
+            <h3>&nbsp;&nbsp;&nbsp;码子信息</h3>
+            <ul>
+                <li>累计收款
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_total_received"></span>
+                </li>
+                <li>累计单数
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_total_tx_times"></span>
+                </li>
+                <li>成功单数
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_suc_tx_times"></span>
+                </li>
+                <li>收款成功比例（%）
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_tx_suc_rate"></span>
+                </li>
+            </ul>
+        </div>
     </div>
+    <div th:if="${roleType.code == 1}">
+        <div style="padding: 10px 0 20px 10px;">
+            <h3>&nbsp;&nbsp;&nbsp;商户信息</h3>
+            <ul>
+                <li>今日收款
+                    <span style="color: #00B83F;margin-left: 25px;" id="daily_received"></span>
+                </li>
+                <li>累计收款
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="m_total_received"></span>
+                </li>
+            </ul>
+
+            <h3>&nbsp;&nbsp;&nbsp;商户的基本信息</h3>
+            <ul>
+                <li>商户号：
+                </li>
+                <li>
+                    秘钥：
+                </li>
+                <li>
+                    回调地址：
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div th:if="${roleType.code == 2}">
+        <div style="padding: 10px 0 20px 10px;">
+            <h3>&nbsp;&nbsp;&nbsp;码子信息</h3>
+            <ul>
+                <li>累计收款
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_total_received"></span>
+                </li>
+                <li>累计单数
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_total_tx_times"></span>
+                </li>
+                <li>成功单数
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_suc_tx_times"></span>
+                </li>
+                <li>收款成功比例（%）
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_tx_suc_rate"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div th:if="${roleType.code == 9}">
+        <h3>用户很懒，没配角色</h3>
+    </div>
+
 </div>
 </body>
 <script src="js/jquery.min.js"></script>
@@ -47,11 +118,15 @@
 
     function load() {
         $.ajax({
-            url: prefix + '/statistic',
+            url: prefix + '/statistics',
             type: "get",
             success: function (r) {
                 $('#daily_received').text(r.dailyReceivedAmount);
-                $('#total_received').text(r.totalReceivedAmount);
+                $('#m_total_received').text(r.totalReceivedAmount);
+                $('#c_total_received').text(r.totalReceivedAmount);
+                $('#c_total_tx_times').text(r.totalTxTimes);
+                $('#c_suc_tx_times').text(r.succeedTxTimes);
+                $('#c_tx_suc_rate').text(r.txSucceedRate);
             }
         });
     }

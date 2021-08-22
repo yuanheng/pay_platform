@@ -1,5 +1,6 @@
 package com.bootdo.system.domain;
 
+import com.bootdo.app.zwlenum.RoleTypeEnum;
 import lombok.ToString;
 
 import java.math.BigDecimal;
@@ -7,11 +8,13 @@ import java.math.BigDecimal;
 /**
  * 首页统计信息
  *
- * @author Zhu YongQi
+ * @author Prometheus
  * @date 2021/8/22.
  */
 @ToString
 public class StatisticInfoDO implements java.io.Serializable {
+
+    private RoleTypeEnum currentRoleEnum;
 
     /**
      * 当日收款总额
@@ -37,6 +40,14 @@ public class StatisticInfoDO implements java.io.Serializable {
      * 收款成功比例（%）
      */
     private BigDecimal txSucceedRate;
+
+    public RoleTypeEnum getCurrentRoleEnum() {
+        return currentRoleEnum;
+    }
+
+    public void setCurrentRoleEnum(RoleTypeEnum currentRoleEnum) {
+        this.currentRoleEnum = currentRoleEnum;
+    }
 
     public BigDecimal getDailyReceivedAmount() {
         return dailyReceivedAmount;
@@ -84,6 +95,15 @@ public class StatisticInfoDO implements java.io.Serializable {
         this.succeedTxTimes = 0;
         this.txSucceedRate = BigDecimal.ZERO;
         this.dailyReceivedAmount = BigDecimal.ZERO;
+        return this;
+    }
+
+    public StatisticInfoDO emptyInstance(int givenValue) {
+        this.totalReceivedAmount = BigDecimal.valueOf(givenValue);
+        this.totalTxTimes = givenValue;
+        this.succeedTxTimes = givenValue;
+        this.txSucceedRate = BigDecimal.valueOf(givenValue);
+        this.dailyReceivedAmount = BigDecimal.valueOf(givenValue);
         return this;
     }
 }

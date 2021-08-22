@@ -3,7 +3,10 @@ package com.bootdo.system.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.bootdo.app.zwlenum.PayTypeEnum;
+import com.bootdo.app.zwlenum.StatusEnum;
 import com.bootdo.common.utils.ShiroUtils;
+import com.bootdo.system.adptor.AccountStatusSynchronizer;
 import com.bootdo.system.domain.PayAlipayInfoDO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +35,14 @@ import com.bootdo.common.utils.R;
 @Controller
 @RequestMapping("/system/payWechatInfo")
 public class PayWechatInfoController {
-    @Autowired
     private PayWechatInfoService payWechatInfoService;
+    private AccountStatusSynchronizer statusSynchronizer;
+
+    @Autowired
+    public PayWechatInfoController(PayWechatInfoService payWechatInfoService, AccountStatusSynchronizer statusSynchronizer) {
+        this.payWechatInfoService = payWechatInfoService;
+        this.statusSynchronizer = statusSynchronizer;
+    }
 
     @GetMapping()
     @RequiresPermissions("system:payWechatInfo:payWechatInfo")
@@ -77,6 +86,12 @@ public class PayWechatInfoController {
         PayWechatInfoDO payWechatInfo = payWechatInfoService.get(id);
         payWechatInfo.setStatus(flag);
         payWechatInfoService.update(payWechatInfo);
+        if (flag.equals(StatusEnum.ENABLE.getKey())) {
+            statusSynchronizer.sync(PayTypeEnum.WECHAT_CODE, payWechatInfo.getId(), payWechatInfo);
+        }
+        if (flag.equals(StatusEnum.DISABLE.getKey())) {
+            statusSynchronizer.remove(PayTypeEnum.WECHAT_CODE, payWechatInfo.getId());
+        }
         return R.ok();
     }
 
