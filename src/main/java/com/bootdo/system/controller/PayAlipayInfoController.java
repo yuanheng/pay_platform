@@ -3,7 +3,10 @@ package com.bootdo.system.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.bootdo.app.zwlenum.PayTypeEnum;
+import com.bootdo.app.zwlenum.StatusEnum;
 import com.bootdo.common.utils.ShiroUtils;
+import com.bootdo.system.adptor.AccountStatusSynchronizer;
 import com.bootdo.system.domain.BankInfoDO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +35,14 @@ import com.bootdo.common.utils.R;
 @Controller
 @RequestMapping("/system/payAlipayInfo")
 public class PayAlipayInfoController {
-    @Autowired
     private PayAlipayInfoService payAlipayInfoService;
+    private AccountStatusSynchronizer statusSynchronizer;
+
+    @Autowired
+    public PayAlipayInfoController(PayAlipayInfoService payAlipayInfoService, AccountStatusSynchronizer statusSynchronizer) {
+        this.payAlipayInfoService = payAlipayInfoService;
+        this.statusSynchronizer = statusSynchronizer;
+    }
 
     @GetMapping()
     @RequiresPermissions("system:payAlipayInfo:payAlipayInfo")
@@ -77,6 +86,12 @@ public class PayAlipayInfoController {
         PayAlipayInfoDO payAlipayInfo = payAlipayInfoService.get(id);
         payAlipayInfo.setStatus(flag);
         payAlipayInfoService.update(payAlipayInfo);
+        if (flag.equals(StatusEnum.ENABLE.getKey())) {
+            statusSynchronizer.sync(PayTypeEnum.APLIPAY_CODE, payAlipayInfo.getId(), payAlipayInfo);
+        }
+        if (flag.equals(StatusEnum.DISABLE.getKey())) {
+            statusSynchronizer.remove(PayTypeEnum.APLIPAY_CODE, payAlipayInfo.getId());
+        }
         return R.ok();
     }
     

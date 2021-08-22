@@ -5,12 +5,12 @@ package com.bootdo.common.redis.shiro;
  * @version V1.0
  */
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Value;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+
+import java.util.Set;
 
 /**
  *

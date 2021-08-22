@@ -1,9 +1,12 @@
 package com.bootdo.system.controller;
 
+import com.bootdo.app.zwlenum.PayTypeEnum;
+import com.bootdo.app.zwlenum.StatusEnum;
 import com.bootdo.common.utils.PageUtils;
 import com.bootdo.common.utils.Query;
 import com.bootdo.common.utils.R;
 import com.bootdo.common.utils.ShiroUtils;
+import com.bootdo.system.adptor.AccountStatusSynchronizer;
 import com.bootdo.system.domain.BankInfoDO;
 import com.bootdo.system.service.BankInfoService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -29,8 +32,14 @@ import java.util.Map;
 @Controller
 @RequestMapping("/system/bankInfo")
 public class BankInfoController {
-    @Autowired
     private BankInfoService bankInfoService;
+    private AccountStatusSynchronizer statusSynchronizer;
+
+    @Autowired
+    public BankInfoController(BankInfoService bankInfoService, AccountStatusSynchronizer statusSynchronizer) {
+        this.bankInfoService = bankInfoService;
+        this.statusSynchronizer = statusSynchronizer;
+    }
 
     @GetMapping()
     @RequiresPermissions("system:bankInfo:bankInfo")
@@ -74,6 +83,12 @@ public class BankInfoController {
         BankInfoDO bankInfo = bankInfoService.get(id);
         bankInfo.setStatus(flag);
         bankInfoService.update(bankInfo);
+        if (flag.equals(StatusEnum.ENABLE.getKey())) {
+            statusSynchronizer.sync(PayTypeEnum.BANK_CODE, bankInfo.getId(), bankInfo);
+        }
+        if (flag.equals(StatusEnum.DISABLE.getKey())) {
+            statusSynchronizer.remove(PayTypeEnum.BANK_CODE, bankInfo.getId());
+        }
         return R.ok();
     }
 
