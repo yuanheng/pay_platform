@@ -1,5 +1,8 @@
 package com.bootdo.system.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -12,6 +15,8 @@ import java.util.Date;
  * @email 1992lcg@163.com
  * @date 2021-08-20 21:24:35
  */
+@NoArgsConstructor
+@AllArgsConstructor
 public class MerchantDO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -30,7 +35,13 @@ public class MerchantDO implements Serializable {
 	//创新时间
 	private Date createTime;
 
-  private String status;
+	public MerchantDO(String merchantNo, String secretKey, String callbackUrl) {
+		this.merchantNo = merchantNo;
+		this.secretKey = secretKey;
+		this.callbackUrl = callbackUrl;
+	}
+
+	private String status;
 
 	public String getStatus() {
 		return status;

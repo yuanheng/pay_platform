@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import com.bootdo.app.zwlenum.RoleTypeEnum;
+import com.bootdo.system.domain.UserDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,6 +20,7 @@ import com.bootdo.system.dao.UserRoleDao;
 import com.bootdo.system.domain.RoleDO;
 import com.bootdo.system.domain.RoleMenuDO;
 import com.bootdo.system.service.RoleService;
+import org.springframework.util.CollectionUtils;
 
 
 @Service
@@ -42,7 +45,6 @@ public class RoleServiceImpl implements RoleService {
         return roles;
     }
 
-
     @Override
     public List<RoleDO> list(Long userId) {
         List<Long> rolesIds = userRoleMapper.listRoleId(userId);
@@ -58,6 +60,7 @@ public class RoleServiceImpl implements RoleService {
         }
         return roles;
     }
+
     @Transactional
     @Override
     public int save(RoleDO role) {
@@ -116,6 +119,28 @@ public class RoleServiceImpl implements RoleService {
     public int batchremove(Long[] ids) {
         int r = roleMapper.batchRemove(ids);
         return r;
+    }
+
+    @Override
+    public RoleTypeEnum distinguishByLoginInfo(UserDO user) {
+        // FIXME 硬编码，不推荐
+        final Long ridOfCoder = 61L;
+        final Long ridOfMerchant = 60L;
+        final List<Long> roleIdList = user.getRoleIds();
+
+        if (!CollectionUtils.isEmpty(roleIdList)) {
+            if (roleIdList.contains(ridOfCoder) && roleIdList.contains(ridOfMerchant)) {
+                return RoleTypeEnum.ALL;
+            } else {
+                if (roleIdList.contains(ridOfCoder)) {
+                    return RoleTypeEnum.CODER;
+                }
+                if (roleIdList.contains(ridOfMerchant)) {
+                    return RoleTypeEnum.MERCHANT;
+                }
+            }
+        }
+        return RoleTypeEnum.UNKNOWN;
     }
 
 }

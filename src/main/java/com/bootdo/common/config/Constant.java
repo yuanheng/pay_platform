@@ -19,6 +19,21 @@ public class Constant {
      */
     public static int YES = 1;
 
+    /**
+     * redis中的key
+     */
+    public static final String PREFIX_OF_STAT_MERCHANT = "STAT_M_";
+
+    /**
+     * redis中的key
+     */
+    public static final String PREFIX_OF_STAT_CODER = "STAT_C_";
+
+    /**
+     * redis中商户基本信息的key
+     */
+    public static final String PREFIX_OF_M_BASIC_INFO = "BIZ_M_";
+
     //部门根节点id
     public static Long DEPT_ROOT_ID = 0l;
     //缓存方式
