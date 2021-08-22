@@ -14,10 +14,16 @@ public class Constant {
     //通知公告阅读状态-已读
     public static int OA_NOTIFY_READ_YES = 1;
 
+    public static final String SYMBOL_COMMA = ",";
+
     /**
      * 常规肯定
      */
-    public static int YES = 1;
+    public static final int YES = 1;
+
+    public static final String LOCK_4_STAT_C_INFO = "LOCK_4_STAT_C_";
+
+    public static final String LOCK_4_STAT_M_INFO = "LOCK_4_STAT_M";
 
     /**
      * redis中的key

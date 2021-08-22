@@ -12,7 +12,7 @@ create table rs_bank_info
 	total_received_amount decimal(26,6) default 0 comment '总收款金额',
 	total_tx_times int(32) default 0 comment '总单数',
 	succeed_tx_times int(32) default 0 comment '成功单数',
-	tx_succeed_rate decimal(4,2) default 0 comment '收款成功比例（%）',
+	tx_succeed_rate decimal(10,2) default 0 comment '收款成功比例（%）',
 	account varchar(45) null comment '账号',
 	bank_name varchar(45) null comment '银行名称',
 	branch_bank_name varchar(45) null comment '支行名称',
@@ -34,7 +34,7 @@ create table rs_pay_alipay_info
 	total_received_amount decimal(26,6) default 0 comment '总收款金额',
 	total_tx_times int(32) default 0 comment '总单数',
 	succeed_tx_times int(32) default 0 comment '成功单数',
-	tx_succeed_rate decimal(4,2) default 0 comment '收款成功比例（%）',
+	tx_succeed_rate decimal(10,2) default 0 comment '收款成功比例（%）',
 	account varchar(45) null comment '账号',
 	remark varchar(255) null comment '备注'
 );
@@ -53,7 +53,7 @@ create table rs_pay_wechat_info
 	total_received_amount decimal(26,6) default 0 comment '总收款金额',
 	total_tx_times int(32) default 0 comment '总单数',
 	succeed_tx_times int(32) default 0 comment '成功单数',
-	tx_succeed_rate decimal(4,2) default 0 comment '收款成功比例（%）',
+	tx_succeed_rate decimal(10,2) default 0 comment '收款成功比例（%）',
 	account varchar(45) null comment '账号',
 	remark varchar(255) null comment '备注'
 );

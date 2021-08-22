@@ -4,25 +4,37 @@
 <mapper namespace="com.bootdo.system.dao.BankInfoDao">
 
     <select id="get" resultType="com.bootdo.system.domain.BankInfoDO">
-		select `id`,`mid`,`name`,`status`,`min_amount`,`max_amount`,`account`,`bank_name`,`branch_bank_name`,`address`,`remark` from rs_bank_info where id = #{value}
+		select `id`,`mid`,`name`,`status`,`min_amount`,`max_amount`,
+		`total_received_amount`,
+        `total_tx_times`,
+        `succeed_tx_times`,
+        `tx_succeed_rate`,
+		`account`,`bank_name`,`branch_bank_name`,`address`,`remark` from rs_bank_info where id = #{value}
 	</select>
 
     <select id="list" resultType="com.bootdo.system.domain.BankInfoDO">
         select
-        `id`,`mid`,`name`,`status`,`min_amount`,`max_amount`,`account`,`bank_name`,`branch_bank_name`,`address`,`remark`
+        `id`,`mid`,`name`,`status`,`min_amount`,`max_amount`,`total_received_amount`,
+        `total_tx_times`,
+        `succeed_tx_times`,
+        `tx_succeed_rate`,`account`,`bank_name`,`branch_bank_name`,`address`,`remark`
         from rs_bank_info
         <where>
-            <if test="id != null and id != ''">and id = #{id}</if>
-            <if test="mid != null and mid != ''">and mid = #{mid}</if>
-            <if test="name != null and name != ''">and name = #{name}</if>
-            <if test="status != null and status != ''">and status = #{status}</if>
-            <if test="minAmount != null and minAmount != ''">and min_amount = #{minAmount}</if>
-            <if test="maxAmount != null and maxAmount != ''">and max_amount = #{maxAmount}</if>
-            <if test="account != null and account != ''">and account = #{account}</if>
-            <if test="bankName != null and bankName != ''">and bank_name = #{bankName}</if>
-            <if test="branchBankName != null and branchBankName != ''">and branch_bank_name = #{branchBankName}</if>
-            <if test="address != null and address != ''">and address = #{address}</if>
-            <if test="remark != null and remark != ''">and remark = #{remark}</if>
+            <if test="id != null and id != ''"> and id = #{id}</if>
+            <if test="mid != null and mid != ''"> and mid = #{mid}</if>
+            <if test="name != null and name != ''"> and name = #{name}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+            <if test="minAmount != null and minAmount != ''"> and min_amount = #{minAmount}</if>
+            <if test="maxAmount != null and maxAmount != ''"> and max_amount = #{maxAmount}</if>
+            <if test="totalReceivedAmount != null"> and total_received_amount = #{totalReceivedAmount}</if>
+            <if test="totalTxTimes != null"> and total_tx_times = #{totalTxTimes}</if>
+            <if test="succeedTxTimes != null"> and succeed_tx_times = #{succeedTxTimes}</if>
+            <if test="txSucceedRate != null"> and tx_succeed_rate = #{txSucceedRate}</if>
+            <if test="account != null and account != ''"> and account = #{account}</if>
+            <if test="bankName != null and bankName != ''"> and bank_name = #{bankName}</if>
+            <if test="branchBankName != null and branchBankName != ''"> and branch_bank_name = #{branchBankName}</if>
+            <if test="address != null and address != ''"> and address = #{address}</if>
+            <if test="remark != null and remark != ''"> and remark = #{remark}</if>
         </where>
         <choose>
             <when test="sort != null and sort.trim() != ''">
@@ -45,17 +57,17 @@
     <select id="count" resultType="int">
         select count(*) from rs_bank_info
         <where>
-            <if test="id != null and id != ''">and id = #{id}</if>
-            <if test="mid != null and mid != ''">and mid = #{mid}</if>
-            <if test="name != null and name != ''">and name = #{name}</if>
-            <if test="status != null and status != ''">and status = #{status}</if>
-            <if test="minAmount != null and minAmount != ''">and min_amount = #{minAmount}</if>
-            <if test="maxAmount != null and maxAmount != ''">and max_amount = #{maxAmount}</if>
-            <if test="account != null and account != ''">and account = #{account}</if>
-            <if test="bankName != null and bankName != ''">and bank_name = #{bankName}</if>
-            <if test="branchBankName != null and branchBankName != ''">and branch_bank_name = #{branchBankName}</if>
-            <if test="address != null and address != ''">and address = #{address}</if>
-            <if test="remark != null and remark != ''">and remark = #{remark}</if>
+            <if test="id != null and id != ''"> and id = #{id}</if>
+            <if test="mid != null and mid != ''"> and mid = #{mid}</if>
+            <if test="name != null and name != ''"> and name = #{name}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+            <if test="minAmount != null and minAmount != ''"> and min_amount = #{minAmount}</if>
+            <if test="maxAmount != null and maxAmount != ''"> and max_amount = #{maxAmount}</if>
+            <if test="account != null and account != ''"> and account = #{account}</if>
+            <if test="bankName != null and bankName != ''"> and bank_name = #{bankName}</if>
+            <if test="branchBankName != null and branchBankName != ''"> and branch_bank_name = #{branchBankName}</if>
+            <if test="address != null and address != ''"> and address = #{address}</if>
+            <if test="remark != null and remark != ''"> and remark = #{remark}</if>
         </where>
     </select>
 
@@ -96,6 +108,10 @@
             <if test="status != null">`status` = #{status},</if>
             <if test="minAmount != null">`min_amount` = #{minAmount},</if>
             <if test="maxAmount != null">`max_amount` = #{maxAmount},</if>
+            <if test="totalReceivedAmount != null">`total_received_amount` = #{totalReceivedAmount},</if>
+            <if test="totalTxTimes != null">`total_tx_times` = #{totalTxTimes},</if>
+            <if test="succeedTxTimes != null">`succeed_tx_times` = #{succeedTxTimes},</if>
+            <if test="txSucceedRate != null">`tx_succeed_rate` = #{txSucceedRate},</if>
             <if test="account != null">`account` = #{account},</if>
             <if test="bankName != null">`bank_name` = #{bankName},</if>
             <if test="branchBankName != null">`branch_bank_name` = #{branchBankName},</if>

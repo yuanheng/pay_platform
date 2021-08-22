@@ -98,24 +98,27 @@ function load() {
                         field: 'paymentInfo',
                         title: '收款信息',
                         formatter: function (value, row, index) {
-                            var text = '<a class="btn btn-primary btn-sm" title="' + value + '" href="#" mce_href="#" onclick="showInfo(\''
-                                + row.account + '\', \'' + row.remark +
-                                '\')">查看</a>'
-                            return text;
+                            var t = '<a class="btn btn-primary btn-sm" title="' + value + '" href="#" mce_href="#" onclick="showInfo(\''
+                                + row.payment.account + '\', \'' + row.payment.name +
+                                '\')"><i class="fa fa-edit"></i>查看</a>';
+                            return t;
                         }
                     }, {
                         title: '操作',
                         field: 'id',
                         align: 'center',
                         formatter: function (value, row, index) {
-                            var e = '<a class="btn btn-primary btn-sm ' + s_edit_h + '" href="#" mce_href="#" title="编辑" onclick="edit(\''
-                                + row.id
-                                + '\')"><i class="fa fa-edit"></i>确认收款</a> ';
+                            var e = '';
+                            if (row.status == 'pre_pay') {
+                                e = '<a class="btn btn-primary btn-sm ' + s_edit_h + '" href="#" mce_href="#" title="编辑" onclick="confirm(\''
+                                    + row.id
+                                    + '\')"><i class="fa fa-edit"></i>确认收款</a> ';
+                            }
 
                             var f = '<a class="btn btn-success btn-sm" href="#" title="备用"  mce_href="#" onclick="resetPwd(\''
                                 + row.id
                                 + '\')"><i class="fa fa-key"></i>发起回调</a> ';
-                            return e + f;
+                            return e != '' ? e + f : f;
                         }
                     }]
             });
@@ -126,8 +129,26 @@ function reLoad() {
 }
 
 function showInfo(acc, rmk) {
-    var msgTxt = '账号：' + acc + '\n 备注：' + rmk;
+    var msgTxt = '账号：' + acc + '\n 名称：' + rmk;
     layer.msg(msgTxt);
+}
+
+function confirm(id) {
+    $.ajax({
+        url: prefix + "/confirm",
+        type: "post",
+        data: {
+            'id': id
+        },
+        success: function (r) {
+            if (r.code == 0) {
+                layer.msg(r.msg);
+                reLoad();
+            } else {
+                layer.msg(r.msg);
+            }
+        }
+    });
 }
 
 function add() {

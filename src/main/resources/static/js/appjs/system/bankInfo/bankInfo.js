@@ -91,6 +91,21 @@ function load() {
                         title: '备注'
                     },
                     {
+                        field: 'totalTxTimes',
+                        title: '总单数'
+                    },
+                    {
+                        field: 'succeedTxTimes',
+                        title: '成功单数'
+                    },
+                    {
+                        field: 'totalReceivedAmount',
+                        title: '总收款金额（元）',
+                        formatter: function (value) {
+                            return value / 100;
+                        }
+                    },
+                    {
                         title: '操作',
                         field: 'id',
                         align: 'center',

@@ -1,13 +1,11 @@
 package com.bootdo.system.controller;
 
-import com.bootdo.app.config.Constants;
 import com.bootdo.app.util.DistributedLock;
 import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.RoleTypeEnum;
 import com.bootdo.common.annotation.Log;
 import com.bootdo.common.config.Constant;
 import com.bootdo.common.controller.BaseController;
-import com.bootdo.common.utils.JSONUtils;
 import com.bootdo.common.utils.MathUtil;
 import com.bootdo.common.utils.ShiroUtils;
 import com.bootdo.system.domain.BankInfoDO;
@@ -90,7 +88,7 @@ public class MainController extends BaseController {
             } else {
                 MerchantDO byMid = merchantService.getByMid(userId);
                 if (byMid != null) {
-                    redisUtil.set(mKey, byMid);
+//                    redisUtil.set(mKey, byMid);
                     model.addAttribute("merchantInfo", byMid);
                 } else {
                     final String unknown = "不详";
@@ -155,16 +153,15 @@ public class MainController extends BaseController {
     /**
      * 收款码的统计信息
      *
-     * @param mKey
-     * @return
+     * @param mKey mKey
+     * @return 收款码的统计信息
      */
     private StatisticInfoDO getStatisticFromRedis(final String mKey) {
-        distributedLock.releaseLock(Constants.PRODUCT_LOCK_ID);
-        distributedLock.getLock(Constants.PRODUCT_LOCK_ID);
-        final String result = JSONUtils.beanToJson(redisUtil.get(mKey));
-        distributedLock.releaseLock(Constants.PRODUCT_LOCK_ID);
-        if (StringUtils.isNotEmpty(result)) {
-            return (StatisticInfoDO) JSONUtils.jsonToBean(result, StatisticInfoDO.class);
+        distributedLock.getLock(mKey);
+        Object o = redisUtil.get(mKey);
+        distributedLock.releaseLock(mKey);
+        if (o != null && StringUtils.isNotEmpty(String.valueOf(o))) {
+            return (StatisticInfoDO) o;
         }
         return null;
     }
@@ -172,15 +169,14 @@ public class MainController extends BaseController {
     /**
      * 商户基本信息
      *
-     * @param mKey
-     * @return
+     * @param mKey mKey
+     * @return 商户基本信息
      */
     private MerchantDO getMerchantBizInfoFromRedis(final String mKey) {
-        distributedLock.releaseLock(Constants.PRODUCT_LOCK_ID);
-        distributedLock.getLock(Constants.PRODUCT_LOCK_ID);
+        distributedLock.getLock(mKey);
         Object o = redisUtil.get(mKey);
-        distributedLock.releaseLock(Constants.PRODUCT_LOCK_ID);
-        if (o != null) {
+        distributedLock.releaseLock(mKey);
+        if (o != null && StringUtils.isNotEmpty(String.valueOf(o))) {
             return (MerchantDO) o;
         }
         return null;
