@@ -8,7 +8,7 @@
 			<div class="ibox">
 				<div class="ibox-body">
 					<div class="fixed-table-toolbar">
-
+						<input type="hidden" id="chanel_id" th:value="${chanleId}">
 						<div class="columns pull-left col-md-2 nopadding">
 							平台订单号：<input id="searchOrderNo" type="text" class="form-control"
 								   placeholder="">
@@ -52,6 +52,26 @@
 		</div>
 	</div>
 	<div th:include="include :: footer"></div>
+	<script src="/js/appjs/oa/webSocket/sockjs.min.js"></script>
+	<script src="/js/appjs/oa/webSocket/stomp.min.js"></script>
 	<script type="text/javascript" src="/js/appjs/system/order/order.js"></script>
+    <script type="text/javascript">
+		var stompClient = null;
+		$(function () {
+			connect();
+		});
+		function connect() {
+			var chanelId = $("#chanel_id").val();
+			var sock = new SockJS("/endpointChat");
+			var stomp = Stomp.over(sock);
+			stomp.connect('guest', 'guest', function(frame) {
+				stomp.subscribe('/topic/'+chanelId+'/getOrderNo', function (response) {
+					console.info("XXXXXXXXXXXXXXXXXXXXXXX" + response);
+					reLoad();
+				});
+			});
+		}
+
+	</script>
 </body>
 </html>

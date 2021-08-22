@@ -48,7 +48,7 @@
 	<input type="hidden" id="pay_time_second" th:value="${second}">
 	<div th:if="${order.payType eq 'wechat' || order.payType eq 'alipay'}" >
 		<div class="img_box">
-			<img src="http://www.jinjukeji.com/data/upload/image/20190329/1553868824535057.jpg">
+			<img th:src="${payInfo.imgUrl}">
 		</div>
 		<div class="info">
 			<p>收款人：<span th:text="${payInfo.name}"</p>

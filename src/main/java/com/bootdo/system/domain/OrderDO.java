@@ -1,5 +1,7 @@
 package com.bootdo.system.domain;
 
+import com.bootdo.app.config.Constants;
+
 import java.io.Serializable;
 import java.util.Date;
 

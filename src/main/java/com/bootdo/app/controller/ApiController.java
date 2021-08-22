@@ -11,6 +11,7 @@ import com.bootdo.app.util.RedisUtils;
 
 import com.bootdo.app.zwlenum.PayTypeEnum;
 import com.bootdo.common.utils.StringUtils;
+import com.bootdo.oa.domain.Response;
 import com.bootdo.system.domain.MerchantDO;
 import com.bootdo.system.domain.OrderDO;
 import com.bootdo.system.service.MerchantService;
@@ -18,6 +19,7 @@ import com.bootdo.system.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -35,13 +37,16 @@ public class ApiController {
     private OrderService orderService;
     @Autowired
     private MerchantService merchantService;
+    @Autowired
+    SimpMessagingTemplate template;
 
     private static Logger logger = LoggerFactory.getLogger(ApiController.class);
 
 
     @GetMapping("/pay/{orderNo}")
     String add(@PathVariable("orderNo") String orderNo, Model model) {
-        OrderDO order = (OrderDO) redisUtils.get(orderNo);
+        String orderKey = Constants.getOrderKey(orderNo);
+        OrderDO order = (OrderDO) redisUtils.get(orderKey);
         String payInfo = order.getPaymentInfo();
         JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
         String reallyAmount = order.getReallyAmount();
@@ -63,7 +68,7 @@ public class ApiController {
         }
         String title = "";
         if (order.getPayType().equals(PayTypeEnum.BANK_CODE.getKey())) {
-            title = "请用进行网银转账付款";
+            title = "请用网银转账付款";
         } else if (order.getPayType().equals(PayTypeEnum.WECHAT_CODE.getKey())) {
             title = "请用微信扫码付款";
         } else if (order.getPayType().equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
@@ -78,7 +83,7 @@ public class ApiController {
     public Result<Map> createOrder(PaymentInfo paymentInfo) throws Exception {
 
         if (StringUtils.isEmpty(paymentInfo.getMerchantNo())
-                || StringUtils.isEmpty(paymentInfo.getMerchantNo())
+                || StringUtils.isEmpty(paymentInfo.getMerchantOrderNo())
                 || StringUtils.isEmpty(paymentInfo.getAmount())
                 || StringUtils.isEmpty(paymentInfo.getSign())
         ) {
@@ -91,11 +96,11 @@ public class ApiController {
             return Result.error("商户不对，merchantNo不正确");
         }
         //校验签名
-        /*
+
         boolean signResult = checkSign(merchant.getSecretKey(),paymentInfo);
         if (!signResult) {
             return Result.error("签名不正确");
-        }*/
+        }
 
         //判断订单额度
         String amount = paymentInfo.getAmount();
@@ -109,17 +114,27 @@ public class ApiController {
             return Result.error("支付方式错误");
         }
 
-        OrderDO order = null;
-        if (type.equals(PayTypeEnum.WECHAT_CODE.getKey())) {
-            order = orderService.createWechatOrder(paymentInfo);
-        } else if (type.equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
-            order = orderService.createAlipayOrder(paymentInfo);
-        } else if (type.equals(PayTypeEnum.BANK_CODE.getKey())) {
-            order = orderService.createBankOrder(paymentInfo);
-        }
         try {
+            OrderDO order = null;
+            if (type.equals(PayTypeEnum.WECHAT_CODE.getKey())) {
+                order = orderService.createWechatOrder(paymentInfo);
+            } else if (type.equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
+                order = orderService.createAlipayOrder(paymentInfo);
+            } else if (type.equals(PayTypeEnum.BANK_CODE.getKey())) {
+                order = orderService.createBankOrder(paymentInfo);
+            }
+            Integer second = (Integer) redisUtils.get(Constants.ORDER_TIMER_KEY);
+            redisUtils.set(Constants.getOrderKey(order.getOrderNo()),order, second);
             //生成支付返回给商户系统
             MerchantPayInfo merchantPayInfo = generatorPayInfo(order);
+            final String no = order.getOrderNo();
+            final String mid = order.getMid() + "";
+            new Thread(){
+                @Override
+                public void run(){
+                    template.convertAndSend("/topic/"+mid+"/getOrderNo", no);
+                }
+            }.start();
             return Result.ok(merchantPayInfo);
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -128,10 +143,10 @@ public class ApiController {
     }
 
     private boolean checkSign(String secretKey, PaymentInfo paymentInfo) {
-        String signstr = "amount="+paymentInfo.getAmount()+"&merchantNo="+paymentInfo.getMerchantNo()+"&type="+paymentInfo.getType()+"&secretKey="+secretKey;
+        String signstr = "amount="+paymentInfo.getAmount()+"&merchantNo="+paymentInfo.getMerchantNo()+"&merchantOrderNo="+paymentInfo.getMerchantOrderNo()+"&type="+paymentInfo.getType()+"&secretKey="+secretKey;
         String tempSign = Encript.md5(signstr);
         String sign  = paymentInfo.getSign();
-        return tempSign.equals(sign);
+        return tempSign.equalsIgnoreCase(sign);
     }
 
     private MerchantPayInfo generatorPayInfo(OrderDO order) {
@@ -148,6 +163,12 @@ public class ApiController {
     }
 
 
+    @RequestMapping(value = "/callback")
+    @ResponseBody
+    public String createOrder(String sign,String merchantNo, String amount, String merchantOrderNo) throws Exception {
+        logger.info("callbak success sign={},merchantNo={},amount={},merchantOrderNo={}",sign,merchantNo,amount,merchantOrderNo,merchantOrderNo);
+        return "OK";
+    }
 
 
 }

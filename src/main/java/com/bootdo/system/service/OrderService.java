@@ -37,4 +37,5 @@ public interface OrderService {
 	OrderDO createBankOrder(PaymentInfo paymentInfo) throws NotPayInfoException;
 
 
+	OrderDO notifyMerchant(OrderDO orderDO);
 }

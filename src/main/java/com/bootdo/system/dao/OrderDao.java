@@ -14,7 +14,8 @@ import org.apache.ibatis.annotations.Mapper;
  * @date 2021-08-20 21:24:35
  */
 @Mapper
-public interface OrderDao {
+public interface
+OrderDao {
 
 	OrderDO get(Integer id);
 	

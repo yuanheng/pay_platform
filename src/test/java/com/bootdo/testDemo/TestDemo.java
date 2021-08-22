@@ -1,6 +1,7 @@
 package com.bootdo.testDemo;
 
 import com.bootdo.app.config.Constants;
+import com.bootdo.app.util.Encript;
 import com.bootdo.app.util.RedisUtils;
 
 import com.bootdo.app.zwlenum.PayTypeEnum;
@@ -42,8 +43,8 @@ public class TestDemo {
       payWechatInfoDO.setName("丁三"+i);
       payWechatInfoDO.setAccount("dingbs"+i);
       payWechatInfoDO.setStatus(StatusEnum.ENABLE.getKey());
-      payWechatInfoDO.setImgUrl("https://login.weixin.qq.com/qrcode/AfWo0BONHQ==");
-      payWechatInfoDO.setMid(137L);
+      payWechatInfoDO.setImgUrl("http://localhost:6868/img/wechat.jpg");
+      payWechatInfoDO.setMid(138L);
       redisUtils.addPaymentInfo(wechatPayKey,payWechatInfoDO);
     }
 
@@ -52,8 +53,8 @@ public class TestDemo {
       payWechatInfoDO.setName("支付宝"+i);
       payWechatInfoDO.setAccount("zhifubao"+i);
       payWechatInfoDO.setStatus(StatusEnum.ENABLE.getKey());
-      payWechatInfoDO.setMid(137L);
-      payWechatInfoDO.setImgUrl("https://login.weixin.qq.com/qrcode/AfWo0BONHQ==");
+      payWechatInfoDO.setMid(138L);
+      payWechatInfoDO.setImgUrl("http://localhost:6868/img/wechat.jpg");
       redisUtils.addPaymentInfo(alipayKey,payWechatInfoDO);
     }
 
@@ -61,7 +62,7 @@ public class TestDemo {
       BankInfoDO payWechatInfoDO = new BankInfoDO();
       payWechatInfoDO.setName("银行"+i);
       payWechatInfoDO.setStatus(StatusEnum.ENABLE.getKey());
-      payWechatInfoDO.setMid(137L);
+      payWechatInfoDO.setMid(138L);
       payWechatInfoDO.setAccount("622588014634687"+i);
       payWechatInfoDO.setAddress("北京市朝去东大街");
       payWechatInfoDO.setBankName("招商银行");
@@ -75,7 +76,11 @@ public class TestDemo {
   @Test
   public void testInitData() {
     redisUtils.set(Constants.ORDER_PAY_URL,"http://localhost:6868/api/pay");
-    redisUtils.set(Constants.ORDER_TIMER_KEY,300);
+    redisUtils.set(Constants.ORDER_TIMER_KEY,660);
   }
 
+  @Test
+  public void md5(){
+    System.out.println(Encript.md5("admin"));
+  }
 }

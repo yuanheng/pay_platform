@@ -25,7 +25,7 @@ public class WelcomeJob implements Job{
         JobDataMap map = jobDetail.getJobDataMap();
         System.out.println("*************:"+map);
         System.out.println("开始执行："+ System.currentTimeMillis());
-    	template.convertAndSend("/topic/getResponse", new Response("欢迎体验bootdo,这是一个任务计划，使用了websocket和quzrtz技术，可以在计划列表中取消，欢迎您加入qq群交流学习!" ));
+    	  template.convertAndSend("/topic/getResponse", new Response("欢迎体验bootdo,这是一个任务计划，使用了websocket和quzrtz技术，可以在计划列表中取消，欢迎您加入qq群交流学习!" ));
 
     }
 

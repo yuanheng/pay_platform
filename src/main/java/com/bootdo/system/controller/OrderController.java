@@ -48,7 +48,9 @@ public class OrderController {
 
 	@GetMapping()
 	@RequiresPermissions("system:order:order")
-	String Order(){
+	String Order(Model model){
+		  UserDO userDO = ShiroUtils.getUser();
+		  model.addAttribute("chanleId",userDO.getUserId());
 	    return "system/order/order";
 	}
 	

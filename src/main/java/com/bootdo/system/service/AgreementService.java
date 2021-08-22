@@ -29,7 +29,7 @@ public interface AgreementService {
 	
 	int batchRemove(Integer[] ids);
 
-    List<AgreementDO> getExpireAgreements(Date endTime);
+	List<AgreementDO> getExpireAgreements(Date endTime);
 
 	AgreementDO getMemberAgreetment(Integer id);
 }

@@ -8,6 +8,12 @@ import java.util.Map;
 
 public class Constants {
 
+    public final static String MERCHANT_NO_KEY = "merchant_no_key:{merchantNo}";
+
+    public final static String ORDER_NO_TIMEOUT_KEY = "order_no:";
+
+    public final static String ORDER_NO_KEY = "order_no:{orderNo}";
+
     public final static String ORDER_TIMER_KEY = "order_time_key";
 
     public final static String ORDER_PAY_URL = "order_pay_url";
@@ -129,7 +135,11 @@ public class Constants {
 
     }
 
+    public static String getMerchantNoKey(String merchantNo){
+        return MERCHANT_NO_KEY.replace("{merchantNo}", merchantNo);
+    }
 
-
-
+    public static String getOrderKey(String orderNo) {
+       return Constants.ORDER_NO_KEY.replace("{orderNo}", orderNo);
+    }
 }
