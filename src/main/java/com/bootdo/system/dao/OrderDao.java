@@ -30,4 +30,6 @@ OrderDao {
 	int remove(Integer id);
 	
 	int batchRemove(Integer[] ids);
+
+  int cancelOrder(OrderDO orderDO);
 }

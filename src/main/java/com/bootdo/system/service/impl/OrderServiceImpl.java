@@ -176,6 +176,11 @@ public class OrderServiceImpl implements OrderService {
 		return orderDO;
 	}
 
+	@Override
+	public int cancelOrder(OrderDO orderDO) {
+		return orderDao.cancelOrder(orderDO);
+	}
+
 
 	private String getSign(String secretKey, OrderDO orderDO) {
 		String signstr = "amount="+orderDO.getAmount()+"&merchantNo="+orderDO.getMerchantNo()+"&merchantOrderNo="+orderDO.getMerchantOrderNo()+"&secretKey="+secretKey;

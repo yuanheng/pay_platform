@@ -105,4 +105,14 @@
 		</foreach>
 	</delete>
 
+	<update id="cancel" parameterType="com.bootdo.system.domain.OrderDO">
+		update rs_order
+		<set>
+
+			<if test="status != null">`status` = #{status}, </if>
+
+		</set>
+		where order_no = #{orderNo} and status = 'pre_pay'
+	</update>
+
 </mapper>

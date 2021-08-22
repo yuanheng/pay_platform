@@ -22,34 +22,7 @@ public class Constants {
     public final static String PAYMENTINFO_LIST = "{payType}_code_list";
 
 
-
-    public final static String PRODUCT_TASK_INFO_QUEUE = "product_task_info_queue";
-    public final static String CURRENT_SYMBOL_PRICE_PRE = "current_symbol_price_pre_";
-    public final static String COIN_TASK_STATUS_PRE = "coin_task_status_pre_";
-    public final static String MEMBER_TASK_PRE = "member_coin_task_{mid}_pre_";
     public final static String PRODUCT_LOCK_ID = "product_lock_id";
-    public final static String MEMBER_HUOBI_SPOT_ACCOUNT_PRE = "member_huobi_spot_account_pre_";
-
-    public final static String MEMBER_HUOBI_SPOT_BALANCE_PRE = "member_huobi_spot_blance_pre_";
-    public final static String MEMBER_HUOBI_API_KEY_PRE = "member_huobi_api_key_pre_";
-    public final static String MEMBER_HUOBI_SECRET_PRE = "member_huobi_secret_key_pre_";
-    public final static String MEMBER_ORDER_PRE = "member_order_{mid}_{symbol}_pre_";
-    public final static Integer MEMBER_ORDER_DELAY_TIME = 5;
-
-
-
-
-
-
-
-
-    public final static String COIN_USDT = "usdt";
-
-
-
-
-    public final static String NYC_PRICE = "nyc_price";
-
     public final static String MY_MOBILE = "my_mobile";
     public final static String MY_URL="my_url";
     public final static String APP_PAY_TYPE="app_pay_type";
@@ -120,20 +93,6 @@ public class Constants {
     public static Map<String,String> teams;
     public static Map<String,String> teamsProfit;
 
-
-    static {
-        teams = new HashMap<>();
-        teams.put("13530689238","53");
-        teams.put("17896090495","51");
-        teams.put("17110995611","55");
-
-        teamsProfit = new HashMap<>();
-
-        teamsProfit.put("13530689238","435000");
-        teamsProfit.put("17896090495","423105");
-        teamsProfit.put("17110995611","450200");
-
-    }
 
     public static String getMerchantNoKey(String merchantNo){
         return MERCHANT_NO_KEY.replace("{merchantNo}", merchantNo);
