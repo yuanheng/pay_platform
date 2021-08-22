@@ -178,10 +178,10 @@ public class MainController extends BaseController {
     private MerchantDO getMerchantBizInfoFromRedis(final String mKey) {
         distributedLock.releaseLock(Constants.PRODUCT_LOCK_ID);
         distributedLock.getLock(Constants.PRODUCT_LOCK_ID);
-        final String result = JSONUtils.beanToJson(redisUtil.get(mKey));
+        Object o = redisUtil.get(mKey);
         distributedLock.releaseLock(Constants.PRODUCT_LOCK_ID);
-        if (StringUtils.isNotEmpty(result)) {
-            return (MerchantDO) JSONUtils.jsonToBean(result, MerchantDO.class);
+        if (o != null) {
+            return (MerchantDO) o;
         }
         return null;
     }
