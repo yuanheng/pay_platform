@@ -35,9 +35,7 @@ import com.bootdo.common.utils.R;
 @RequestMapping("/system/agreement")
 public class AgreementController {
 
-
 	private static Logger logger = LoggerFactory.getLogger(AgreementController.class);
-
 
 	@Autowired
 	private AgreementService agreementService;

@@ -27,4 +27,5 @@ public interface BankInfoService {
     int batchRemove(Integer[] ids);
 
     List<BankInfoDO> getByUserId(Long userId);
+
 }

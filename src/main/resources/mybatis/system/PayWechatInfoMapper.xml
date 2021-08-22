@@ -4,11 +4,19 @@
 <mapper namespace="com.bootdo.system.dao.PayWechatInfoDao">
 
 	<select id="get" resultType="com.bootdo.system.domain.PayWechatInfoDO">
-		select `id`,`mid`,`name`,`status`,`img_url`,`min_amount`,`max_amount`,`account`,`remark` from rs_pay_wechat_info where id = #{value}
+		select `id`,`mid`,`name`,`status`,`img_url`,`min_amount`,`max_amount`,
+		`total_received_amount`,
+        `total_tx_times`,
+        `succeed_tx_times`,
+        `tx_succeed_rate`, `account`,`remark` from rs_pay_wechat_info where id = #{value}
 	</select>
 
 	<select id="list" resultType="com.bootdo.system.domain.PayWechatInfoDO">
-		select `id`,`mid`,`name`,`status`,`img_url`,`min_amount`,`max_amount`,`account`,`remark` from rs_pay_wechat_info
+		select `id`,`mid`,`name`,`status`,`img_url`,`min_amount`,`max_amount`,
+		`total_received_amount`,
+		`total_tx_times`,
+		`succeed_tx_times`,
+		`tx_succeed_rate`, `account`,`remark` from rs_pay_wechat_info
         <where>  
 		  		  <if test="id != null and id != ''"> and id = #{id} </if>
 		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
@@ -84,6 +92,10 @@
 			<if test="imgUrl != null">`img_url` = #{imgUrl}, </if>
 			<if test="minAmount != null">`min_amount` = #{minAmount}, </if>
 			<if test="maxAmount != null">`max_amount` = #{maxAmount}, </if>
+			<if test="totalReceivedAmount != null">`total_received_amount` = #{totalReceivedAmount},</if>
+			<if test="totalTxTimes != null">`total_tx_times` = #{totalTxTimes},</if>
+			<if test="succeedTxTimes != null">`succeed_tx_times` = #{succeedTxTimes},</if>
+			<if test="txSucceedRate != null">`tx_succeed_rate` = #{txSucceedRate},</if>
 			<if test="account != null">`account` = #{account}, </if>
 			<if test="remark != null">`remark` = #{remark}</if>
 		</set>

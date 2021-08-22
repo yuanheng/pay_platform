@@ -44,6 +44,8 @@ public class BankInfoDO implements Serializable {
      */
     private BigDecimal txSucceedRate;
 
+    private BigDecimal dailyReceivedAmount;
+
     //账号
     private String account;
     //银行名称
@@ -157,6 +159,14 @@ public class BankInfoDO implements Serializable {
 
     public void setTxSucceedRate(BigDecimal txSucceedRate) {
         this.txSucceedRate = txSucceedRate;
+    }
+
+    public BigDecimal getDailyReceivedAmount() {
+        return dailyReceivedAmount;
+    }
+
+    public void setDailyReceivedAmount(BigDecimal dailyReceivedAmount) {
+        this.dailyReceivedAmount = dailyReceivedAmount;
     }
 
     /**
