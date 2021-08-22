@@ -51,5 +51,10 @@ public class BankInfoServiceImpl implements BankInfoService {
 	public int batchRemove(Integer[] ids){
 		return bankInfoDao.batchRemove(ids);
 	}
-	
+
+	@Override
+	public List<BankInfoDO> getByUserId(Long userId) {
+		return bankInfoDao.getByUserId(userId);
+	}
+
 }

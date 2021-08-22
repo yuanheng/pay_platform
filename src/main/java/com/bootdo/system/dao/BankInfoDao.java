@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 
@@ -29,4 +30,6 @@ public interface BankInfoDao {
 	int remove(Integer id);
 	
 	int batchRemove(Integer[] ids);
+
+    List<BankInfoDO> getByUserId(@Param("userId") Long userId);
 }

@@ -23,10 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootTest
 public class TestDemo {
 
-
   @Autowired
   RedisUtils redisUtils;
-
 
   private static Logger logger = LoggerFactory.getLogger(TestDemo.class);
 

@@ -77,7 +77,7 @@ public class LoginController extends BaseController {
     @Log("登录")
     @PostMapping("/login")
     @ResponseBody
-    R ajaxLogin(String username, String password,String verify,HttpServletRequest request) {
+    R ajaxLogin(String username, String password, String verify, HttpServletRequest request) {
         if (bootdoConfig.isVeriCodeNeeded()) {
             try {
                 //从session中获取随机数
@@ -109,11 +109,6 @@ public class LoginController extends BaseController {
     String logout() {
         ShiroUtils.logout();
         return "redirect:/login";
-    }
-
-    @GetMapping("/main")
-    String main() {
-        return "main";
     }
 
     /**

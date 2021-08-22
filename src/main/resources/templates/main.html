@@ -7,14 +7,18 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="stylesheet" href="css/bootstrap.min.css">
 </head>
-<body>
+<body onload="load()">
 <div class="panel panel-default">
 
     <div style="padding: 10px 0 20px 10px;">
         <h3>&nbsp;&nbsp;&nbsp;商户信息</h3>
         <ul>
-            <li>今日收款</li>
-            <li>累计收款</li>
+            <li>今日收款
+                <span style="color: #00B83F;" id="daily_received"></span>
+            </li>
+            <li>累计收款
+                <span style="color: #3e8f3e;" id="total_received"></span>
+            </li>
         </ul>
 
         <h3>&nbsp;&nbsp;&nbsp;商户的基本信息</h3>
@@ -35,4 +39,22 @@
 </body>
 <script src="js/jquery.min.js"></script>
 <script src="js/openTab.js"></script>
+<script type="text/javascript">
+    var prefix = "/main";
+    $(function () {
+        load();
+    });
+
+    function load() {
+        $.ajax({
+            url: prefix + '/statistic',
+            type: "get",
+            success: function (r) {
+                $('#daily_received').text(r.dailyReceivedAmount);
+                $('#total_received').text(r.totalReceivedAmount);
+            }
+        });
+    }
+
+</script>
 </html>

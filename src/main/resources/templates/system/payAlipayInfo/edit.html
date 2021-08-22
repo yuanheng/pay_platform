@@ -22,8 +22,8 @@
                             <div class="col-sm-8">
                                 <select id="status" name="status" class="form-control"
                                         th:field="${payAlipayInfo.status}" th:switch="${payAlipayInfo.status}">
-                                    <option value="valid" th:selected="${payAlipayInfo.status}=='enable'">启用</option>
-                                    <option value="invalid" th:selected="${payAlipayInfo.status}=='disable'">禁用</option>
+                                    <option value="enable" th:selected="${payAlipayInfo.status}=='enable'">启用</option>
+                                    <option value="disable" th:selected="${payAlipayInfo.status}=='disable'">禁用</option>
                                 </select>
                             </div>
                         </div>

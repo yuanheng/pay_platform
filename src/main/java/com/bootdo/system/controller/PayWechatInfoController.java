@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bootdo.common.utils.ShiroUtils;
+import com.bootdo.system.domain.PayAlipayInfoDO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -64,6 +65,19 @@ public class PayWechatInfoController {
         PayWechatInfoDO payWechatInfo = payWechatInfoService.get(id);
         model.addAttribute("payWechatInfo", payWechatInfo);
         return "system/payWechatInfo/edit";
+    }
+
+    /**
+     * 启用|禁用
+     */
+    @PostMapping("/changeStatus")
+    @ResponseBody
+    @RequiresPermissions("system:payWechatInfo:edit")
+    public R changeStatus(Integer id, String flag) {
+        PayWechatInfoDO payWechatInfo = payWechatInfoService.get(id);
+        payWechatInfo.setStatus(flag);
+        payWechatInfoService.update(payWechatInfo);
+        return R.ok();
     }
 
     /**

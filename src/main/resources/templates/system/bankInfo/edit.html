@@ -22,8 +22,8 @@
                             <div class="col-sm-8">
                                 <select id="status" name="status" class="form-control"
                                         th:field="${bankInfo.status}" th:switch="${bankInfo.status}">
-                                    <option value="valid" th:selected="${bankInfo.status}=='valid'">启用</option>
-                                    <option value="invalid" th:selected="${bankInfo.status}=='invalid'">禁用</option>
+                                    <option value="enable" th:selected="${bankInfo.status}=='enable'">启用</option>
+                                    <option value="disable" th:selected="${bankInfo.status}=='disable'">禁用</option>
                                 </select>
                             </div>
                         </div>

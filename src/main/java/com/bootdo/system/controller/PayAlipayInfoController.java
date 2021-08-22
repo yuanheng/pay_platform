@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bootdo.common.utils.ShiroUtils;
+import com.bootdo.system.domain.BankInfoDO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -66,6 +67,19 @@ public class PayAlipayInfoController {
         return "system/payAlipayInfo/edit";
     }
 
+    /**
+     * 启用|禁用
+     */
+    @PostMapping("/changeStatus")
+    @ResponseBody
+    @RequiresPermissions("system:payAlipayInfo:edit")
+    public R changeStatus(Integer id, String flag) {
+        PayAlipayInfoDO payAlipayInfo = payAlipayInfoService.get(id);
+        payAlipayInfo.setStatus(flag);
+        payAlipayInfoService.update(payAlipayInfo);
+        return R.ok();
+    }
+    
     /**
      * 保存
      */
