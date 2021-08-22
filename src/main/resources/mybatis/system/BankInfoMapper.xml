@@ -3,56 +3,63 @@
 
 <mapper namespace="com.bootdo.system.dao.BankInfoDao">
 
-	<select id="get" resultType="com.bootdo.system.domain.BankInfoDO">
+    <select id="get" resultType="com.bootdo.system.domain.BankInfoDO">
 		select `id`,`mid`,`name`,`status`,`min_amount`,`max_amount`,`account`,`bank_name`,`branch_bank_name`,`address`,`remark` from rs_bank_info where id = #{value}
 	</select>
 
-	<select id="list" resultType="com.bootdo.system.domain.BankInfoDO">
-		select `id`,`mid`,`name`,`status`,`min_amount`,`max_amount`,`account`,`bank_name`,`branch_bank_name`,`address`,`remark` from rs_bank_info
-        <where>  
-		  		  <if test="id != null and id != ''"> and id = #{id} </if>
-		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
-		  		  <if test="name != null and name != ''"> and name = #{name} </if>
-		  		  <if test="status != null and status != ''"> and status = #{status} </if>
-		  		  <if test="minAmount != null and minAmount != ''"> and min_amount = #{minAmount} </if>
-		  		  <if test="maxAmount != null and maxAmount != ''"> and max_amount = #{maxAmount} </if>
-		  		  <if test="account != null and account != ''"> and account = #{account} </if>
-		  		  <if test="bankName != null and bankName != ''"> and bank_name = #{bankName} </if>
-		  		  <if test="branchBankName != null and branchBankName != ''"> and branch_bank_name = #{branchBankName} </if>
-		  		  <if test="address != null and address != ''"> and address = #{address} </if>
-		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
-		  		</where>
+    <select id="list" resultType="com.bootdo.system.domain.BankInfoDO">
+        select
+        `id`,`mid`,`name`,`status`,`min_amount`,`max_amount`,`account`,`bank_name`,`branch_bank_name`,`address`,`remark`
+        from rs_bank_info
+        <where>
+            <if test="id != null and id != ''">and id = #{id}</if>
+            <if test="mid != null and mid != ''">and mid = #{mid}</if>
+            <if test="name != null and name != ''">and name = #{name}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+            <if test="minAmount != null and minAmount != ''">and min_amount = #{minAmount}</if>
+            <if test="maxAmount != null and maxAmount != ''">and max_amount = #{maxAmount}</if>
+            <if test="account != null and account != ''">and account = #{account}</if>
+            <if test="bankName != null and bankName != ''">and bank_name = #{bankName}</if>
+            <if test="branchBankName != null and branchBankName != ''">and branch_bank_name = #{branchBankName}</if>
+            <if test="address != null and address != ''">and address = #{address}</if>
+            <if test="remark != null and remark != ''">and remark = #{remark}</if>
+        </where>
         <choose>
             <when test="sort != null and sort.trim() != ''">
                 order by ${sort} ${order}
             </when>
-			<otherwise>
+            <otherwise>
                 order by id desc
-			</otherwise>
+            </otherwise>
         </choose>
-		<if test="offset != null and limit != null">
-			limit #{offset}, #{limit}
-		</if>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="getByUserId" resultType="com.bootdo.system.domain.BankInfoDO">
+		select `id`,`mid`,`name`,`status`,`min_amount`,`max_amount`,`account`,`bank_name`,`branch_bank_name`,`address`,`remark` from rs_bank_info
+		where mid = #{userId}
 	</select>
-	
- 	<select id="count" resultType="int">
-		select count(*) from rs_bank_info
-		 <where>  
-		  		  <if test="id != null and id != ''"> and id = #{id} </if>
-		  		  <if test="mid != null and mid != ''"> and mid = #{mid} </if>
-		  		  <if test="name != null and name != ''"> and name = #{name} </if>
-		  		  <if test="status != null and status != ''"> and status = #{status} </if>
-		  		  <if test="minAmount != null and minAmount != ''"> and min_amount = #{minAmount} </if>
-		  		  <if test="maxAmount != null and maxAmount != ''"> and max_amount = #{maxAmount} </if>
-		  		  <if test="account != null and account != ''"> and account = #{account} </if>
-		  		  <if test="bankName != null and bankName != ''"> and bank_name = #{bankName} </if>
-		  		  <if test="branchBankName != null and branchBankName != ''"> and branch_bank_name = #{branchBankName} </if>
-		  		  <if test="address != null and address != ''"> and address = #{address} </if>
-		  		  <if test="remark != null and remark != ''"> and remark = #{remark} </if>
-		  		</where>
-	</select>
-	 
-	<insert id="save" parameterType="com.bootdo.system.domain.BankInfoDO">
+
+    <select id="count" resultType="int">
+        select count(*) from rs_bank_info
+        <where>
+            <if test="id != null and id != ''">and id = #{id}</if>
+            <if test="mid != null and mid != ''">and mid = #{mid}</if>
+            <if test="name != null and name != ''">and name = #{name}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+            <if test="minAmount != null and minAmount != ''">and min_amount = #{minAmount}</if>
+            <if test="maxAmount != null and maxAmount != ''">and max_amount = #{maxAmount}</if>
+            <if test="account != null and account != ''">and account = #{account}</if>
+            <if test="bankName != null and bankName != ''">and bank_name = #{bankName}</if>
+            <if test="branchBankName != null and branchBankName != ''">and branch_bank_name = #{branchBankName}</if>
+            <if test="address != null and address != ''">and address = #{address}</if>
+            <if test="remark != null and remark != ''">and remark = #{remark}</if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.bootdo.system.domain.BankInfoDO">
 		insert into rs_bank_info
 		(
 			`mid`,
@@ -80,33 +87,33 @@
 			#{remark}
 		)
 	</insert>
-	 
-	<update id="update" parameterType="com.bootdo.system.domain.BankInfoDO">
-		update rs_bank_info 
-		<set>
-			<if test="mid != null">`mid` = #{mid}, </if>
-			<if test="name != null">`name` = #{name}, </if>
-			<if test="status != null">`status` = #{status}, </if>
-			<if test="minAmount != null">`min_amount` = #{minAmount}, </if>
-			<if test="maxAmount != null">`max_amount` = #{maxAmount}, </if>
-			<if test="account != null">`account` = #{account}, </if>
-			<if test="bankName != null">`bank_name` = #{bankName}, </if>
-			<if test="branchBankName != null">`branch_bank_name` = #{branchBankName}, </if>
-			<if test="address != null">`address` = #{address}, </if>
-			<if test="remark != null">`remark` = #{remark}</if>
-		</set>
-		where id = #{id}
-	</update>
-	
-	<delete id="remove">
+
+    <update id="update" parameterType="com.bootdo.system.domain.BankInfoDO">
+        update rs_bank_info
+        <set>
+            <if test="mid != null">`mid` = #{mid},</if>
+            <if test="name != null">`name` = #{name},</if>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="minAmount != null">`min_amount` = #{minAmount},</if>
+            <if test="maxAmount != null">`max_amount` = #{maxAmount},</if>
+            <if test="account != null">`account` = #{account},</if>
+            <if test="bankName != null">`bank_name` = #{bankName},</if>
+            <if test="branchBankName != null">`branch_bank_name` = #{branchBankName},</if>
+            <if test="address != null">`address` = #{address},</if>
+            <if test="remark != null">`remark` = #{remark}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="remove">
 		delete from rs_bank_info where id = #{value}
 	</delete>
-	
-	<delete id="batchRemove">
-		delete from rs_bank_info where id in 
-		<foreach item="id" collection="array" open="(" separator="," close=")">
-			#{id}
-		</foreach>
-	</delete>
+
+    <delete id="batchRemove">
+        delete from rs_bank_info where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
 </mapper>

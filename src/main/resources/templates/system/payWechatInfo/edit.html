@@ -22,8 +22,8 @@
                             <div class="col-sm-8">
                                 <select id="status" name="status" class="form-control"
                                         th:field="${payWechatInfo.status}" th:switch="${payWechatInfo.status}">
-                                    <option value="valid" th:selected="${payWechatInfo.status}=='enable'">启用</option>
-                                    <option value="invalid" th:selected="${payWechatInfo.status}=='disable'">禁用</option>
+                                    <option value="enable" th:selected="${payWechatInfo.status}=='enable'">启用</option>
+                                    <option value="disable" th:selected="${payWechatInfo.status}=='disable'">禁用</option>
                                 </select>
                             </div>
                         </div>
