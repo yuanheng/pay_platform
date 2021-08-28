@@ -115,12 +115,11 @@ public class BankInfoController {
         BankInfoDO bankInfo = bankInfoService.get(id);
         bankInfo.setStatus(flag);
         bankInfoService.update(bankInfo);
-        UserDO userDO = ShiroUtils.getUser();
         if (flag.equals(StatusEnum.ENABLE.getKey())) {
             String payListKey = Constants.getPayInfoListKey(PayTypeEnum.BANK_CODE.getKey());
             redisUtils.addPaymentInfo(payListKey,bankInfo);
         }
-        String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.BANK_CODE.getKey(),userDO.getUserId() ,id);
+        String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.BANK_CODE.getKey(),bankInfo.getMid() ,id);
         redisUtils.set(payInfoKey,bankInfo);
 
         return R.ok();

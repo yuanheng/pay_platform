@@ -116,12 +116,11 @@ public class PayAlipayInfoController {
         PayAlipayInfoDO payAlipayInfo = payAlipayInfoService.get(id);
         payAlipayInfo.setStatus(flag);
         payAlipayInfoService.update(payAlipayInfo);
-        UserDO userDO = ShiroUtils.getUser();
         if (flag.equals(StatusEnum.ENABLE.getKey())) {
             String payListKey = Constants.getPayInfoListKey(PayTypeEnum.APLIPAY_CODE.getKey());
             redisUtils.addPaymentInfo(payListKey,payAlipayInfo);
         }
-        String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.APLIPAY_CODE.getKey(),userDO.getUserId(), id);
+        String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.APLIPAY_CODE.getKey(),payAlipayInfo.getMid(), id);
         redisUtils.set(payInfoKey,payAlipayInfo);
 
         return R.ok();

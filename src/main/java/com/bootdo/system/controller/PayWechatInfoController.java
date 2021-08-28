@@ -114,13 +114,12 @@ public class PayWechatInfoController {
         PayWechatInfoDO payWechatInfo = payWechatInfoService.get(id);
         payWechatInfo.setStatus(flag);
         payWechatInfoService.update(payWechatInfo);
-        UserDO userDO = ShiroUtils.getUser();
         if (flag.equals(StatusEnum.ENABLE.getKey())) {
             String payListKey = Constants.getPayInfoListKey(PayTypeEnum.WECHAT_CODE.getKey());
             redisUtils.addPaymentInfo(payListKey,payWechatInfo);
         }
 
-        String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.WECHAT_CODE.getKey(), userDO.getUserId(),id);
+        String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.WECHAT_CODE.getKey(),payWechatInfo.getMid(),id);
         redisUtils.set(payInfoKey,payWechatInfo);
 
         return R.ok();

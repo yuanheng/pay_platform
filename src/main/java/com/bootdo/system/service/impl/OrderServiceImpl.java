@@ -124,7 +124,8 @@ public class OrderServiceImpl implements OrderService {
 		boolean flag = false;
 		Integer num = 1;
 		while (!flag) {
-			Object payInfoObj = redisUtils.getPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.APLIPAY_CODE.getKey()));
+			String payListKey = Constants.getPayInfoListKey(PayTypeEnum.APLIPAY_CODE.getKey());
+			Object payInfoObj = redisUtils.getPaymentInfo(payListKey);
 			if (payInfoObj == null) {
 				throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
 			}
