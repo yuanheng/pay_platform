@@ -13,11 +13,11 @@ public class DistributedLock {
    * 获得锁
    */
   public boolean getLock(String lockId) {
-    Boolean success = redisTemplate.opsForValue().setIfAbsent(lockId, "");
+    Boolean success = redisTemplate.opsForValue().setIfAbsent("lock:"+lockId, "");
     return success != null && success;
   }
 
   public void releaseLock(String lockId) {
-    redisTemplate.delete(lockId);
+    redisTemplate.delete("lock:"+lockId);
   }
 }

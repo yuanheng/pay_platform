@@ -1,5 +1,5 @@
 server:
-  session-timeout: 9000
+  session-timeout: 90000
   #    tomcat:
   #        max-threads: 1000
   #        min-spare-threads: 30
@@ -10,8 +10,8 @@ server:
 #    enabled: false
 
 bootdo:
-#  uploadPath: /Users/dingbaosheng/uploaded_files/
-  uploadPath: /Users/charles/provisional/customer/pay_platform/
+  #uploadPath: /Users/dingbaosheng/uploaded_files/
+  uploadPath: /www/wwwroot/pics/
   veriCodeNeeded: 0
   username: admin
   password: 111111

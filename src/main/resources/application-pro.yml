@@ -1,5 +1,5 @@
 server:
-  session-timeout: 9000
+  session-timeout: 900000
   #    tomcat:
   #        max-threads: 1000
   #        min-spare-threads: 30
@@ -10,9 +10,11 @@ server:
 #    enabled: false
 
 bootdo:
-  uploadPath: /Users/dingbaosheng/uploaded_files/
+  #uploadPath: /Users/dingbaosheng/uploaded_files/
+  uploadPath: /www/wwwroot/pics/
+  veriCodeNeeded: 0
   username: admin
-  password: 111111
+  password: yisan14
 logging:
   level:
     root: info
@@ -21,9 +23,9 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://45.202.9.153:3306/u_gongchang?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true
-    username: u_gongchang
-    password: nGb5sd5zkDa2StFL
+    url: jdbc:mysql://43.129.219.47:3306/pay_db?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true
+    username: pay_db
+    password: nyYJxbf6bZawwK5i
     initialSize: 1
     minIdle: 3
     maxActive: 20
@@ -47,9 +49,9 @@ spring:
     # 合并多个DruidDataSource的监控数据
     #useGlobalDataSourceStat: true
   redis:
-    host: 45.202.9.153
+    host: 43.129.219.47
     port: 6379
-    password: dingbs_383241
+    password: 383241
     # 连接超时时间（毫秒）
     timeout: 60000
     jedis:
@@ -59,20 +61,20 @@ spring:
         # 连接池中的最小空闲连接
         min-idle: 1
         # 连接池最大连接数（使用负值表示没有限制）
-        max-active: 100
+        max-active: 200
         # 连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1
-sell_nofity_url: http://localhost/zwl/nofitfy
-pay_nofity_url: http://localhost/api/notify
-MERCHANT_NAME: xgww213
-MERCHANT_PRIVATE_KEY: MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAJE17mFgJ0jd3E4gHBy68JH7XJp8uNt50MYv2ZWaonhJk37i7a/f8ufHOW2SmGQ8Hhn1xHpXbqkwrftQs+WXtMaFhf8+3WY9VeGESvVrkgGkkJePmYoBslUKFjO/1zd8qZ+YWtCvSGSAzOmKM7IFGfFwCV6uCRb1t7awCSc/h7nJAgMBAAECgYBdFqK7v+VPPBMH7mO3M0wXeXlS/BORd1UUSAaHdnsi+5/XXuiar8lLNpclHC4fS77MS5ZqC3TAd5mBG6pHy+oxw/5nmxblKduoRlR5iWlXgQ6Nlnd+nFtyMO7Q1HDjkbNv6KUq6E8NI7CAhEiSIboZzG7doIV/xdPH4Mg5mu9+xQJBAN8YiJCBIMZLGiV3eJqMjSyh4/b2M+ZkqsYuALnLE2v65DGX30YyLKbnHjeiytY9CTRweSr3XucY4w/LE4qsmFcCQQCmoKywhtBHd1+q8JDbtCVRyzW+eJ2KOGbs4bk41+PsRlS3Otap82Xk5GjnbRPk7kzsFL/oVXga+v8azCWv3WrfAkEAzBnQzoskJeWNjRto3dOaUGvneAe0YaJVTivGBDQSl6YX4Hs2DC1ZBnTJA1NOyINciXogkDtxunDdQpSiUyslzwJAKFy1WBFf9F/LMboSLNYHUDfcLeZDqw6ch/bpigZptHsY3EWJaCOIZBib/KskbYj34xvnnJzPeiGgl9opqt8EmwJBAKPFxFGgkNgnHkLfL2uzrlgOQJ9E4/EdaIswRY1TSAOp7wKaPIgU8gn+NtPBYc32hraT55TmbJeEAhNN05JXsHM=
-QAPPLE_PUBLIC_KEY: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCX9BKjV4Nb/hjJwxS2QB942mv7PKXZIifDhVxgx6tqkQDGnd7Wsu2AtHnR4eBSzg/wxdQeKE2VlJNYOiRe98+GFAQih/OGSC5w3boQQIz8ZQ+23nsu9Gg2Yo4mlF0xyoisV+4fhpekabyhq9d3FJpjf05wmaR/kj7VgpYIP4uLEwIDAQAB
-QAPPLE_SERVER_URL: https://api.qapple.io/v2/api
-WEB_SITE: http://www.ueyhsnpt.best:8888
+sell_nofity_url: 123
+pay_nofity_url: 123
+MERCHANT_NAME: 123
+MERCHANT_PRIVATE_KEY: 123
+QAPPLE_PUBLIC_KEY: 123
+QAPPLE_SERVER_URL: 123
+WEB_SITE: 123
 
 ustd:
-    gateway: https://www.ccoinglobal.com/api/v1/
-    mchId: 8211603602483052
-    mdkey: f80cd5e68806fd7c8794de3940b2ed81
-    notifyUrl: http://www.yikamile:6868/api/notify
-    withdrawNotifyUrl: http://www.yikamile:6868/api/withdrawNotify
+    gateway: 123
+    mchId: 123
+    mdkey: 123
+    notifyUrl: 123
+    withdrawNotifyUrl: 123

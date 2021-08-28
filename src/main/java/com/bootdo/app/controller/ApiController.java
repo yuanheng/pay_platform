@@ -1,17 +1,19 @@
 package com.bootdo.app.controller;
 
+import cn.hutool.db.sql.Order;
 import com.alibaba.fastjson.JSONObject;
 import com.bootdo.app.config.Constants;
 import com.bootdo.app.model.MerchantPayInfo;
 import com.bootdo.app.model.PaymentInfo;
 import com.bootdo.app.model.Result;
+import com.bootdo.app.model.StatisticsInfo;
+import com.bootdo.app.util.DistributedLock;
 import com.bootdo.app.util.Encript;
 import com.bootdo.app.util.NumberUtil;
 import com.bootdo.app.util.RedisUtils;
 
 import com.bootdo.app.zwlenum.PayTypeEnum;
 import com.bootdo.common.utils.StringUtils;
-import com.bootdo.oa.domain.Response;
 import com.bootdo.system.domain.MerchantDO;
 import com.bootdo.system.domain.OrderDO;
 import com.bootdo.system.service.MerchantService;
@@ -38,7 +40,9 @@ public class ApiController {
     @Autowired
     private MerchantService merchantService;
     @Autowired
-    SimpMessagingTemplate template;
+    private SimpMessagingTemplate template;
+    @Autowired
+    private DistributedLock distributedLock;
 
     private static Logger logger = LoggerFactory.getLogger(ApiController.class);
 
@@ -46,35 +50,43 @@ public class ApiController {
     @GetMapping("/pay/{orderNo}")
     String add(@PathVariable("orderNo") String orderNo, Model model) {
         String orderKey = Constants.getOrderKey(orderNo);
-        OrderDO order = (OrderDO) redisUtils.get(orderKey);
-        String payInfo = order.getPaymentInfo();
-        JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
-        String reallyAmount = order.getReallyAmount();
-        model.addAttribute("reallyAmount", NumberUtil.divide(reallyAmount,"100"));
-        model.addAttribute("payInfo", payInfoJSON);
-        Integer second = (Integer) redisUtils.get(Constants.ORDER_TIMER_KEY);
-        Integer minute = second / 60 - 1;
-        model.addAttribute("minute", minute);
-        model.addAttribute("order", order);
-        Date createTime = order.getCreateTime();
-        long createTimeMillions  = createTime.getTime();
-        long currentTime = System.currentTimeMillis();
-        long timer = (currentTime - createTimeMillions)/1000;
-        timer = second - timer;
-        if (timer > 0) {
-            model.addAttribute("second", timer);
-        } else {
-            model.addAttribute("second", 0);
+        try {
+            OrderDO order = (OrderDO) redisUtils.get(orderKey);
+            String payInfo = order.getPaymentInfo();
+            JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
+            String reallyAmount = order.getReallyAmount();
+            model.addAttribute("reallyAmount", NumberUtil.divide(reallyAmount,"100"));
+            model.addAttribute("payInfo", payInfoJSON);
+            Integer second = (Integer) redisUtils.get(Constants.ORDER_TIMER_KEY);
+            Integer minute = second / 60;
+            model.addAttribute("minute", minute);
+            model.addAttribute("order", order);
+            Date createTime = order.getCreateTime();
+            long createTimeMillions  = createTime.getTime();
+            long currentTime = System.currentTimeMillis();
+            long timer = (currentTime - createTimeMillions)/1000;
+            timer = second - timer;
+            if (timer > 0) {
+                model.addAttribute("second", timer);
+            } else {
+                model.addAttribute("second", 0);
+            }
+            String title = "";
+            if (order.getPayType().equals(PayTypeEnum.BANK_CODE.getKey())) {
+                title = "请用网银转账付款";
+            } else if (order.getPayType().equals(PayTypeEnum.WECHAT_CODE.getKey())) {
+                title = "请用微信扫码付款";
+            } else if (order.getPayType().equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
+                title = "请用支付宝扫码付款";
+            }
+            model.addAttribute("title",title);
+            model.addAttribute("flag","success");
+        } catch (Exception e) {
+            logger.error("支付信息已失效");
+            model.addAttribute("flag","error");
+            model.addAttribute("error","支付信息已失效");
         }
-        String title = "";
-        if (order.getPayType().equals(PayTypeEnum.BANK_CODE.getKey())) {
-            title = "请用网银转账付款";
-        } else if (order.getPayType().equals(PayTypeEnum.WECHAT_CODE.getKey())) {
-            title = "请用微信扫码付款";
-        } else if (order.getPayType().equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
-            title = "请用支付宝扫码付款";
-        }
-        model.addAttribute("title",title);
+
         return  "system/order/payDetail";
     }
 
@@ -104,7 +116,7 @@ public class ApiController {
 
         //判断订单额度
         String amount = paymentInfo.getAmount();
-        if (NumberUtil.compare("100", amount) > 0 || NumberUtil.compare("500000", amount) < 0) {
+        if (NumberUtil.compare("100", amount) > 0 || NumberUtil.compare("5000001", amount) < 0) {
             return Result.error("订单额度在10-5000元之间");
         }
         //创建订单
@@ -132,6 +144,9 @@ public class ApiController {
             new Thread(){
                 @Override
                 public void run(){
+                    //统计码商 和 商户的信息
+                    staticsOrder(no);
+                    //推送新订单
                     template.convertAndSend("/topic/"+mid+"/getOrderNo", no);
                 }
             }.start();
@@ -141,6 +156,140 @@ public class ApiController {
         }
 
     }
+
+    @RequestMapping(value = "/createAlipayOrder")
+    public String  createAlipayOrder(String amount, Model model) throws Exception {
+
+        PaymentInfo paymentInfo = new PaymentInfo();
+        paymentInfo.setAmount(amount);
+
+        if (StringUtils.isEmpty(paymentInfo.getAmount())) {
+            amount = "50000";
+        }
+
+        paymentInfo.setMerchantNo("1000001");
+
+        //判断订单额度
+        if (NumberUtil.compare("100", amount) > 0 || NumberUtil.compare("5000001", amount) < 0) {
+            amount = "50000";
+        }
+
+        OrderDO order = null;
+        try {
+            paymentInfo.setType(PayTypeEnum.APLIPAY_CODE.getKey());
+            order = orderService.createAlipayOrder(paymentInfo);
+            Integer second = (Integer) redisUtils.get(Constants.ORDER_TIMER_KEY);
+            redisUtils.set(Constants.getOrderKey(order.getOrderNo()),order, second);
+            String payInfo = order.getPaymentInfo();
+            JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
+            String reallyAmount = order.getReallyAmount();
+            model.addAttribute("reallyAmount", NumberUtil.divide(reallyAmount,"100"));
+            model.addAttribute("payInfo", payInfoJSON);
+            model.addAttribute("minute", second/60);
+            model.addAttribute("order", order);
+            Date createTime = order.getCreateTime();
+            long createTimeMillions  = createTime.getTime();
+            long currentTime = System.currentTimeMillis();
+            long timer = (currentTime - createTimeMillions)/1000;
+            timer = second - timer;
+            if (timer > 0) {
+                model.addAttribute("second", timer);
+            } else {
+                model.addAttribute("second", 0);
+            }
+            String title = "";
+            if (order.getPayType().equals(PayTypeEnum.BANK_CODE.getKey())) {
+                title = "请用网银转账付款";
+            } else if (order.getPayType().equals(PayTypeEnum.WECHAT_CODE.getKey())) {
+                title = "请用微信扫码付款";
+            } else if (order.getPayType().equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
+                title = "请用支付宝扫码付款";
+            }
+            model.addAttribute("title",title);
+            model.addAttribute("flag","success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("支付信息已失效");
+            model.addAttribute("flag","error");
+            model.addAttribute("error","支付信息已失效");
+        }
+
+        return "system/order/payDetail";
+    }
+
+
+
+
+
+
+    @RequestMapping(value = "/createWechatOrder")
+    public String  createWechatOrder(String amount, Model model) throws Exception {
+
+        PaymentInfo paymentInfo = new PaymentInfo();
+        paymentInfo.setAmount(amount);
+
+        if (StringUtils.isEmpty(paymentInfo.getAmount())) {
+            amount = "50000";
+        }
+
+        paymentInfo.setMerchantNo("1000001");
+        // 根据merchantId 获取商户信息
+        MerchantDO merchant = merchantService.getByMerchantNo(paymentInfo.getMerchantNo());
+
+
+        //判断订单额度
+        if (NumberUtil.compare("100", amount) > 0 || NumberUtil.compare("5000001", amount) < 0) {
+           amount = "50000";
+        }
+        //创建订单
+        String type = "wechat";
+        PayTypeEnum payTypeEnum = PayTypeEnum.getByKey(type);
+        OrderDO order = null;
+        try {
+            paymentInfo.setType(PayTypeEnum.WECHAT_CODE.getKey());
+            order = orderService.createWechatOrder(paymentInfo);
+            Integer second = (Integer) redisUtils.get(Constants.ORDER_TIMER_KEY);
+            redisUtils.set(Constants.getOrderKey(order.getOrderNo()),order, second);
+
+
+            String payInfo = order.getPaymentInfo();
+            JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
+            String reallyAmount = order.getReallyAmount();
+            model.addAttribute("reallyAmount", NumberUtil.divide(reallyAmount,"100"));
+            model.addAttribute("payInfo", payInfoJSON);
+            model.addAttribute("minute", "10");
+            model.addAttribute("order", order);
+            Date createTime = order.getCreateTime();
+            long createTimeMillions  = createTime.getTime();
+            long currentTime = System.currentTimeMillis();
+            long timer = (currentTime - createTimeMillions)/1000;
+            timer = second - timer;
+            if (timer > 0) {
+                model.addAttribute("second", timer);
+            } else {
+                model.addAttribute("second", 0);
+            }
+            String title = "";
+            if (order.getPayType().equals(PayTypeEnum.BANK_CODE.getKey())) {
+                title = "请用网银转账付款";
+            } else if (order.getPayType().equals(PayTypeEnum.WECHAT_CODE.getKey())) {
+                title = "请用微信扫码付款";
+            } else if (order.getPayType().equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
+                title = "请用支付宝扫码付款";
+            }
+            model.addAttribute("title",title);
+            model.addAttribute("flag","success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("支付信息已失效");
+            model.addAttribute("flag","error");
+            model.addAttribute("error","支付信息已失效");
+        }
+
+        return "system/order/payDetail";
+    }
+
+
 
     private boolean checkSign(String secretKey, PaymentInfo paymentInfo) {
         String signstr = "amount="+paymentInfo.getAmount()+"&merchantNo="+paymentInfo.getMerchantNo()+"&merchantOrderNo="+paymentInfo.getMerchantOrderNo()+"&type="+paymentInfo.getType()+"&secretKey="+secretKey;
@@ -153,10 +302,20 @@ public class ApiController {
         MerchantPayInfo merchantPayInfo = new MerchantPayInfo();
         String payInfoStr = order.getPaymentInfo();
         JSONObject payInfoJSON = JSONObject.parseObject(payInfoStr);
-        payInfoJSON.put("amount",order.getAmount());
-        payInfoJSON.put("reallyAmount",order.getReallyAmount());
-        payInfoJSON.put("type",order.getPayType());
-        merchantPayInfo.setPayInfo(payInfoJSON);
+        String amount = order.getAmount();
+        String type  = order.getPayType();
+        String reallyAmount = order.getReallyAmount();
+        String url = payInfoJSON.getString("remark");
+        String account = payInfoJSON.getString("account");
+        String name = payInfoJSON.getString("name");
+        JSONObject tempInfo = new JSONObject();
+        tempInfo.put("amount", amount);
+        tempInfo.put("type", type);
+        tempInfo.put("reallyAmount", reallyAmount);
+        tempInfo.put("account", account);
+        tempInfo.put("name", name);
+        tempInfo.put("url", url);
+        merchantPayInfo.setPayInfo(tempInfo);
         String payApi = (String) redisUtils.get(Constants.ORDER_PAY_URL);
         merchantPayInfo.setPayUrl(payApi + "/" + order.getOrderNo());
         return merchantPayInfo;
@@ -170,5 +329,43 @@ public class ApiController {
         return "OK";
     }
 
+    public void staticsOrder (String orderNo){
+        String key  = Constants.getOrderKey(orderNo);
+        OrderDO orderDO = (OrderDO) redisUtils.get(key);
+        String payInfo = orderDO.getPaymentInfo();
+        JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
+        String type = orderDO.getPayType();
+        String payId = payInfoJSON.getString("id");
+        String payStatisticsInfoKey = "payStatisticsInfoKey_" + orderDO.getMid() + "_" + type + ":" + payId;
+        updateStatisticsInfo(payStatisticsInfoKey,orderDO);
+        String merchantStatisticsInfoKey = "merchantStatisticsInfoKey_" + orderDO.getMerchantNo();
+        updateStatisticsInfo(merchantStatisticsInfoKey,orderDO);
+    }
+
+    private void updateStatisticsInfo(String key, OrderDO orderDO) {
+        if (redisUtils.hasKey(key)) {
+            try {
+                distributedLock.getLock(key);
+                StatisticsInfo statisticsInfo = (StatisticsInfo) redisUtils.get(key);
+                statisticsInfo.setTotalAmount(statisticsInfo.getTotalAmount() + Integer.parseInt(orderDO.getAmount()));
+                statisticsInfo.setTotalOrderNum(statisticsInfo.getTotalOrderNum() + 1);
+                redisUtils.set(key,statisticsInfo);
+            } finally {
+                distributedLock.releaseLock(key);
+            }
+        } else {
+            try {
+                distributedLock.getLock(key);
+                StatisticsInfo statisticsInfo = new StatisticsInfo();
+                statisticsInfo.setPayedTotalOrderNum(0);
+                statisticsInfo.setTotalAmount(Integer.parseInt(orderDO.getAmount()));
+                statisticsInfo.setTotalOrderNum(1);
+                statisticsInfo.setPayedTotalAmount(0);
+                redisUtils.set(key,statisticsInfo);
+            } finally {
+                distributedLock.releaseLock(key);
+            }
+        }
+    }
 
 }

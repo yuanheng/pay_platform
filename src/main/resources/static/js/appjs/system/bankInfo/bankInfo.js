@@ -59,10 +59,6 @@ function load() {
                         title: '收款人'
                     },
                     {
-                        field: 'status',
-                        title: '状态'
-                    },
-                    {
                         field: 'minAmount',
                         title: '最小收款金额（元）'
                     },
@@ -89,6 +85,29 @@ function load() {
                     {
                         field: 'remark',
                         title: '备注'
+                    },
+                    {
+                        field: 'totalTxTimes',
+                        title: '总单数'
+                    },
+                    {
+                        field: 'succeedTxTimes',
+                        title: '成功单数'
+                    },
+                    {
+                        field: 'totalReceivedAmount',
+                        title: '总收款金额（元）',
+                        formatter: function (value) {
+                            return value / 100;
+                        }
+                    },
+                    {
+                        field: 'status',
+                        title: '状态',
+                        formatter (value,row,index) {
+                            var s_status = row.status == 'enable' ? '已启用': '已禁用' ;
+                            return s_status;
+                        }
                     },
                     {
                         title: '操作',

@@ -1,15 +1,24 @@
 package com.bootdo.system.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
+import com.bootdo.app.config.Constants;
+import com.bootdo.app.model.StatisticsInfo;
+import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.PayTypeEnum;
+import com.bootdo.app.zwlenum.RoleTypeEnum;
 import com.bootdo.app.zwlenum.StatusEnum;
 import com.bootdo.common.utils.ShiroUtils;
 import com.bootdo.system.adptor.AccountStatusSynchronizer;
 import com.bootdo.system.domain.BankInfoDO;
+import com.bootdo.system.domain.UserDO;
+import com.bootdo.system.service.RoleService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,12 +45,17 @@ import com.bootdo.common.utils.R;
 @RequestMapping("/system/payAlipayInfo")
 public class PayAlipayInfoController {
     private PayAlipayInfoService payAlipayInfoService;
-    private AccountStatusSynchronizer statusSynchronizer;
 
     @Autowired
-    public PayAlipayInfoController(PayAlipayInfoService payAlipayInfoService, AccountStatusSynchronizer statusSynchronizer) {
+    private RoleService roleService;
+
+    @Autowired
+    private RedisUtils redisUtils;
+
+    @Autowired
+    public PayAlipayInfoController(PayAlipayInfoService payAlipayInfoService) {
         this.payAlipayInfoService = payAlipayInfoService;
-        this.statusSynchronizer = statusSynchronizer;
+
     }
 
     @GetMapping()
@@ -54,9 +68,25 @@ public class PayAlipayInfoController {
     @GetMapping("/list")
     @RequiresPermissions("system:payAlipayInfo:payAlipayInfo")
     public PageUtils list(@RequestParam Map<String, Object> params) {
+        UserDO userDO = ShiroUtils.getUser();
+        final RoleTypeEnum currentRoleEnum = roleService.distinguishByLoginInfo(userDO);
+        if (currentRoleEnum != RoleTypeEnum.ALL) {
+            params.put("mid", userDO.getUserId());
+        }
         //查询列表数据
         Query query = new Query(params);
         List<PayAlipayInfoDO> payAlipayInfoList = payAlipayInfoService.list(query);
+        if (payAlipayInfoList != null && payAlipayInfoList.size() > 0) {
+            payAlipayInfoList.stream().forEach(payAlipay -> {
+                String payStatisticsInfoKey = "payStatisticsInfoKey_" + payAlipay.getMid() + "_" + PayTypeEnum.APLIPAY_CODE.getKey() + ":" + payAlipay.getId();
+                if (redisUtils.hasKey(payStatisticsInfoKey)) {
+                    StatisticsInfo statisticsInfo = (StatisticsInfo) redisUtils.get(payStatisticsInfoKey);
+                    payAlipay.setSucceedTxTimes(statisticsInfo.getPayedTotalOrderNum());
+                    payAlipay.setTotalTxTimes(statisticsInfo.getTotalOrderNum());
+                    payAlipay.setTotalReceivedAmount(new BigDecimal(statisticsInfo.getPayedTotalAmount()));
+                }
+            });
+        }
         int total = payAlipayInfoService.count(query);
         PageUtils pageUtils = new PageUtils(payAlipayInfoList, total);
         return pageUtils;
@@ -86,12 +116,14 @@ public class PayAlipayInfoController {
         PayAlipayInfoDO payAlipayInfo = payAlipayInfoService.get(id);
         payAlipayInfo.setStatus(flag);
         payAlipayInfoService.update(payAlipayInfo);
+        UserDO userDO = ShiroUtils.getUser();
         if (flag.equals(StatusEnum.ENABLE.getKey())) {
-            statusSynchronizer.sync(PayTypeEnum.APLIPAY_CODE, payAlipayInfo.getId(), payAlipayInfo);
+            String payListKey = Constants.getPayInfoListKey(PayTypeEnum.APLIPAY_CODE.getKey());
+            redisUtils.addPaymentInfo(payListKey,payAlipayInfo);
         }
-        if (flag.equals(StatusEnum.DISABLE.getKey())) {
-            statusSynchronizer.remove(PayTypeEnum.APLIPAY_CODE, payAlipayInfo.getId());
-        }
+        String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.APLIPAY_CODE.getKey(),userDO.getUserId(), id);
+        redisUtils.set(payInfoKey,payAlipayInfo);
+
         return R.ok();
     }
     
@@ -103,7 +135,9 @@ public class PayAlipayInfoController {
     @RequiresPermissions("system:payAlipayInfo:add")
     public R save(PayAlipayInfoDO payAlipayInfo) {
         payAlipayInfo.setMid(ShiroUtils.getUserId());
+        payAlipayInfo.setStatus(StatusEnum.DISABLE.getKey());
         if (payAlipayInfoService.save(payAlipayInfo) > 0) {
+            //redisUtils.set(Constants.getPayInfoKey(PayTypeEnum.APLIPAY_CODE.getKey(),payAlipayInfo.getId().intValue()),payAlipayInfo);
             return R.ok();
         }
         return R.error();
@@ -116,7 +150,10 @@ public class PayAlipayInfoController {
     @RequestMapping("/update")
     @RequiresPermissions("system:payAlipayInfo:edit")
     public R update(PayAlipayInfoDO payAlipayInfo) {
+        UserDO userDO = ShiroUtils.getUser();
+        payAlipayInfo.setStatus(StatusEnum.DISABLE.getKey());
         payAlipayInfoService.update(payAlipayInfo);
+        redisUtils.set(Constants.getPayInfoKey(PayTypeEnum.APLIPAY_CODE.getKey(),userDO.getUserId(),payAlipayInfo.getId().intValue()),payAlipayInfo);
         return R.ok();
     }
 
@@ -127,9 +164,12 @@ public class PayAlipayInfoController {
     @ResponseBody
     @RequiresPermissions("system:payAlipayInfo:remove")
     public R remove(Integer id) {
+        UserDO userDO = ShiroUtils.getUser();
         if (payAlipayInfoService.remove(id) > 0) {
+            redisUtils.remove(Constants.getPayInfoKey(PayTypeEnum.APLIPAY_CODE.getKey(),userDO.getUserId(),id));
             return R.ok();
         }
+
         return R.error();
     }
 

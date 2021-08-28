@@ -1,0 +1,44 @@
+package com.bootdo.app.model;
+
+import java.io.Serializable;
+
+public class StatisticsInfo implements Serializable {
+
+  private Integer totalAmount;
+  private Integer payedTotalAmount;
+  private Integer totalOrderNum;
+  private Integer payedTotalOrderNum;
+
+
+  public Integer getTotalAmount() {
+    return totalAmount;
+  }
+
+  public void setTotalAmount(Integer totalAmount) {
+    this.totalAmount = totalAmount;
+  }
+
+  public Integer getPayedTotalAmount() {
+    return payedTotalAmount;
+  }
+
+  public void setPayedTotalAmount(Integer payedTotalAmount) {
+    this.payedTotalAmount = payedTotalAmount;
+  }
+
+  public Integer getTotalOrderNum() {
+    return totalOrderNum;
+  }
+
+  public void setTotalOrderNum(Integer totalOrderNum) {
+    this.totalOrderNum = totalOrderNum;
+  }
+
+  public Integer getPayedTotalOrderNum() {
+    return payedTotalOrderNum;
+  }
+
+  public void setPayedTotalOrderNum(Integer payedTotalOrderNum) {
+    this.payedTotalOrderNum = payedTotalOrderNum;
+  }
+}

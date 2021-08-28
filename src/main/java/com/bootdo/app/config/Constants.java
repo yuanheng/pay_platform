@@ -94,11 +94,18 @@ public class Constants {
     public static Map<String,String> teamsProfit;
 
 
+    public static String getPayInfoListKey(String type) {
+        return Constants.PAYMENTINFO_LIST.replace("{payType}",type);
+    }
     public static String getMerchantNoKey(String merchantNo){
         return MERCHANT_NO_KEY.replace("{merchantNo}", merchantNo);
     }
 
     public static String getOrderKey(String orderNo) {
        return Constants.ORDER_NO_KEY.replace("{orderNo}", orderNo);
+    }
+
+    public static String getPayInfoKey(String type, Long userId, Integer id) {
+        return Constants.PAYMENTINFO_LIST.replace("{payType}",type) + "_" + userId + ":" + id;
     }
 }

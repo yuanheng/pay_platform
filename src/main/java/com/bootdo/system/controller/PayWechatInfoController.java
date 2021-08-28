@@ -1,13 +1,21 @@
 package com.bootdo.system.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.bootdo.app.config.Constants;
+import com.bootdo.app.model.StatisticsInfo;
+import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.PayTypeEnum;
+import com.bootdo.app.zwlenum.RoleTypeEnum;
 import com.bootdo.app.zwlenum.StatusEnum;
 import com.bootdo.common.utils.ShiroUtils;
 import com.bootdo.system.adptor.AccountStatusSynchronizer;
+import com.bootdo.system.dao.UserDao;
 import com.bootdo.system.domain.PayAlipayInfoDO;
+import com.bootdo.system.domain.UserDO;
+import com.bootdo.system.service.RoleService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -37,6 +45,10 @@ import com.bootdo.common.utils.R;
 public class PayWechatInfoController {
     private PayWechatInfoService payWechatInfoService;
     private AccountStatusSynchronizer statusSynchronizer;
+    @Autowired
+    private RoleService roleService;
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Autowired
     public PayWechatInfoController(PayWechatInfoService payWechatInfoService, AccountStatusSynchronizer statusSynchronizer) {
@@ -54,9 +66,25 @@ public class PayWechatInfoController {
     @GetMapping("/list")
     @RequiresPermissions("system:payWechatInfo:payWechatInfo")
     public PageUtils list(@RequestParam Map<String, Object> params) {
+        UserDO userDO = ShiroUtils.getUser();
+        final RoleTypeEnum currentRoleEnum = roleService.distinguishByLoginInfo(userDO);
+        if (currentRoleEnum != RoleTypeEnum.ALL) {
+            params.put("mid", userDO.getUserId());
+        }
         //查询列表数据
         Query query = new Query(params);
         List<PayWechatInfoDO> payWechatInfoList = payWechatInfoService.list(query);
+        if (payWechatInfoList != null && payWechatInfoList.size() > 0) {
+            payWechatInfoList.stream().forEach(payAlipay -> {
+                String payStatisticsInfoKey = "payStatisticsInfoKey_" + payAlipay.getMid() + "_" + PayTypeEnum.WECHAT_CODE.getKey() + ":" + payAlipay.getId();
+                if (redisUtils.hasKey(payStatisticsInfoKey)) {
+                    StatisticsInfo statisticsInfo = (StatisticsInfo) redisUtils.get(payStatisticsInfoKey);
+                    payAlipay.setSucceedTxTimes(statisticsInfo.getPayedTotalOrderNum());
+                    payAlipay.setTotalTxTimes(statisticsInfo.getTotalOrderNum());
+                    payAlipay.setTotalReceivedAmount(new BigDecimal(statisticsInfo.getPayedTotalAmount()));
+                }
+            });
+        }
         int total = payWechatInfoService.count(query);
         PageUtils pageUtils = new PageUtils(payWechatInfoList, total);
         return pageUtils;
@@ -86,12 +114,15 @@ public class PayWechatInfoController {
         PayWechatInfoDO payWechatInfo = payWechatInfoService.get(id);
         payWechatInfo.setStatus(flag);
         payWechatInfoService.update(payWechatInfo);
+        UserDO userDO = ShiroUtils.getUser();
         if (flag.equals(StatusEnum.ENABLE.getKey())) {
-            statusSynchronizer.sync(PayTypeEnum.WECHAT_CODE, payWechatInfo.getId(), payWechatInfo);
+            String payListKey = Constants.getPayInfoListKey(PayTypeEnum.WECHAT_CODE.getKey());
+            redisUtils.addPaymentInfo(payListKey,payWechatInfo);
         }
-        if (flag.equals(StatusEnum.DISABLE.getKey())) {
-            statusSynchronizer.remove(PayTypeEnum.WECHAT_CODE, payWechatInfo.getId());
-        }
+
+        String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.WECHAT_CODE.getKey(), userDO.getUserId(),id);
+        redisUtils.set(payInfoKey,payWechatInfo);
+
         return R.ok();
     }
 
@@ -103,7 +134,10 @@ public class PayWechatInfoController {
     @RequiresPermissions("system:payWechatInfo:add")
     public R save(PayWechatInfoDO payWechatInfo) {
         payWechatInfo.setMid(ShiroUtils.getUserId());
+        payWechatInfo.setStatus(StatusEnum.DISABLE.getKey());
         if (payWechatInfoService.save(payWechatInfo) > 0) {
+           // String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.WECHAT_CODE.getKey(), payWechatInfo.getId().intValue());
+           // redisUtils.set(payInfoKey,payWechatInfo);
             return R.ok();
         }
         return R.error();
@@ -116,7 +150,11 @@ public class PayWechatInfoController {
     @RequestMapping("/update")
     @RequiresPermissions("system:payWechatInfo:edit")
     public R update(PayWechatInfoDO payWechatInfo) {
+        payWechatInfo.setStatus(payWechatInfo.getStatus());
         payWechatInfoService.update(payWechatInfo);
+        UserDO userDO = ShiroUtils.getUser();
+        String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.WECHAT_CODE.getKey(), userDO.getUserId(), payWechatInfo.getId().intValue());
+        redisUtils.set(payInfoKey,payWechatInfo);
         return R.ok();
     }
 
@@ -127,7 +165,10 @@ public class PayWechatInfoController {
     @ResponseBody
     @RequiresPermissions("system:payWechatInfo:remove")
     public R remove(Integer id) {
+        UserDO userDO = ShiroUtils.getUser();
         if (payWechatInfoService.remove(id) > 0) {
+            String payInfoKey = Constants.getPayInfoKey(PayTypeEnum.WECHAT_CODE.getKey(), userDO.getUserId(), id);
+            redisUtils.remove(payInfoKey);
             return R.ok();
         }
         return R.error();

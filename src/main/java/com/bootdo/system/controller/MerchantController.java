@@ -1,19 +1,19 @@
 package com.bootdo.system.controller;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+import com.bootdo.app.config.Constants;
+import com.bootdo.app.util.RedisUtils;
+import com.bootdo.common.utils.ShiroUtils;
+import com.bootdo.system.domain.UserDO;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import com.bootdo.system.domain.MerchantDO;
 import com.bootdo.system.service.MerchantService;
@@ -34,6 +34,8 @@ import com.bootdo.common.utils.R;
 public class MerchantController {
 	@Autowired
 	private MerchantService merchantService;
+	@Autowired
+	private RedisUtils redisUtils;
 	
 	@GetMapping()
 	@RequiresPermissions("system:merchant:merchant")
@@ -75,6 +77,7 @@ public class MerchantController {
 	@RequiresPermissions("system:merchant:add")
 	public R save(MerchantDO merchant){
 		if(merchantService.save(merchant)>0){
+			redisUtils.set(Constants.getMerchantNoKey(merchant.getMerchantNo()),merchant);
 			return R.ok();
 		}
 		return R.error();
@@ -87,6 +90,8 @@ public class MerchantController {
 	@RequiresPermissions("system:merchant:edit")
 	public R update( MerchantDO merchant){
 		merchantService.update(merchant);
+		MerchantDO merchantDO = merchantService.get(merchant.getId().intValue());
+		redisUtils.set(Constants.getMerchantNoKey(merchant.getMerchantNo()),merchantDO);
 		return R.ok();
 	}
 	
@@ -113,5 +118,22 @@ public class MerchantController {
 		merchantService.batchRemove(ids);
 		return R.ok();
 	}
-	
+
+
+
+	/**
+	 * 修改
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/updateInfo",method = RequestMethod.POST)
+	public R updateInfo(String secretKey, String callbackUrl){
+		UserDO userDO = ShiroUtils.getUser();
+		MerchantDO merchant = merchantService.getByMid(userDO.getUserId());
+		merchant.setCallbackUrl(callbackUrl);
+		merchant.setSecretKey(secretKey);
+		merchantService.update(merchant);
+		String merchantKey = Constants.getMerchantNoKey(merchant.getMerchantNo());
+		redisUtils.set(merchantKey,merchant);
+		return R.ok();
+	}
 }

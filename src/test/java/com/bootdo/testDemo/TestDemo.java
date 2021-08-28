@@ -38,31 +38,31 @@ public class TestDemo {
     redisUtils.del(alipayKey);
     redisUtils.del(bankPayKey);
     //添加微信收款码
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 1000; i++) {
       PayWechatInfoDO payWechatInfoDO = new PayWechatInfoDO();
       payWechatInfoDO.setName("丁三"+i);
       payWechatInfoDO.setAccount("dingbs"+i);
       payWechatInfoDO.setStatus(StatusEnum.ENABLE.getKey());
-      payWechatInfoDO.setImgUrl("http://localhost:6868/img/wechat.jpg");
-      payWechatInfoDO.setMid(138L);
+      payWechatInfoDO.setImgUrl("http://140.143.244.246:6868/img/wechat.jpg");
+      payWechatInfoDO.setMid(137L);
       redisUtils.addPaymentInfo(wechatPayKey,payWechatInfoDO);
     }
 
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 1000; i++) {
       PayAlipayInfoDO payWechatInfoDO = new PayAlipayInfoDO();
       payWechatInfoDO.setName("支付宝"+i);
       payWechatInfoDO.setAccount("zhifubao"+i);
       payWechatInfoDO.setStatus(StatusEnum.ENABLE.getKey());
-      payWechatInfoDO.setMid(138L);
-      payWechatInfoDO.setImgUrl("http://localhost:6868/img/wechat.jpg");
+      payWechatInfoDO.setMid(137L);
+      payWechatInfoDO.setImgUrl("http://140.143.244.246:6868/img/wechat.jpg");
       redisUtils.addPaymentInfo(alipayKey,payWechatInfoDO);
     }
 
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 1000; i++) {
       BankInfoDO payWechatInfoDO = new BankInfoDO();
       payWechatInfoDO.setName("银行"+i);
       payWechatInfoDO.setStatus(StatusEnum.ENABLE.getKey());
-      payWechatInfoDO.setMid(138L);
+      payWechatInfoDO.setMid(137L);
       payWechatInfoDO.setAccount("622588014634687"+i);
       payWechatInfoDO.setAddress("北京市朝去东大街");
       payWechatInfoDO.setBankName("招商银行");
@@ -75,10 +75,25 @@ public class TestDemo {
 
   @Test
   public void testInitData() {
-    redisUtils.set(Constants.ORDER_PAY_URL,"http://localhost:6868/api/pay");
-    redisUtils.set(Constants.ORDER_TIMER_KEY,660);
+
+
+    String wechatPayKey = Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.WECHAT_CODE.getKey());
+    String alipayKey =  Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.APLIPAY_CODE.getKey());
+    String bankPayKey = Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.BANK_CODE.getKey());
+    redisUtils.del(wechatPayKey);
+    redisUtils.del(alipayKey);
+
+   /* //@TODO 必须初始化.
+    redisUtils.set(Constants.ORDER_PAY_URL,"http://140.143.244.246:6868/api/pay");
+    redisUtils.set(Constants.ORDER_TIMER_KEY,1 * 60 * 10);*/
   }
 
+  @Test
+  public void tesInitPro() {
+    String host = "http://43.129.219.47:6868";
+    redisUtils.set(Constants.ORDER_PAY_URL, host+"/api/pay");
+    redisUtils.set(Constants.ORDER_TIMER_KEY,1 * 60 * 10);
+  }
   @Test
   public void md5(){
     System.out.println(Encript.md5("admin"));

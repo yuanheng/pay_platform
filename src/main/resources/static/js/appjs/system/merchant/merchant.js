@@ -58,10 +58,12 @@ function load() {
 																{
 									field : 'mid', 
 									title : '用户id' 
-								},
-																{
+								}, {
 									field : 'secretKey', 
 									title : '秘钥' 
+								},{
+									field : 'status',
+									title : '状态'
 								},
 																{
 									field : 'callbackUrl', 

@@ -8,6 +8,8 @@ import com.bootdo.app.util.Encript;
 import com.bootdo.app.util.OrderCodeUtil;
 import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.OrderStatusEnum;
+import com.bootdo.app.zwlenum.PayTypeEnum;
+import com.bootdo.app.zwlenum.StatusEnum;
 import com.bootdo.system.domain.*;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -71,76 +73,145 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public OrderDO createWechatOrder(PaymentInfo paymentInfo) throws NotPayInfoException {
-		Object payInfoObj = redisUtils.getPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", paymentInfo.getType()));
-		if (payInfoObj == null) {
-			throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+
+		boolean flag = false;
+		Integer num = 1;
+		while (!flag) {
+			Object payInfoObj = redisUtils.getPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.WECHAT_CODE.getKey()));
+			if (payInfoObj == null) {
+				throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+			}
+
+			PayWechatInfoDO payWechatInfoDO = (PayWechatInfoDO) payInfoObj;
+			Long userid = payWechatInfoDO.getMid();
+			String key = Constants.getPayInfoKey(PayTypeEnum.WECHAT_CODE.getKey(),userid,payWechatInfoDO.getId().intValue());
+			if (redisUtils.hasKey(key)) {
+				PayWechatInfoDO tempPayWechatInfoDO = (PayWechatInfoDO) redisUtils.get(key);
+				if (tempPayWechatInfoDO.getStatus().equals(StatusEnum.ENABLE.getKey())) {
+					OrderDO order = new OrderDO();
+					order.setMid(payWechatInfoDO.getMid());
+					order.setMerchantNo(paymentInfo.getMerchantNo());
+					order.setOrderNo(OrderCodeUtil.getOrderCode(null));
+					order.setCreateTime(new Date());
+					order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
+					order.setAmount(paymentInfo.getAmount());
+					order.setReallyAmount(paymentInfo.getAmount());
+					order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
+					order.setPayType(paymentInfo.getType());
+					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
+					save(order);
+					redisUtils.addPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.WECHAT_CODE.getKey()) ,payWechatInfoDO);
+					return  order;
+				} else {
+					if (num > 5) {
+						throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+					}
+					num ++;
+					try {
+						Thread.sleep(500);
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 
-		PayWechatInfoDO payWechatInfoDO = (PayWechatInfoDO) payInfoObj;
-		//判断当前收款方式的状态 @TODO
-
-		OrderDO order = new OrderDO();
-		order.setMid(payWechatInfoDO.getMid());
-		order.setMerchantNo(paymentInfo.getMerchantNo());
-		order.setOrderNo(OrderCodeUtil.getOrderCode(null));
-		order.setCreateTime(new Date());
-		order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
-		order.setAmount(paymentInfo.getAmount());
-		order.setReallyAmount(paymentInfo.getAmount());
-		order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
-		order.setPayType(paymentInfo.getType());
-		order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
-		save(order);
-		return order;
+		return  null;
 	}
 
 	@Override
 	public OrderDO createAlipayOrder(PaymentInfo paymentInfo) throws NotPayInfoException{
-		Object payInfoObj = redisUtils.getPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", paymentInfo.getType()));
-		if (payInfoObj == null) {
-			throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+		boolean flag = false;
+		Integer num = 1;
+		while (!flag) {
+			Object payInfoObj = redisUtils.getPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.APLIPAY_CODE.getKey()));
+			if (payInfoObj == null) {
+				throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+			}
+
+			PayAlipayInfoDO payWechatInfoDO = (PayAlipayInfoDO) payInfoObj;
+			Long userid = payWechatInfoDO.getMid();
+			String key = Constants.getPayInfoKey(PayTypeEnum.APLIPAY_CODE.getKey(),userid,payWechatInfoDO.getId().intValue());
+			if (redisUtils.hasKey(key)) {
+				PayAlipayInfoDO tempPayWechatInfoDO = (PayAlipayInfoDO) redisUtils.get(key);
+				if (tempPayWechatInfoDO.getStatus().equals(StatusEnum.ENABLE.getKey())) {
+					OrderDO order = new OrderDO();
+					order.setMid(payWechatInfoDO.getMid());
+					order.setMerchantNo(paymentInfo.getMerchantNo());
+					order.setOrderNo(OrderCodeUtil.getOrderCode(null));
+					order.setCreateTime(new Date());
+					order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
+					order.setAmount(paymentInfo.getAmount());
+					order.setReallyAmount(paymentInfo.getAmount());
+					order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
+					order.setPayType(paymentInfo.getType());
+					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
+					save(order);
+					redisUtils.addPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.APLIPAY_CODE.getKey()) , payWechatInfoDO);
+					return  order;
+				} else {
+					if (num > 5) {
+						throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+					}
+					num++;
+					try {
+						Thread.sleep(500);
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 
-		PayAlipayInfoDO payWechatInfoDO = (PayAlipayInfoDO) payInfoObj;
-
-		OrderDO order = new OrderDO();
-		order.setMid(payWechatInfoDO.getMid());
-		order.setMerchantNo(paymentInfo.getMerchantNo());
-		order.setOrderNo(OrderCodeUtil.getOrderCode(null));
-		order.setCreateTime(new Date());
-		order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
-		order.setAmount(paymentInfo.getAmount());
-		order.setReallyAmount(paymentInfo.getAmount());
-		order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
-		order.setPayType(paymentInfo.getType());
-		order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
-		save(order);
-		redisUtils.set(Constants.getOrderKey(order.getOrderNo()),order);
-		return order;
+		return  null;
 	}
 
 	@Override
 	public OrderDO createBankOrder(PaymentInfo paymentInfo) throws NotPayInfoException{
-		Object payInfoObj = redisUtils.getPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", paymentInfo.getType()));
-		if (payInfoObj == null) {
-			throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+		boolean flag = false;
+		Integer num = 1;
+		while (!flag) {
+			Object payInfoObj = redisUtils.getPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.BANK_CODE.getKey()));
+			if (payInfoObj == null) {
+				throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+			}
+
+			BankInfoDO payWechatInfoDO = (BankInfoDO) payInfoObj;
+			Long userid = payWechatInfoDO.getMid();
+			String key = Constants.getPayInfoKey(PayTypeEnum.BANK_CODE.getKey(), userid ,payWechatInfoDO.getId().intValue());
+			if (redisUtils.hasKey(key)) {
+				BankInfoDO tempPayWechatInfoDO = (BankInfoDO) redisUtils.get(key);
+				if (tempPayWechatInfoDO.getStatus().equals(StatusEnum.ENABLE.getKey())) {
+					OrderDO order = new OrderDO();
+					order.setMid(payWechatInfoDO.getMid());
+					order.setMerchantNo(paymentInfo.getMerchantNo());
+					order.setOrderNo(OrderCodeUtil.getOrderCode(null));
+					order.setCreateTime(new Date());
+					order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
+					order.setAmount(paymentInfo.getAmount());
+					order.setReallyAmount(paymentInfo.getAmount());
+					order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
+					order.setPayType(paymentInfo.getType());
+					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
+					save(order);
+					redisUtils.addPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.BANK_CODE.getKey()) , payWechatInfoDO);
+					return  order;
+				} else {
+					if (num > 5) {
+						throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+					}
+					num++;
+					try {
+						Thread.sleep(500);
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
-		BankInfoDO payWechatInfoDO = (BankInfoDO) payInfoObj;
-		OrderDO order = new OrderDO();
-		order.setMid(payWechatInfoDO.getMid());
-		order.setMerchantNo(paymentInfo.getMerchantNo());
-		order.setOrderNo(OrderCodeUtil.getOrderCode(null));
-		order.setCreateTime(new Date());
-		order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
-		order.setAmount(paymentInfo.getAmount());
-		order.setReallyAmount(paymentInfo.getAmount());
-		order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
-		order.setPayType(paymentInfo.getType());
-		order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
-		save(order);
-		redisUtils.set(Constants.getOrderKey(order.getOrderNo()),order);
-		return order;
+		return  null;
 	}
+
 
 	@Override
 	public OrderDO notifyMerchant(OrderDO orderDO) {
@@ -163,6 +234,7 @@ public class OrderServiceImpl implements OrderService {
 				if (result.equals("OK")) {
 					orderDO.setStatus(OrderStatusEnum.CALLBACK_SUCCESS.getKey());
 					orderDO.setFinishTime(new Date());
+					orderDO.setRemark("OK");
 				} else {
 					orderDO.setStatus(OrderStatusEnum.CALLBACK_FAILED.getKey());
 					orderDO.setFinishTime(new Date());
@@ -178,12 +250,16 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public int cancelOrder(OrderDO orderDO) {
+		orderDO.setFinishTime(new Date());
 		return orderDao.cancelOrder(orderDO);
 	}
+
 
 
 	private String getSign(String secretKey, OrderDO orderDO) {
 		String signstr = "amount="+orderDO.getAmount()+"&merchantNo="+orderDO.getMerchantNo()+"&merchantOrderNo="+orderDO.getMerchantOrderNo()+"&secretKey="+secretKey;
 		return Encript.md5(signstr);
 	}
+
+
 }

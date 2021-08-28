@@ -53,7 +53,7 @@ public class RepaymentScheduler {
 
 
     //每天9点半和15点半执行一次
-    @Scheduled(cron = "0 30 9,14 * * ?")
+  //  @Scheduled(cron = "0 30 9,14 * * ?")
     public void purchase() {
 
         Date currentDate = new Date();
@@ -245,27 +245,11 @@ public class RepaymentScheduler {
     }
 
 
-    /**
-     * 每天凌晨12点清空用户的当日收益
-     */
+
     @Scheduled(cron = "0 0 0 * * ?")
     private void refreshMember() {
-        Map<String, Object> params = new HashMap<>();
 
-        List<MemberDO> memberDOS = memberService.list(params);
-        if (memberDOS != null && memberDOS.size() > 0) {
-            for (MemberDO memberDO : memberDOS) {
-                memberDO.setDayProfitAmount("0.00");
-                memberDO.setTeamProfitAmount("0.00");
-                memberService.update(memberDO);
-                authManager.refeshMemberInfo(memberDO);
-            }
-        }
     }
-
-
-
-
 
 
 

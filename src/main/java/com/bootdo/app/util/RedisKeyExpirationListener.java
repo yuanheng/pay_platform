@@ -1,6 +1,7 @@
 package com.bootdo.app.util;
 
 import com.bootdo.app.config.Constants;
+import com.bootdo.app.model.StatisticsInfo;
 import com.bootdo.app.zwlenum.OrderStatusEnum;
 import com.bootdo.system.domain.OrderDO;
 import com.bootdo.system.service.OrderService;
@@ -34,10 +35,11 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
       String temp = orderNo[1];
       OrderDO orderDO = new OrderDO();
       orderDO.setOrderNo(temp);
-      orderDO.setStatus(OrderStatusEnum.CALLBACK_SUCCESS.getKey());
+      orderDO.setStatus(OrderStatusEnum.CANCELED.getKey());
       orderService.cancelOrder(orderDO);
     }
     System.out.println(expiredKey);
   }
 
 }
+

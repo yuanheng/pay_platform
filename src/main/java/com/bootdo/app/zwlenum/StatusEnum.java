@@ -10,7 +10,8 @@ package com.bootdo.app.zwlenum;
 public enum StatusEnum {
   //充值
   ENABLE("enable", "启用"),
-  DISABLE("disable", "禁用");
+  DISABLE("disable", "禁用"),
+  DELETED("delete", "删除");
 
 
   StatusEnum(String key, String desc) {

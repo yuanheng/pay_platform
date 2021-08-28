@@ -126,21 +126,23 @@ public class RoleServiceImpl implements RoleService {
         // FIXME 硬编码，不推荐
         final Long ridOfCoder = 61L;
         final Long ridOfMerchant = 60L;
-        final List<Long> roleIdList = user.getRoleIds();
-
-        if (!CollectionUtils.isEmpty(roleIdList)) {
-            if (roleIdList.contains(ridOfCoder) && roleIdList.contains(ridOfMerchant)) {
-                return RoleTypeEnum.ALL;
-            } else {
-                if (roleIdList.contains(ridOfCoder)) {
+        final Long admin = 1L;
+        final List<RoleDO> roleIdList = list(user.getUserId());
+        for (RoleDO roleDO : roleIdList) {
+            if (roleDO.getRoleSign().equals("true")) {
+                if (roleDO.getRoleId() - ridOfCoder == 0) {
                     return RoleTypeEnum.CODER;
                 }
-                if (roleIdList.contains(ridOfMerchant)) {
+                if(roleDO.getRoleId() - ridOfMerchant == 0) {
                     return RoleTypeEnum.MERCHANT;
                 }
+                if (roleDO.getRoleId() - admin == 0) {
+                    return RoleTypeEnum.ALL;
+                }
             }
+
         }
-        return RoleTypeEnum.UNKNOWN;
+        return RoleTypeEnum.ALL;
     }
 
 }

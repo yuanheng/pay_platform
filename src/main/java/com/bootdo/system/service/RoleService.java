@@ -25,5 +25,5 @@ public interface RoleService {
 
 	int batchremove(Long[] ids);
 
-    RoleTypeEnum distinguishByLoginInfo(UserDO user);
+	RoleTypeEnum distinguishByLoginInfo(UserDO user);
 }

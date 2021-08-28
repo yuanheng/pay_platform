@@ -1,85 +1,49 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>欢迎页</title>
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-</head>
+
+<head th:include="include :: header"></head>
 <body onload="load()">
 <div class="panel panel-default">
 
     <div th:if="${roleType.code == 0}">
         <div style="padding: 10px 0 20px 10px;">
-            <h3>&nbsp;&nbsp;&nbsp;商户信息</h3>
-            <ul>
-                <li>今日收款
-                    <span style="color: #00B83F;margin-left: 25px;" id="daily_received"></span>
-                </li>
-                <li>累计收款
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="m_total_received"></span>
-                </li>
-            </ul>
-
-            <h4>&nbsp;&nbsp;&nbsp;商户的基本信息</h4>
-            <ul>
-                <li>商户号：
-                    <span style="color: #00B83F;margin-left: 25px;" th:text="${merchantInfo.merchantNo}">商户号</span>
-                </li>
-                <li>
-                    秘钥：
-                    <span style="color: #00B83F;margin-left: 25px;" th:text="${merchantInfo.secretKey}">秘钥</span>
-                </li>
-                <li>
-                    回调地址：
-                    <span style="color: #00B83F;margin-left: 25px;" th:text="${merchantInfo.callbackUrl}">回调地址</span>
-                </li>
-            </ul>
-        </div>
-
-        <hr>
-
-        <div style="padding: 10px 0 20px 10px;">
-            <h3>&nbsp;&nbsp;&nbsp;码子信息</h3>
-            <ul>
-                <li>累计收款
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_total_received"></span>
-                </li>
-                <li>累计单数
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_total_tx_times"></span>
-                </li>
-                <li>成功单数
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_suc_tx_times"></span>
-                </li>
-                <li>收款成功比例（%）
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_tx_suc_rate"></span>
-                </li>
-            </ul>
+            <h1>欢迎管理员</h1>
         </div>
     </div>
     <div th:if="${roleType.code == 1}">
         <div style="padding: 10px 0 20px 10px;">
             <h3>&nbsp;&nbsp;&nbsp;商户信息</h3>
             <ul>
-                <li>今日收款
-                    <span style="color: #00B83F;margin-left: 25px;" id="daily_received"></span>
-                </li>
+
                 <li>累计收款
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="m_total_received"></span>
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="m_total_received"></span><span>元</span>
+                </li>
+
+                <li>成功单数
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="payed_order_num"></span><span>单</span>
+                </li>
+
+                <li>订单总额
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="total_amount"></span><span>元</span>
+                </li>
+                <li>总订单数量
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="order_num"></span><span>单</span>
                 </li>
             </ul>
 
             <h3>&nbsp;&nbsp;&nbsp;商户的基本信息</h3>
-            <ul>
-                <li>商户号：
-                </li>
-                <li>
-                    秘钥：
-                </li>
-                <li>
-                    回调地址：
-                </li>
+
+                <div class="col-sm-8">商户号：<span th:text="${merchantInfo.merchantNo}"></span></div>
+                <div class="col-sm-8">
+                    秘钥：<input  type="text"  class="form-control"  id="secretKey" th:value="${merchantInfo.secretKey}" />
+                </div>
+
+                <div class="col-sm-8">
+                    回调地址：<input class="form-control" type="text" id="callbackUrl" th:value="${merchantInfo.callbackUrl}" />
+                </div>
+                <div class="col-sm-8 col-sm-offset-4">
+                    <button onclick="update()" class="btn btn-primary">&nbsp;&nbsp;&nbsp;&nbsp;提&nbsp;&nbsp;&nbsp;&nbsp;交&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                </div>
             </ul>
         </div>
     </div>
@@ -108,6 +72,7 @@
 
 </div>
 </body>
+<div th:include="include::footer"></div>
 <script src="js/jquery.min.js"></script>
 <script src="js/openTab.js"></script>
 <script type="text/javascript">
@@ -121,15 +86,39 @@
             url: prefix + '/statistics',
             type: "get",
             success: function (r) {
-                $('#daily_received').text(r.dailyReceivedAmount);
-                $('#m_total_received').text(r.totalReceivedAmount);
-                $('#c_total_received').text(r.totalReceivedAmount);
-                $('#c_total_tx_times').text(r.totalTxTimes);
-                $('#c_suc_tx_times').text(r.succeedTxTimes);
-                $('#c_tx_suc_rate').text(r.txSucceedRate);
+                $('#m_total_received').text(r.payedTotalAmount/100);
+                $('#payed_order_num').text(r.payedTotalOrderNum);
+                $('#total_amount').text(r.totalAmount / 100);
+                $('#order_num').text(r.totalOrderNum);
+
             }
         });
     }
 
+    function update() {
+        layer.confirm('确定要修改商户信息吗？', {
+            btn: ['确定', '取消']
+        }, function () {
+            var secretKey = $("#secretKey").val();
+            var callbackUrl = $("#callbackUrl").val();
+
+            $.ajax({
+                url: "/system/merchant/updateInfo",
+                type: "post",
+                data: {
+                    'secretKey': secretKey,
+                    'callbackUrl': callbackUrl
+                },
+                success: function (r) {
+                    if (r.code == 0) {
+                        layer.msg(r.msg);
+                        reLoad();
+                    } else {
+                        layer.msg(r.msg);
+                    }
+                }
+            });
+        })
+    }
 </script>
 </html>
