@@ -10,6 +10,8 @@ public class PaymentInfo implements Serializable {
   private String sign;
   private String type;
 
+  private String remark;
+
   public String getMerchantOrderNo() {
     return merchantOrderNo;
   }
@@ -49,5 +51,13 @@ public class PaymentInfo implements Serializable {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public String getRemark() {
+    return remark;
+  }
+
+  public void setRemark(String remark) {
+    this.remark = remark;
   }
 }

@@ -99,6 +99,7 @@ public class OrderServiceImpl implements OrderService {
 					order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
 					order.setPayType(paymentInfo.getType());
 					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
+					order.setRemark(paymentInfo.getRemark());
 					save(order);
 					redisUtils.addPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.WECHAT_CODE.getKey()) ,payWechatInfoDO);
 					return  order;
@@ -147,6 +148,7 @@ public class OrderServiceImpl implements OrderService {
 					order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
 					order.setPayType(paymentInfo.getType());
 					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
+					order.setRemark(paymentInfo.getRemark());
 					save(order);
 					redisUtils.addPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.APLIPAY_CODE.getKey()) , payWechatInfoDO);
 					return  order;
@@ -194,6 +196,7 @@ public class OrderServiceImpl implements OrderService {
 					order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
 					order.setPayType(paymentInfo.getType());
 					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
+					order.setRemark(paymentInfo.getRemark());
 					save(order);
 					redisUtils.addPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.BANK_CODE.getKey()) , payWechatInfoDO);
 					return  order;

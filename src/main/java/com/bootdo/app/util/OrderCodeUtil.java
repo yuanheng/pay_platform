@@ -52,7 +52,7 @@ public class OrderCodeUtil {
      *      * 生成时间戳
      *      
      */
-    private static String getDateTime() {
+    public static String getDateTime() {
         DateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         return sdf.format(new Date());
     }

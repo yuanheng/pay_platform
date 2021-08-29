@@ -3,20 +3,18 @@ package com.bootdo.system.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.bootdo.app.config.Constants;
 import com.bootdo.app.model.MerchantPayInfo;
-import com.bootdo.app.model.PaymentInfo;
 import com.bootdo.app.model.Result;
 import com.bootdo.app.model.StatisticsInfo;
 import com.bootdo.app.util.DistributedLock;
 import com.bootdo.app.util.NumberUtil;
+import com.bootdo.app.util.OrderCodeUtil;
 import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.PayTypeEnum;
-import com.bootdo.common.utils.StringUtils;
 import com.bootdo.system.domain.MerchantDO;
 import com.bootdo.system.domain.OrderDO;
 import com.bootdo.system.dto.Order4InstanceReqDTO;
 import com.bootdo.system.service.MerchantService;
 import com.bootdo.system.service.OrderService;
-import com.bootdo.system.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Map;
-import java.util.Random;
 
 /**
  * @author Prometheus
@@ -60,11 +57,13 @@ public class PayExamController {
     public Result<Map> createOrder(@Validated Order4InstanceReqDTO paymentInfo) throws Exception {
         // 根据merchantId 获取商户信息
         try {
-//            MerchantDO merchant = merchantService.getByMerchantNo(dto.getMerchantNo());
-//            if (merchant == null) {
-//                return Result.error("商户不对，merchantNo不正确");
-//            }
-//            //校验签名
+            final String merchantNo = "1000001";
+            MerchantDO merchant = merchantService.getByMerchantNo(merchantNo);
+            if (merchant == null) {
+                return Result.error("商户不对，merchantNo不正确");
+            }
+
+            //校验签名
 //            boolean signResult = checkSign(merchant.getSecretKey(), paymentInfo);
 //            if (!signResult) {
 //                return Result.error("签名不正确");
@@ -72,12 +71,9 @@ public class PayExamController {
 
             //判断订单额度
             String amount = paymentInfo.getAmount();
-//            if (NumberUtil.compare("100", amount) > 0 || NumberUtil.compare("5000001", amount) < 0) {
-//                return Result.error("订单额度在10-5000元之间");
-//            }
-
-            // 重置支付金額
-            paymentInfo.setAmount(String.valueOf(new Random().nextInt(100)));
+            if (NumberUtil.compare("100", amount) > 0 || NumberUtil.compare("5000001", amount) < 0) {
+                return Result.error("订单额度在10-5000元之间");
+            }
 
             //创建订单
             String type = paymentInfo.getType();
@@ -86,6 +82,8 @@ public class PayExamController {
                 return Result.error("支付方式错误");
             }
             OrderDO order = null;
+
+            paymentInfo.setRemark(String.format("测试支付_%s", OrderCodeUtil.getDateTime()));
             if (type.equals(PayTypeEnum.WECHAT_CODE.getKey())) {
                 order = orderService.createWechatOrder(paymentInfo);
             } else if (type.equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
