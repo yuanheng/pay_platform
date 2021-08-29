@@ -11,7 +11,7 @@ server:
 
 bootdo:
   #uploadPath: /Users/dingbaosheng/uploaded_files/
-  uploadPath: /www/wwwroot/pics/
+  uploadPath: /Users/charles/provisional/customer/pay_platform
   veriCodeNeeded: 0
   username: admin
   password: 111111

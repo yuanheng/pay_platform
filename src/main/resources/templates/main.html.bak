@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head th:include="include :: header"></head>
+<body onload="load()">
+<div class="panel panel-default">
+
+    <div th:if="${roleType.code == 0}">
+        <div style="padding: 10px 0 20px 10px;">
+            <h1>欢迎管理员</h1>
+        </div>
+    </div>
+    <div th:if="${roleType.code == 1}">
+        <div style="padding: 10px 0 20px 10px;">
+            <h3>&nbsp;&nbsp;&nbsp;商户信息</h3>
+            <ul>
+
+                <li>累计收款
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="m_total_received"></span><span>元</span>
+                </li>
+
+                <li>成功单数
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="payed_order_num"></span><span>单</span>
+                </li>
+
+                <li>订单总额
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="total_amount"></span><span>元</span>
+                </li>
+                <li>总订单数量
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="order_num"></span><span>单</span>
+                </li>
+            </ul>
+
+            <h3>&nbsp;&nbsp;&nbsp;商户的基本信息</h3>
+
+                <div class="col-sm-8">商户号：<span th:text="${merchantInfo.merchantNo}"></span></div>
+                <div class="col-sm-8">
+                    秘钥：<input  type="text"  class="form-control"  id="secretKey" th:value="${merchantInfo.secretKey}" />
+                </div>
+
+                <div class="col-sm-8">
+                    回调地址：<input class="form-control" type="text" id="callbackUrl" th:value="${merchantInfo.callbackUrl}" />
+                </div>
+                <div class="col-sm-8 col-sm-offset-4">
+                    <button onclick="update()" class="btn btn-primary">&nbsp;&nbsp;&nbsp;&nbsp;提&nbsp;&nbsp;&nbsp;&nbsp;交&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                </div>
+            </ul>
+        </div>
+    </div>
+    <div th:if="${roleType.code == 2}">
+        <div style="padding: 10px 0 20px 10px;">
+            <h3>&nbsp;&nbsp;&nbsp;码子信息</h3>
+            <ul>
+                <li>累计收款
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_total_received"></span>
+                </li>
+                <li>累计单数
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_total_tx_times"></span>
+                </li>
+                <li>成功单数
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_suc_tx_times"></span>
+                </li>
+                <li>收款成功比例（%）
+                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_tx_suc_rate"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div th:if="${roleType.code == 9}">
+        <h3>用户很懒，没配角色</h3>
+    </div>
+
+</div>
+</body>
+<div th:include="include::footer"></div>
+<script src="js/jquery.min.js"></script>
+<script src="js/openTab.js"></script>
+<script type="text/javascript">
+    var prefix = "/main";
+    $(function () {
+        load();
+    });
+
+    function load() {
+        $.ajax({
+            url: prefix + '/statistics',
+            type: "get",
+            success: function (r) {
+                $('#m_total_received').text(r.payedTotalAmount/100);
+                $('#payed_order_num').text(r.payedTotalOrderNum);
+                $('#total_amount').text(r.totalAmount / 100);
+                $('#order_num').text(r.totalOrderNum);
+
+            }
+        });
+    }
+
+    function update() {
+        layer.confirm('确定要修改商户信息吗？', {
+            btn: ['确定', '取消']
+        }, function () {
+            var secretKey = $("#secretKey").val();
+            var callbackUrl = $("#callbackUrl").val();
+
+            $.ajax({
+                url: "/system/merchant/updateInfo",
+                type: "post",
+                data: {
+                    'secretKey': secretKey,
+                    'callbackUrl': callbackUrl
+                },
+                success: function (r) {
+                    if (r.code == 0) {
+                        layer.msg(r.msg);
+                        reLoad();
+                    } else {
+                        layer.msg(r.msg);
+                    }
+                }
+            });
+        })
+    }
+</script>
+</html>

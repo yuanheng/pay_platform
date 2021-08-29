@@ -110,10 +110,7 @@ public class LoginController extends BaseController {
         Subject subject = SecurityUtils.getSubject();
         try {
             subject.login(token);
-            return R.ok();
-        } catch (AuthenticationException e) {
-            return R.error("用户或密码错误");
-        } finally {
+
             UserDO userDO = (UserDO) subject.getPrincipal();
             final Long currentUserId = userDO.getUserId();
             List<RoleDO> roles = roleService.list(currentUserId);
@@ -124,6 +121,10 @@ public class LoginController extends BaseController {
             } else {
                 logger.warn("当前用户[{}]没有可用角色。", currentUserId);
             }
+
+            return R.ok();
+        } catch (AuthenticationException e) {
+            return R.error("用户或密码错误");
         }
     }
 
