@@ -1,75 +1,148 @@
 <!DOCTYPE html>
 <html>
-
+<meta charset="utf-8">
 <head th:include="include :: header"></head>
-<body onload="load()">
-<div class="panel panel-default">
+<body class="gray-bg" onload="load()">
 
-    <div th:if="${roleType.code == 0}">
-        <div style="padding: 10px 0 20px 10px;">
-            <h1>欢迎管理员</h1>
+<!--管理员-->
+<div th:if="${roleType.code == 0}">
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>欢迎管理员</h1>
+            </div>
         </div>
     </div>
-    <div th:if="${roleType.code == 1}">
-        <div style="padding: 10px 0 20px 10px;">
-            <h3>&nbsp;&nbsp;&nbsp;商户信息</h3>
-            <ul>
-
-                <li>累计收款
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="m_total_received"></span><span>元</span>
-                </li>
-
-                <li>成功单数
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="payed_order_num"></span><span>单</span>
-                </li>
-
-                <li>订单总额
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="total_amount"></span><span>元</span>
-                </li>
-                <li>总订单数量
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="order_num"></span><span>单</span>
-                </li>
-            </ul>
-
-            <h3>&nbsp;&nbsp;&nbsp;商户的基本信息</h3>
-
-                <div class="col-sm-8">商户号：<span th:text="${merchantInfo.merchantNo}"></span></div>
-                <div class="col-sm-8">
-                    秘钥：<input  type="text"  class="form-control"  id="secretKey" th:value="${merchantInfo.secretKey}" />
+</div>
+<!--商户-->
+<div th:if="${roleType.code == 1}">
+    <div class="panel panel-default">
+        <div class="row">
+            <h1 style="margin-left: 25px;">商户订单信息</h1>
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">总订单数量：</label>
+                            <span class="col-sm-1 control-label" id="order_num"></span>&nbsp;单
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">成功单数：</label>
+                            <span class="col-sm-1 control-label" id="payed_order_num"></span>&nbsp;单
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">订单总额：</label>
+                            <span class="col-sm-1 control-label" id="total_amount"></span>&nbsp;元
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">累计收款：</label>
+                            <span class="col-sm-1 control-label" id="m_total_received"></span>&nbsp;元
+                        </div>
+                    </div>
                 </div>
-
-                <div class="col-sm-8">
-                    回调地址：<input class="form-control" type="text" id="callbackUrl" th:value="${merchantInfo.callbackUrl}" />
+            </div>
+            <h1 style="margin-left: 25px;">商户基本信息</h1>
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">商户号：</label>
+                            <span class="col-sm-6 control-label" th:text="${merchantInfo.merchantNo}"></span>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">秘钥：</label>
+                            <div class="col-sm-6">
+                                <input class="form-control" type="text" id="secretKey"
+                                       th:value="${merchantInfo.secretKey}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">回调地址：</label>
+                            <div class="col-sm-6">
+                                <input type="text" id="callbackUrl" class="form-control"
+                                       th:value="${merchantInfo.callbackUrl}">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-8 col-sm-offset-4">
-                    <button onclick="update()" class="btn btn-primary">&nbsp;&nbsp;&nbsp;&nbsp;提&nbsp;&nbsp;&nbsp;&nbsp;交&nbsp;&nbsp;&nbsp;&nbsp;</button>
+            </div>
+        </div>
+        <h1></h1>
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="form-group">
+                        <div class="col-sm-8 col-sm-offset-4">
+                            <button onclick="update()" class="btn btn-primary">&nbsp;&nbsp;&nbsp;&nbsp;提&nbsp;&nbsp;&nbsp;&nbsp;交&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                        </div>
+                    </div>
                 </div>
-            </ul>
+            </div>
         </div>
     </div>
-    <div th:if="${roleType.code == 2}">
-        <div style="padding: 10px 0 20px 10px;">
-            <h3>&nbsp;&nbsp;&nbsp;码子信息</h3>
-            <ul>
-                <li>累计收款
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_total_received"></span>
-                </li>
-                <li>累计单数
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_total_tx_times"></span>
-                </li>
-                <li>成功单数
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_suc_tx_times"></span>
-                </li>
-                <li>收款成功比例（%）
-                    <span style="color: #3e8f3e;margin-left: 25px;" id="c_tx_suc_rate"></span>
-                </li>
-            </ul>
+</div>
+</div>
+<!--码商-->
+<div th:if="${roleType.code == 2}">
+    <div class="panel panel-default">
+        <div class="row">
+            <h1 style="margin-left: 25px;">码子信息</h1>
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">累计收款：</label>
+                            <label class="col-sm-2 control-label" id="c_total_received"></label>&nbsp;元
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">累计单数：</label>
+                            <label class="col-sm-2 control-label" id="c_total_tx_times"></label>&nbsp;单
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">成功单数：</label>
+                            <label class="col-sm-2 control-label" id="c_suc_tx_times"></label>&nbsp;单
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">收款成功比例（%）：</label>
+                            <label class="col-sm-2 control-label" id="c_tx_suc_rate"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div th:if="${roleType.code == 9}">
-        <h3>用户很懒，没配角色</h3>
+</div>
+<!--未知-->
+<div th:if="${roleType.code == 9}">
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>用户很懒，没配角色</h1>
+            </div>
+        </div>
     </div>
-
 </div>
 </body>
 <div th:include="include::footer"></div>
@@ -86,7 +159,7 @@
             url: prefix + '/statistics',
             type: "get",
             success: function (r) {
-                $('#m_total_received').text(r.payedTotalAmount/100);
+                $('#m_total_received').text(r.payedTotalAmount / 100);
                 $('#payed_order_num').text(r.payedTotalOrderNum);
                 $('#total_amount').text(r.totalAmount / 100);
                 $('#order_num').text(r.totalOrderNum);
