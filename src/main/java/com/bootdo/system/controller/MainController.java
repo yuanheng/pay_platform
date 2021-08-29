@@ -1,22 +1,15 @@
 package com.bootdo.system.controller;
 
 import com.bootdo.app.model.StatisticsInfo;
-import com.bootdo.app.util.DistributedLock;
 import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.RoleTypeEnum;
 import com.bootdo.common.annotation.Log;
-import com.bootdo.common.config.Constant;
 import com.bootdo.common.controller.BaseController;
-import com.bootdo.common.utils.MathUtil;
 import com.bootdo.common.utils.ShiroUtils;
-import com.bootdo.system.domain.BankInfoDO;
 import com.bootdo.system.domain.MerchantDO;
 import com.bootdo.system.domain.StatisticInfoDO;
 import com.bootdo.system.domain.UserDO;
-import com.bootdo.system.service.BankInfoService;
 import com.bootdo.system.service.MerchantService;
-import com.bootdo.system.service.PayAlipayInfoService;
-import com.bootdo.system.service.PayWechatInfoService;
 import com.bootdo.system.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

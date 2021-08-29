@@ -10,8 +10,7 @@ server:
 #    enabled: false
 
 bootdo:
-  #uploadPath: /Users/dingbaosheng/uploaded_files/
-  uploadPath: /Users/charles/provisional/customer/pay_platform
+  uploadPath: /Users/dingbaosheng/uploaded_files/
   veriCodeNeeded: 0
   username: admin
   password: 111111

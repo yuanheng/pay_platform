@@ -86,7 +86,6 @@
             <nav class="navbar navbar-static-top" role="navigation"
                  style="margin-bottom: 0">
                 <div class="navbar-header">
-
                     <a class="navbar-minimalize minimalize-styl-2 btn btn-default "
                        href="#" title="收起菜单"><i class="fa fa-bars"></i> </a>
                     <form role="search" class="navbar-form-custom"
@@ -98,6 +97,8 @@
                     </form>
                 </div>
                 <ul class="nav navbar-top-links navbar-right">
+                    <li class="hidden-xs"><a href="/e/toward" target="_Blank"
+                                             class=""><i class="fa fa-rss-square"></i>支付示例</a></li>
                     <li class="hidden-xs"><a href="/blog" target="_Blank"
                                              class=""><i class="fa fa-rss-square"></i>博客</a></li>
                     <li class="dropdown"><a class="dropdown-toggle count-info"
@@ -128,7 +129,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="hidden-xs"><a @click="personal" href="#" ><i class="fa fa-id-card"></i> 个人</a></li>
+                    <li class="hidden-xs"><a @click="personal" href="#"><i class="fa fa-id-card"></i> 个人</a></li>
                     <li class="dropdown hidden-xs"><a
                             class="right-sidebar-toggle" aria-expanded="false"> <i
                             class="fa fa-tasks"></i> 主题
@@ -309,7 +310,7 @@
     function connect() {
         var sock = new SockJS("/endpointChat");
         var stomp = Stomp.over(sock);
-        stomp.connect('guest', 'guest', function(frame) {
+        stomp.connect('guest', 'guest', function (frame) {
 
             /**  订阅了/user/queue/notifications 发送的消息,这里雨在控制器的 convertAndSendToUser 定义的地址保持一致, 
              *  这里多用了一个/user,并且这个user 是必须的,使用user 才会发送消息到指定的用户。 
@@ -334,6 +335,7 @@
                 toastr.info(JSON.parse(response.body).responseMessage);
             });
         });
+
         function handleNotification(message) {
             wrapper.notify();
             toastr.info(message.body);
