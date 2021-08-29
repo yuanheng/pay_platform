@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header">
+</head>
+<body class="gray-bg">
+<!--示例支付-->
+<div class="row">
+    <div class="col-sm-12 col-md-8">
+        <div class="col-sm-2 col-md-2">
+            <div class="thumbnail">
+                <img src="img/badge/shutterstock-203562340.jpeg" alt="..."/>
+                <div class="caption">
+                    <h1><p style="margin: 0 0 0;">支付示例</p></h1>
+                </div>
+            </div>
+        </div>
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="payExam">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">收款方：</label>
+                        <div class="col-sm-6">
+                            <input id="name" name="name" class="form-control" value="隨機" type="text" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">支付方式：</label>
+                        <div class="col-sm-6">
+                            <select id="payType" name="payType" class="form-control">
+                                <option value="wechat">微信</option>
+                                <option value="alipay">支付寶</option>
+                                <option value="bank">銀行卡</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">支付金額：</label>
+                        <div class="col-sm-6">
+                            <input id="amount" name="amount" class="form-control" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">備註：</label>
+                        <div class="col-sm-6">
+                            <input id="remark" name="remark" class="form-control" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <button type="button" class="btn btn-primary" onclick="apply()">提交</button>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="goBack();">
+                            返回
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<div th:include="include::footer"></div>
+<script src="js/jquery.min.js"></script>
+<script src="js/openTab.js"></script>
+<script type="text/javascript">
+    function apply() {
+        var name = $('#name').val();
+        var payType = $('#payType').val();
+        var amount = $('#amount').val();
+        var remark = $('#remark').val();
+
+        var msg = '確定給[' + name + ']付款[' + amount + ']，備註[' + remark + ']？';
+        layer.confirm(msg, {
+            btn: ['确定', '取消']
+        }, function () {
+            $.ajax({
+                url: "/e/createOrder",
+                type: "post",
+                data: {
+                    'name': name,
+                    'type': payType,
+                    'amount': amount,
+                    'remark': remark
+                },
+                success: function (r) {
+                    if (r.code == 0) {
+                        layer.msg('金額修正為：' + r.data.payInfo.amount);
+                        window.location.href = r.data.payUrl;
+                    } else {
+                        layer.msg(r.msg);
+                    }
+                }
+            });
+        })
+    }
+
+    function goBack() {
+        window.location.href = '../index';
+    }
+</script>
+</html>

@@ -1,42 +1,70 @@
 <!DOCTYPE html>
 <html>
 <meta charset="utf-8">
-<head th:include="include :: header"></head>
+<head th:include="include :: header">
+</head>
 <body class="gray-bg" onload="load()">
 
 <!--管理员-->
 <div th:if="${roleType.code == 0}">
     <div class="panel panel-default">
         <div class="row">
-            <div class="col-sm-12">
-                <h1>欢迎管理员</h1>
+            <div class="col-sm-12 col-md-8">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <h1>欢理员</h1>
+                    </div>
+                    <img src="img/badge/shutterstock-1086853526.jpeg" alt="..."/>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 <!--商户-->
 <div th:if="${roleType.code == 1}">
     <div class="panel panel-default">
         <div class="row">
             <h1 style="margin-left: 25px;">商户订单信息</h1>
-            <div class="col-sm-12">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-content">
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">总订单数量：</label>
-                            <span class="col-sm-1 control-label" id="order_num"></span>&nbsp;单
+            <div class="row" style="margin-left: 30px;">
+                <div class="col-sm-2 col-md-2">
+                    <div class="thumbnail">
+                        <!--                        <img th:src="${p13Url}" alt="..."/>-->
+                        <img src="img/badge/shutterstock-317680286.jpeg" alt="..."/>
+                        <div class="caption">
+                            <h2><span class="control-label" id="order_num"></span>&nbsp;单</h2>
+                            <p style="margin: 0 0 0;">总订单数量</p>
+                            <!--                <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">成功单数：</label>
-                            <span class="col-sm-1 control-label" id="payed_order_num"></span>&nbsp;单
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2">
+                    <div class="thumbnail">
+                        <img src="img/badge/shutterstock-623493332.jpeg" alt="...">
+                        <div class="caption">
+                            <h2><span class="control-label" id="payed_order_num"></span>&nbsp;单</h2>
+                            <p style="margin: 0 0 0;">成功单数</p>
+                            <!--                <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">订单总额：</label>
-                            <span class="col-sm-1 control-label" id="total_amount"></span>&nbsp;元
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2">
+                    <div class="thumbnail">
+                        <img src="img/badge/shutterstock-203562340.jpeg" alt="...">
+                        <div class="caption">
+                            <h2><span class="control-label" id="total_amount"></span>&nbsp;&nbsp;元</h2>
+                            <p style="margin: 0 0 0;">订单总额</p>
+                            <!--                <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">累计收款：</label>
-                            <span class="col-sm-1 control-label" id="m_total_received"></span>&nbsp;元
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2">
+                    <div class="thumbnail">
+                        <img src="img/badge/shutterstock-1164366778.jpeg" alt="...">
+                        <div class="caption">
+                            <h2><span class="control-label" id="m_total_received"></span>&nbsp;&nbsp;元</h2>
+                            <p style="margin: 0 0 0;">累计收款</p>
+                            <!--                <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
                         </div>
                     </div>
                 </div>
@@ -91,42 +119,44 @@
     <div class="panel panel-default">
         <div class="row">
             <h1 style="margin-left: 25px;">码子信息</h1>
-            <div class="col-sm-12">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-content">
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">累计收款：</label>
-                            <label class="col-sm-2 control-label" id="c_total_received"></label>&nbsp;元
+            <div class="row" style="margin-left: 30px;">
+                <div class="col-sm-2 col-md-2">
+                    <div class="thumbnail">
+                        <img src="img/badge/shutterstock-317680286.jpeg" alt="..."/>
+                        <div class="caption">
+                            <h2><span class="control-label" id="c_total_received"></span>&nbsp;元</h2>
+                            <p style="margin: 0 0 0;">累计收款</p>
+                            <!--                <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-12">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-content">
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">累计单数：</label>
-                            <label class="col-sm-2 control-label" id="c_total_tx_times"></label>&nbsp;单
+                <div class="col-sm-2 col-md-2">
+                    <div class="thumbnail">
+                        <img src="img/badge/shutterstock-623493332.jpeg" alt="...">
+                        <div class="caption">
+                            <h2><span class="control-label" id="c_total_tx_times"></span>&nbsp;单</h2>
+                            <p style="margin: 0 0 0;">累计单数</p>
+                            <!--                <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-12">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-content">
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">成功单数：</label>
-                            <label class="col-sm-2 control-label" id="c_suc_tx_times"></label>&nbsp;单
+                <div class="col-sm-2 col-md-2">
+                    <div class="thumbnail">
+                        <img src="img/badge/shutterstock-203562340.jpeg" alt="...">
+                        <div class="caption">
+                            <h2><span class="control-label" id="c_suc_tx_times"></span>&nbsp;单</h2>
+                            <p style="margin: 0 0 0;">成功单数</p>
+                            <!--                <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-12">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-content">
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">收款成功比例（%）：</label>
-                            <label class="col-sm-2 control-label" id="c_tx_suc_rate"></label>
+                <div class="col-sm-2 col-md-2">
+                    <div class="thumbnail">
+                        <img src="img/badge/shutterstock-1164366778.jpeg" alt="...">
+                        <div class="caption">
+                            <h2><span class="control-label" id="c_tx_suc_rate">0</span></h2>
+                            <p style="margin: 0 0 0;">成功比例(%)</p>
+                            <!--                <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
                         </div>
                     </div>
                 </div>
