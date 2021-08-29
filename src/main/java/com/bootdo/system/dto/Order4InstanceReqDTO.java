@@ -12,13 +12,13 @@ import javax.validation.constraints.NotEmpty;
 @Data
 public class Order4InstanceReqDTO extends PaymentInfo {
 
-    @NotEmpty(message = "非法的數值[name]")
+    //    @NotEmpty(message = "非法的數值[name]")
     private String name;
     @NotEmpty(message = "非法的數值[payType]")
     private String type;
     @NotEmpty(message = "非法的數值[amount]")
     private String amount;
-    @NotEmpty(message = "非法的數值[remark]")
-    private String remark;
+    //    @NotEmpty(message = "非法的數值[remark]")
+
 
 }
