@@ -1,16 +1,22 @@
 package com.bootdo.system.controller;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.bootdo.app.config.Constants;
 import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.StatusEnum;
 import com.bootdo.common.utils.ShiroUtils;
 import com.bootdo.system.domain.UserDO;
+import com.bootdo.system.dto.TbCodeStatusDTO;
+import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,13 +31,13 @@ import com.bootdo.common.utils.Query;
 import com.bootdo.common.utils.R;
 
 /**
- * 
- * 
+ *
+ *
  * @author chglee
  * @email 1992lcg@163.com
  * @date 2021-09-08 22:32:27
  */
- 
+@Slf4j
 @Controller
 @RequestMapping("/system/tbOrder")
 public class TbOrderController {
@@ -39,13 +45,32 @@ public class TbOrderController {
 	private TbOrderService tbOrderService;
 	@Autowired
 	private RedisUtils redisUtils;
-	
+
 	@GetMapping()
 	@RequiresPermissions("system:tbOrder:tbOrder")
-	String TbOrder(){
+	String TbOrder(Model model){
+		final List<TbCodeStatusDTO> statusCountList = tbOrderService.statCodeStatus();
+		Map<String, List<TbCodeStatusDTO>> statusMap = statusCountList.stream()
+				.filter(e -> StringUtils.isNotEmpty(e.getStatus()))
+				.collect(Collectors.groupingBy(TbCodeStatusDTO::getStatus));
+		statusMap.entrySet().forEach(e -> e.getValue()
+				.forEach(ex -> ex.setStatus(StatusEnum.getStatusEnumByKey(ex.getStatus()).getTypeDesc())));
+		List<TbCodeStatusDTO> list = Lists.newLinkedList();
+		for (Map.Entry<String, List<TbCodeStatusDTO>> entry : statusMap.entrySet()) {
+			List<TbCodeStatusDTO> value = entry.getValue();
+			if (!CollectionUtils.isEmpty(value)) {
+				try {
+					value.sort(Comparator.comparing(e -> Long.parseLong(e.getAmount())));
+				} catch (Exception e) {
+					log.error("数值转化异常，影响显示排序，不影响使用");
+				}
+				list.addAll(value);
+			}
+		}
+		model.addAttribute("codeStatusInfo", list);
 	    return "system/tbOrder/tbOrder";
 	}
-	
+
 	@ResponseBody
 	@GetMapping("/list")
 	@RequiresPermissions("system:tbOrder:tbOrder")
@@ -57,7 +82,7 @@ public class TbOrderController {
 		PageUtils pageUtils = new PageUtils(tbOrderList, total);
 		return pageUtils;
 	}
-	
+
 	@GetMapping("/add")
 	@RequiresPermissions("system:tbOrder:add")
 	String add(){
@@ -71,7 +96,7 @@ public class TbOrderController {
 		model.addAttribute("tbOrder", tbOrder);
 	    return "system/tbOrder/edit";
 	}
-	
+
 	/**
 	 * 保存
 	 */
@@ -98,7 +123,7 @@ public class TbOrderController {
 		tbOrderService.update(tbOrder);
 		return R.ok();
 	}
-	
+
 	/**
 	 * 删除
 	 */
@@ -111,7 +136,7 @@ public class TbOrderController {
 		}
 		return R.error();
 	}
-	
+
 	/**
 	 * 删除
 	 */

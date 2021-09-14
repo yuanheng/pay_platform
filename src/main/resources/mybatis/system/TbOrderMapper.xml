@@ -3,13 +3,19 @@
 
 <mapper namespace="com.bootdo.system.dao.TbOrderDao">
 
+	<resultMap id="TbCodeStatusMap" type="com.bootdo.system.dto.TbCodeStatusDTO">
+		<result property="amount" column="amount" />
+		<result property="status" column="status" />
+		<result property="count" column="count" />
+	</resultMap>
+
 	<select id="get" resultType="com.bootdo.system.domain.TbOrderDO">
 		select `id`,`no`,`amount`,`account`,`create_time`,`validity`,`status`,`mid`,`remark`,`end_time`,`url`,`extra` from rs_tb_order where id = #{value}
 	</select>
 
 	<select id="list" resultType="com.bootdo.system.domain.TbOrderDO">
 		select `id`,`no`,`amount`,`account`,`create_time`,`validity`,`status`,`mid`,`remark`,`end_time`,`url`,`extra` from rs_tb_order
-        <where>  
+        <where>
 
 		  		  <if test="no != null and no != ''"> and no = #{no} </if>
 		  		  <if test="amount != null and amount != ''"> and amount = #{amount} </if>
@@ -35,10 +41,14 @@
 			limit #{offset}, #{limit}
 		</if>
 	</select>
-	
+
+	<select id="statCodeStatus" resultMap="TbCodeStatusMap">
+		select amount, status, count(*) as count from rs_tb_order group by amount, status order by amount, status
+	</select>
+
  	<select id="count" resultType="int">
 		select count(*) from rs_tb_order
-		 <where>  
+		 <where>
 		  		  <if test="id != null and id != ''"> and id = #{id} </if>
 		  		  <if test="no != null and no != ''"> and no = #{no} </if>
 		  		  <if test="amount != null and amount != ''"> and amount = #{amount} </if>
@@ -53,7 +63,7 @@
 		  		  <if test="extra != null and extra != ''"> and extra = #{extra} </if>
 		  		</where>
 	</select>
-	 
+
 	<insert id="save" parameterType="com.bootdo.system.domain.TbOrderDO" useGeneratedKeys="true" keyProperty="id">
 		insert into rs_tb_order
 		(
@@ -84,9 +94,9 @@
 			#{extra}
 		)
 	</insert>
-	 
+
 	<update id="update" parameterType="com.bootdo.system.domain.TbOrderDO">
-		update rs_tb_order 
+		update rs_tb_order
 		<set>
 			<if test="no != null">`no` = #{no}, </if>
 			<if test="amount != null">`amount` = #{amount}, </if>
@@ -102,13 +112,13 @@
 		</set>
 		where id = #{id}
 	</update>
-	
+
 	<delete id="remove">
 		delete from rs_tb_order where id = #{value}
 	</delete>
-	
+
 	<delete id="batchRemove">
-		delete from rs_tb_order where id in 
+		delete from rs_tb_order where id in
 		<foreach item="id" collection="array" open="(" separator="," close=")">
 			#{id}
 		</foreach>

@@ -1,5 +1,7 @@
 package com.bootdo.app.zwlenum;
 
+import lombok.Getter;
+
 /**
  * PayTypeEnum
  *
@@ -7,6 +9,7 @@ package com.bootdo.app.zwlenum;
  * @version v1.0, 2016年7月6日
  * @since v6.1
  */
+@Getter
 public enum StatusEnum {
   //充值
   ENABLE("enable", "启用"),
