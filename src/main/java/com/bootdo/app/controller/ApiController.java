@@ -26,7 +26,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -50,17 +52,16 @@ public class ApiController {
     @GetMapping("/pay/{orderNo}")
     String add(@PathVariable("orderNo") String orderNo, Model model) {
         String orderKey = Constants.getOrderKey(orderNo);
+        String returnVM = "payDetail";
         try {
             OrderDO order = (OrderDO) redisUtils.get(orderKey);
             String payInfo = order.getPaymentInfo();
-            JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
-            String reallyAmount = order.getReallyAmount();
-            model.addAttribute("reallyAmount", NumberUtil.divide(reallyAmount, "100"));
-            model.addAttribute("payInfo", payInfoJSON);
             Integer second = (Integer) redisUtils.get(Constants.ORDER_TIMER_KEY);
             Integer minute = second / 60;
             model.addAttribute("minute", minute);
             model.addAttribute("order", order);
+            String reallyAmount = order.getReallyAmount();
+            model.addAttribute("reallyAmount", NumberUtil.divide(reallyAmount, "100"));
             Date createTime = order.getCreateTime();
             long createTimeMillions = createTime.getTime();
             long currentTime = System.currentTimeMillis();
@@ -76,8 +77,15 @@ public class ApiController {
                 title = "请用网银转账付款";
             } else if (order.getPayType().equals(PayTypeEnum.WECHAT_CODE.getKey())) {
                 title = "请用微信扫码付款";
-            } else if (order.getPayType().equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
-                title = "请用支付宝扫码付款";
+                returnVM = "payWXDetail";
+            }  else  if (order.getPayType().equals(PayTypeEnum.APLIPAY_CODE.getKey()) || order.getPayType().equals(PayTypeEnum.TABO_CODE.getKey())) {
+                JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
+                model.addAttribute("payInfo", payInfoJSON);
+                String url = payInfoJSON.getString("url");
+                String bizNo  = getPamras(url,"biz_no");
+                String[] temps = bizNo.split("_");
+                model.addAttribute("bizNo", temps[0]);
+                returnVM = "tbPayDetail";
             }
             model.addAttribute("title", title);
             model.addAttribute("flag", "success");
@@ -87,7 +95,7 @@ public class ApiController {
             model.addAttribute("error", "支付信息已失效");
         }
 
-        return "system/order/payDetail";
+        return "system/order/" + returnVM;
     }
 
     @RequestMapping(value = "/createOrder")
@@ -130,10 +138,10 @@ public class ApiController {
             OrderDO order = null;
             if (type.equals(PayTypeEnum.WECHAT_CODE.getKey())) {
                 order = orderService.createWechatOrder(paymentInfo);
-            } else if (type.equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
-                order = orderService.createAlipayOrder(paymentInfo);
             } else if (type.equals(PayTypeEnum.BANK_CODE.getKey())) {
                 order = orderService.createBankOrder(paymentInfo);
+            } else if (type.equals(PayTypeEnum.APLIPAY_CODE.getKey()) || type.equals(PayTypeEnum.TABO_CODE.getKey())) {
+                order = orderService.createTBOrder(paymentInfo);
             }
             Integer second = (Integer) redisUtils.get(Constants.ORDER_TIMER_KEY);
             redisUtils.set(Constants.getOrderKey(order.getOrderNo()), order, second);
@@ -159,6 +167,8 @@ public class ApiController {
 
     @RequestMapping(value = "/createAlipayOrder")
     public String createAlipayOrder(String amount, Model model) throws Exception {
+
+        String returnVM = "payDetail";
 
         PaymentInfo paymentInfo = new PaymentInfo();
         paymentInfo.setAmount(amount);
@@ -202,6 +212,7 @@ public class ApiController {
                 title = "请用网银转账付款";
             } else if (order.getPayType().equals(PayTypeEnum.WECHAT_CODE.getKey())) {
                 title = "请用微信扫码付款";
+                returnVM = "payWXDetail";
             } else if (order.getPayType().equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
                 title = "请用支付宝扫码付款";
             }
@@ -213,7 +224,7 @@ public class ApiController {
             model.addAttribute("flag", "error");
             model.addAttribute("error", "支付信息已失效");
         }
-        return "system/order/payDetail";
+        return "system/order/" + returnVM;
     }
 
     @RequestMapping(value = "/createWechatOrder")
@@ -357,4 +368,29 @@ public class ApiController {
         }
     }
 
+
+    private String getPamras(String url, String key){
+        Map<String,String> params = getParameter(url);
+        return params.get(key);
+    }
+
+    private Map<String, String> getParameter(String url) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            final String charset = "utf-8";
+            url = URLDecoder.decode(url, charset);
+            if (url.indexOf('?') != -1) {
+                final String contents = url.substring(url.indexOf('?') + 1);
+                String[] keyValues = contents.split("&");
+                for (int i = 0; i < keyValues.length; i++) {
+                    String key = keyValues[i].substring(0, keyValues[i].indexOf("="));
+                    String value = keyValues[i].substring(keyValues[i].indexOf("=") + 1);
+                    map.put(key, value);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
 }

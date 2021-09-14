@@ -56,6 +56,10 @@ public class PayWechatInfoDO implements Serializable {
 
 	private String remark;
 
+	private String currentDayPayedAmount;
+
+	private String yesterdayPayedAmount;
+
 	public Long getId() {
 		return id;
 	}
@@ -191,4 +195,21 @@ public class PayWechatInfoDO implements Serializable {
 	public String getRemark() {
 		return remark;
 	}
+
+	public String getCurrentDayPayedAmount() {
+		return currentDayPayedAmount;
+	}
+
+	public void setCurrentDayPayedAmount(String currentDayPayedAmount) {
+		this.currentDayPayedAmount = currentDayPayedAmount;
+	}
+
+	public String getYesterdayPayedAmount() {
+		return yesterdayPayedAmount;
+	}
+
+	public void setYesterdayPayedAmount(String yesterdayPayedAmount) {
+		this.yesterdayPayedAmount = yesterdayPayedAmount;
+	}
 }
+

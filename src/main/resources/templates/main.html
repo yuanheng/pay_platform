@@ -29,6 +29,15 @@
             <div class="row" style="margin-left: 30px;">
                 <div class="col-sm-2 col-md-2">
                     <div class="thumbnail">
+                        <img src="img/badge/shutterstock-623493332.jpeg" alt="...">
+                        <div class="caption">
+                            <h2><span class="control-label" id="today_payed_order_amount"></span>&nbsp;元</h2>
+                            <p style="margin: 0 0 0;">今日收款</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2">
+                    <div class="thumbnail">
                         <!--                        <img th:src="${p13Url}" alt="..."/>-->
                         <img src="img/badge/shutterstock-317680286.jpeg" alt="..."/>
                         <div class="caption">
@@ -45,6 +54,15 @@
                             <h2><span class="control-label" id="payed_order_num"></span>&nbsp;单</h2>
                             <p style="margin: 0 0 0;">成功单数</p>
                             <!--                <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2">
+                    <div class="thumbnail">
+                        <img src="img/badge/shutterstock-623493332.jpeg" alt="...">
+                        <div class="caption">
+                            <h2><span class="control-label" id="yesterday_payed_order_amount"></span>&nbsp;元</h2>
+                            <p style="margin: 0 0 0;">昨日收款</p>
                         </div>
                     </div>
                 </div>
@@ -193,6 +211,8 @@
                 $('#payed_order_num').text(r.payedTotalOrderNum);
                 $('#total_amount').text(r.totalAmount / 100);
                 $('#order_num').text(r.totalOrderNum);
+                $('#today_payed_order_amount').text(r.currentDayAmount / 100);
+                $('#yesterday_payed_order_amount').text(r.yesterdayAmount / 100);
 
             }
         });

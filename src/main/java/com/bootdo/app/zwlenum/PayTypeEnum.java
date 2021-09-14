@@ -11,7 +11,8 @@ public enum PayTypeEnum {
     //充值
     WECHAT_CODE("wechat", "微信个码"),
     APLIPAY_CODE("alipay", "支付宝个码"),
-    BANK_CODE("bank", "银行卡");
+    BANK_CODE("bank", "银行卡"),
+    TABO_CODE("tb", "淘宝代付");
 
     PayTypeEnum(String key, String desc) {
         this.key = key;
@@ -33,7 +34,9 @@ public enum PayTypeEnum {
             return APLIPAY_CODE;
         } else if (BANK_CODE.key.equals(key)) {
             return BANK_CODE;
-        } else {
+        } else if (TABO_CODE.key.equals(key)) {
+            return TABO_CODE;
+        }else {
             return null;
         }
     }

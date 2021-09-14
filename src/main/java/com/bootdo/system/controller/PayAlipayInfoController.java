@@ -84,6 +84,20 @@ public class PayAlipayInfoController {
                     payAlipay.setSucceedTxTimes(statisticsInfo.getPayedTotalOrderNum());
                     payAlipay.setTotalTxTimes(statisticsInfo.getTotalOrderNum());
                     payAlipay.setTotalReceivedAmount(new BigDecimal(statisticsInfo.getPayedTotalAmount()));
+                    String currentDayPayedAmountKey = Constants.getTodayKey(payStatisticsInfoKey);
+                    if (redisUtils.hasKey(currentDayPayedAmountKey)) {
+                        Integer amount = (Integer) redisUtils.get(currentDayPayedAmountKey);
+                        payAlipay.setCurrentDayPayedAmount(amount /100 + "");
+                    } else {
+                        payAlipay.setCurrentDayPayedAmount("0");
+                    }
+                    String yesterdayPayedAmountKey = Constants.getYesterdatKey(payStatisticsInfoKey);
+                    if (redisUtils.hasKey(yesterdayPayedAmountKey)) {
+                        Integer amount = (Integer) redisUtils.get(yesterdayPayedAmountKey);
+                        payAlipay.setYesterdayPayedAmount(amount * 1.0/100 + "");
+                    } else {
+                        payAlipay.setYesterdayPayedAmount("0");
+                    }
                 }
             });
         }

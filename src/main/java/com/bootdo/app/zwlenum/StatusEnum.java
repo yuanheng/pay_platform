@@ -11,7 +11,8 @@ public enum StatusEnum {
   //充值
   ENABLE("enable", "启用"),
   DISABLE("disable", "禁用"),
-  DELETED("delete", "删除");
+  DELETED("delete", "删除"),
+  FINISHED("finish", "完成");
 
 
   StatusEnum(String key, String desc) {
@@ -39,5 +40,16 @@ public enum StatusEnum {
 
   private String key;
   private String typeDesc;
+
+  public static StatusEnum getStatusEnumByKey(String key){
+    if(StatusEnum.ENABLE.key.equals(key)) {
+      return StatusEnum.ENABLE;
+    } else if (StatusEnum.DISABLE.key.equals(key)) {
+      return StatusEnum.DISABLE;
+    } else if (StatusEnum.DELETED.equals(key)) {
+      return StatusEnum.DELETED;
+    }
+    return null;
+  }
 
 }

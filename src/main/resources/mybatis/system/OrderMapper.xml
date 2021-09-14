@@ -17,6 +17,8 @@
 			<if test="status != null and status != ''"> and status = #{status} </if>
 			<if test="roleId != null and roleId == 60">and merchant_no = #{merchantNo}</if>
 			<if test="roleId != null and roleId == 61">and mid = #{mid}</if>
+			<if test="createTime != null and createTime != ''">and create_time &gt; #{createTime}</if>
+			<if test="finishTime != null and finishTime != ''">and create_time &lt; #{finishTime}</if>
 		</where>
         <choose>
             <when test="sort != null and sort.trim() != ''">

@@ -3,20 +3,17 @@ package com.bootdo.system.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.bootdo.app.config.Constants;
 import com.bootdo.app.model.StatisticsInfo;
+import com.bootdo.app.util.DateUtil;
 import com.bootdo.app.util.DistributedLock;
 import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.OrderStatusEnum;
-import com.bootdo.common.utils.PageUtils;
-import com.bootdo.common.utils.Query;
-import com.bootdo.common.utils.R;
-import com.bootdo.common.utils.ShiroUtils;
-import com.bootdo.system.domain.MerchantDO;
-import com.bootdo.system.domain.OrderDO;
-import com.bootdo.system.domain.RoleDO;
-import com.bootdo.system.domain.UserDO;
+import com.bootdo.app.zwlenum.StatusEnum;
+import com.bootdo.common.utils.*;
+import com.bootdo.system.domain.*;
 import com.bootdo.system.service.MerchantService;
 import com.bootdo.system.service.OrderService;
 import com.bootdo.system.service.RoleService;
+import com.bootdo.system.service.TbOrderService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -46,10 +43,15 @@ public class OrderController {
     private RoleService roleService;
     private OrderService orderService;
     private MerchantService merchantService;
+
+    @Autowired
+    private TbOrderService tbOrderService;
+
     @Autowired
     private RedisUtils redisUtils;
     @Autowired
     private DistributedLock distributedLock;
+
 
     @Autowired
     public OrderController(RoleService roleService, OrderService orderService, MerchantService merchantService) {
@@ -61,7 +63,20 @@ public class OrderController {
 
     @GetMapping()
     @RequiresPermissions("system:order:order")
-    String Order() {
+    String Order(Model model) {
+        UserDO userDO = ShiroUtils.getUser();
+        List<RoleDO> roles = roleService.list(userDO.getUserId());
+
+        for (RoleDO role : roles) {
+            if (role.getRoleSign().equals("true")) {
+                if (role.getRoleId() - 60L == 0) {
+                    model.addAttribute("roleId","60");
+                }
+            }
+
+        }
+        model.addAttribute("chanleId",userDO.getUserId());
+
         return "system/order/order";
     }
 
@@ -89,7 +104,6 @@ public class OrderController {
         //查询列表数据
         Query query = new Query(params);
         List<OrderDO> orderList = orderService.list(query);
-//        orderList.forEach(e -> e.setPayment(JSONUtil.toBean(e.getPaymentInfo(), OrderDO.Payment.class)));
         int total = orderService.count(query);
         PageUtils pageUtils = new PageUtils(orderList, total);
         return pageUtils;
@@ -147,9 +161,17 @@ public class OrderController {
             orderDO.setStatus(OrderStatusEnum.FINISHED_PAY.getKey());
             orderDO.setFinishTime(new Date());
             orderService.update(orderDO);
+            String paymentInfo = orderDO.getPaymentInfo();
+            JSONObject payJson = JSONObject.parseObject(paymentInfo);
+            Integer tbOrderId = payJson.getInteger("id");
+            TbOrderDO tempTbOrder = new TbOrderDO();
+            tempTbOrder.setId(tbOrderId);
+            tempTbOrder.setStatus(StatusEnum.FINISHED.getKey());
+            tempTbOrder.setEndTime(new Date());
+            tbOrderService.update(tempTbOrder);
             orderService.notifyMerchant(orderDO);
-            orderService.update(orderDO);
             if (orderDO.getStatus().equals(OrderStatusEnum.CALLBACK_SUCCESS.getKey())){
+                orderService.update(orderDO);
                 // 触发统计
                 staticsSuccessOrder(orderDO);
             }
@@ -175,11 +197,13 @@ public class OrderController {
             // 更新订单状态
             orderDO.setStatus(OrderStatusEnum.FINISHED_PAY.getKey());
             orderDO.setFinishTime(new Date());
-            orderService.update(orderDO);
             orderService.notifyMerchant(orderDO);
+            orderService.update(orderDO);
             if (orderDO.getStatus().equals(OrderStatusEnum.CALLBACK_SUCCESS.getKey())){
                 // 触发统计
                 staticsSuccessOrder(orderDO);
+            } else {
+                return R.error();
             }
 
         }
@@ -218,11 +242,14 @@ public class OrderController {
         JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
         String type = orderDO.getPayType();
         String payId = payInfoJSON.getString("id");
-        String payStatisticsInfoKey = "payStatisticsInfoKey_" + orderDO.getMid() + "_" + type + ":" + payId;
-        updateStatisticsInfo(payStatisticsInfoKey,orderDO);
+        //String payStatisticsInfoKey = "payStatisticsInfoKey_" + orderDO.getMid() + "_" + type + ":" + payId;
+       // updateStatisticsInfo(payStatisticsInfoKey,orderDO);
+       // updateStatisticsInfoCuccrentDay(payStatisticsInfoKey,orderDO.getAmount());
         String merchantStatisticsInfoKey = "merchantStatisticsInfoKey_" + orderDO.getMerchantNo();
         updateStatisticsInfo(merchantStatisticsInfoKey,orderDO);
+        updateStatisticsInfoCuccrentDay(merchantStatisticsInfoKey,orderDO.getAmount());
     }
+
 
     private void updateStatisticsInfo(String key, OrderDO orderDO) {
         if (redisUtils.hasKey(key)) {
@@ -232,6 +259,26 @@ public class OrderController {
                 statisticsInfo.setPayedTotalAmount(statisticsInfo.getPayedTotalAmount() + Integer.parseInt(orderDO.getAmount()));
                 statisticsInfo.setPayedTotalOrderNum(statisticsInfo.getPayedTotalOrderNum() + 1);
                 redisUtils.set(key,statisticsInfo);
+            } finally {
+                distributedLock.releaseLock(key);
+            }
+        }
+    }
+
+    private void updateStatisticsInfoCuccrentDay(String key, String amount) {
+        key = Constants.getTodayKey(key);
+        if (redisUtils.hasKey(key)) {
+            try {
+                distributedLock.getLock(key);
+                Integer tempAmount = (Integer) redisUtils.get(key);
+                redisUtils.set(key,Integer.parseInt(amount)+tempAmount);
+            } finally {
+                distributedLock.releaseLock(key);
+            }
+        } else {
+            try {
+                distributedLock.getLock(key);
+                redisUtils.set(key,Integer.parseInt(amount));
             } finally {
                 distributedLock.releaseLock(key);
             }

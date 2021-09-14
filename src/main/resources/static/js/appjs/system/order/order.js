@@ -4,6 +4,7 @@ $(function () {
 });
 
 function load() {
+    var roleId = $("#role_id").val();
     $('#exampleTable')
         .bootstrapTable(
             {
@@ -33,7 +34,10 @@ function load() {
                         limit: params.limit,
                         offset: params.offset,
                         orderNo: $('#searchOrderNo').val(),
-                        merchantOrderNo: $('#searchMechantOrderNo').val()
+                        merchantOrderNo: $('#searchMechantOrderNo').val(),
+                        status: $('#status').val(),
+                        createTime: $('#createTime').val(),
+                        finishTime: $('#finishTime').val()
                     };
                 },
                 columns: [
@@ -100,20 +104,25 @@ function load() {
                         formatter: function (value, row, index) {
                             return row.payment.account;
                         }
-                    }, {
-                        field: 'paymentInfo',
-                        title: '收款信息',
+                    },{
+                        field: 'code',
+                        title: '留言码',
                         formatter: function (value, row, index) {
-                            var t = '<a class="btn btn-primary btn-sm" title="' + value + '" href="#" mce_href="#" onclick="showInfo(\''
-                                + row.payment.account + '\', \'' + row.payment.name +
-                                '\')"><i class="fa fa-edit"></i>查看</a>';
-                            return t;
+                            if(row.paymentInfo){
+                                var paymentInfoObj =JSON.parse(row.paymentInfo);
+                                return paymentInfoObj.no;
+                            } else {
+                                return "--";
+                            }
                         }
                     }, {
                         title: '操作',
                         field: 'id',
                         align: 'center',
                         formatter: function (value, row, index) {
+                            if (roleId == 60) {
+                                return "--";
+                            }
                             var e = '';
                             if (row.status == 'pre_pay') {
                                 e = '<a class="btn btn-primary btn-sm ' + s_edit_h + '" href="#" mce_href="#" title="编辑" onclick="confirm(\''

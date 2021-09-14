@@ -9,12 +9,32 @@
 				<div class="ibox-body">
 					<div class="fixed-table-toolbar">
 						<input type="hidden" id="chanel_id" th:value="${chanleId}">
+						<input type="hidden" id="role_id" th:value="${roleId}">
 						<div class="columns pull-left col-md-2 nopadding">
 							平台订单号：<input id="searchOrderNo" type="text" class="form-control"
 								   placeholder="">
 						</div>
 						<div class="columns pull-left col-md-2 nopadding">
 							商户订单号：<input id="searchMechantOrderNo" type="text" class="form-control"
+										 placeholder="">
+						</div>
+						<div class="columns pull-left col-md-2 nopadding">
+							订单状态：
+							<select id="status" name="status" class="form-control">
+								<option value="">请选择</option>
+								<option value="pre_pay">待支付</option>
+								<option value="finished_pay">已支付</option>
+								<option value="callback_success">回调成功</option>
+								<option value="callback_failed">回调失败</option>
+								<option value="canceled">取消</option>
+							</select>
+						</div>
+						<div class="columns pull-left col-md-2 nopadding">
+							开始时间：<input id="createTime" type="text" class="form-control"
+										 placeholder="">
+						</div>
+						<div class="columns pull-left col-md-2 nopadding">
+							结束时间：<input id="finishTime" type="text" class="form-control"
 										 placeholder="">
 						</div>
 						<div class="columns pull-left">
@@ -26,6 +46,7 @@
 				</div>
 			</div>
 		</div>
+		<audio style="display: none" id="dingdan_nofity" src="/img/dingdan.mp3"  controls="controls" />
 	</div>
 	<!--shiro控制bootstraptable行内按钮看见性 来自bootdo的创新方案 -->
 		<div>
@@ -60,6 +81,8 @@
 		$(function () {
 			connect();
 		});
+		var audio = document.getElementById("dingdan_nofity")
+
 		function connect() {
 			var chanelId = $("#chanel_id").val();
 			var sock = new SockJS("/endpointChat");
@@ -67,6 +90,7 @@
 			stomp.connect('guest', 'guest', function(frame) {
 				stomp.subscribe('/topic/'+chanelId+'/getOrderNo', function (response) {
 					console.info("XXXXXXXXXXXXXXXXXXXXXXX" + response);
+					audio.play();
 					reLoad();
 				});
 			});

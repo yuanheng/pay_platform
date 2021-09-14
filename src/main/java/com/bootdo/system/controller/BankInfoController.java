@@ -76,12 +76,26 @@ public class BankInfoController {
         List<BankInfoDO> bankInfoList = bankInfoService.list(query);
         if (bankInfoList != null && bankInfoList.size() > 0) {
             bankInfoList.stream().forEach(payAlipay -> {
-                String payStatisticsInfoKey = "payStatisticsInfoKey_" + payAlipay.getMid() + "_" + PayTypeEnum.APLIPAY_CODE.getKey() + ":" + payAlipay.getId();
+                String payStatisticsInfoKey = "payStatisticsInfoKey_" + payAlipay.getMid() + "_" + PayTypeEnum.BANK_CODE.getKey() + ":" + payAlipay.getId();
                 if (redisUtils.hasKey(payStatisticsInfoKey)) {
                     StatisticsInfo statisticsInfo = (StatisticsInfo) redisUtils.get(payStatisticsInfoKey);
                     payAlipay.setSucceedTxTimes(statisticsInfo.getPayedTotalOrderNum());
                     payAlipay.setTotalTxTimes(statisticsInfo.getTotalOrderNum());
                     payAlipay.setTotalReceivedAmount(new BigDecimal(statisticsInfo.getPayedTotalAmount()));
+                    String currentDayPayedAmountKey = Constants.getTodayKey(payStatisticsInfoKey);
+                    if (redisUtils.hasKey(currentDayPayedAmountKey)) {
+                        Integer amount = (Integer) redisUtils.get(currentDayPayedAmountKey);
+                        payAlipay.setCurrentDayPayedAmount(amount /100 + "");
+                    } else {
+                        payAlipay.setCurrentDayPayedAmount("0");
+                    }
+                    String yesterdayPayedAmountKey = Constants.getYesterdatKey(payStatisticsInfoKey);
+                    if (redisUtils.hasKey(yesterdayPayedAmountKey)) {
+                        Integer amount = (Integer) redisUtils.get(yesterdayPayedAmountKey);
+                        payAlipay.setYesterdayPayedAmount(amount * 1.0/100 + "");
+                    } else {
+                        payAlipay.setYesterdayPayedAmount("0");
+                    }
                 }
 
             });

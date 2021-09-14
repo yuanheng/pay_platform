@@ -63,6 +63,8 @@ public class PayExamController {
                 return Result.error("商户不对，merchantNo不正确");
             }
 
+            paymentInfo.setMerchantNo(merchantNo);
+            paymentInfo.setMerchantOrderNo("CS"+OrderCodeUtil.getOrderCode(1L));
             //校验签名
 //            boolean signResult = checkSign(merchant.getSecretKey(), paymentInfo);
 //            if (!signResult) {
@@ -86,10 +88,10 @@ public class PayExamController {
             paymentInfo.setRemark(String.format("测试支付_%s", OrderCodeUtil.getDateTime()));
             if (type.equals(PayTypeEnum.WECHAT_CODE.getKey())) {
                 order = orderService.createWechatOrder(paymentInfo);
-            } else if (type.equals(PayTypeEnum.APLIPAY_CODE.getKey())) {
-                order = orderService.createAlipayOrder(paymentInfo);
             } else if (type.equals(PayTypeEnum.BANK_CODE.getKey())) {
                 order = orderService.createBankOrder(paymentInfo);
+            } else if (type.equals(PayTypeEnum.APLIPAY_CODE.getKey()) || type.equals(PayTypeEnum.TABO_CODE.getKey())) {
+                order = orderService.createTBOrder(paymentInfo);
             }
             Integer second = (Integer) redisUtils.get(Constants.ORDER_TIMER_KEY);
             redisUtils.set(Constants.getOrderKey(order.getOrderNo()), order, second);

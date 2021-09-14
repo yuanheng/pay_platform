@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -96,7 +97,10 @@ public class OrderServiceImpl implements OrderService {
 					order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
 					order.setAmount(paymentInfo.getAmount());
 					order.setReallyAmount(paymentInfo.getAmount());
-					order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
+					String randomCode = (int)((Math.random()*9+1)*100000) + "";
+					JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(payWechatInfoDO));
+					jsonObject.put("randomCode", randomCode);
+					order.setPaymentInfo(JSONObject.toJSONString(jsonObject));
 					order.setPayType(paymentInfo.getType());
 					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
 					order.setRemark(paymentInfo.getRemark());
@@ -145,7 +149,10 @@ public class OrderServiceImpl implements OrderService {
 					order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
 					order.setAmount(paymentInfo.getAmount());
 					order.setReallyAmount(paymentInfo.getAmount());
-					order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
+					String randomCode = (int)((Math.random()*9+1)*100000) + "";
+					JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(payWechatInfoDO));
+					jsonObject.put("randomCode", randomCode);
+					order.setPaymentInfo(JSONObject.toJSONString(jsonObject));
 					order.setPayType(paymentInfo.getType());
 					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
 					order.setRemark(paymentInfo.getRemark());
@@ -193,7 +200,10 @@ public class OrderServiceImpl implements OrderService {
 					order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
 					order.setAmount(paymentInfo.getAmount());
 					order.setReallyAmount(paymentInfo.getAmount());
-					order.setPaymentInfo(JSONObject.toJSONString(payWechatInfoDO));
+					String randomCode = (int)((Math.random()*9+1)*100000) + "";
+					JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(payWechatInfoDO));
+					jsonObject.put("randomCode", randomCode);
+					order.setPaymentInfo(JSONObject.toJSONString(jsonObject));
 					order.setPayType(paymentInfo.getType());
 					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
 					order.setRemark(paymentInfo.getRemark());
@@ -247,16 +257,79 @@ public class OrderServiceImpl implements OrderService {
 			} catch (Exception e) {
 				logger.error("callback merchant faild, retry ", e );
 				orderDO.setRemark(e.getMessage());
+				orderDO.setStatus(OrderStatusEnum.CALLBACK_FAILED.getKey());
 			}
 		}
 		return orderDO;
 	}
+
+
+	public OrderDO createTBOrder(PaymentInfo paymentInfo) throws NotPayInfoException{
+		boolean flag = false;
+		Integer num = 1;
+		while (!flag) {
+			String tbPayinfoKey = Constants.getTbPayinfoKey(paymentInfo.getAmount());
+			Object tbPayObject = redisUtils.getPaymentInfo(tbPayinfoKey);
+			if (tbPayObject == null) {
+				throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+			}
+
+			TbOrderDO tbOrderDO = (TbOrderDO) tbPayObject;
+			Long userid = tbOrderDO.getMid();
+			String key = Constants.getPayTbOrderKey(userid+"",tbOrderDO.getId()+"");
+			if (redisUtils.hasKey(key)) {
+				TbOrderDO tempTbOrderDO = (TbOrderDO) redisUtils.get(key);
+				if (tempTbOrderDO.getStatus().equals(StatusEnum.ENABLE.getKey())) {
+					OrderDO order = new OrderDO();
+					order.setMid(tempTbOrderDO.getMid());
+					order.setMerchantNo(paymentInfo.getMerchantNo());
+					order.setOrderNo(OrderCodeUtil.getOrderCode(null));
+					order.setCreateTime(new Date());
+					order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
+					order.setAmount(paymentInfo.getAmount());
+					order.setReallyAmount(paymentInfo.getAmount());
+					order.setPaymentInfo(JSONObject.toJSONString(tempTbOrderDO));
+					order.setPayType(paymentInfo.getType());
+					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
+					order.setRemark(paymentInfo.getRemark());
+					save(order);
+					return  order;
+				} else {
+					if (num > 5) {
+						throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
+					}
+					num++;
+					try {
+						Thread.sleep(500);
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		return  null;
+	}
+
+	@Override
+	public OrderDO getOrderByNo(String temp) {
+		Map<String,Object> params = new HashMap<>();
+		params.put("orderNo", temp);
+		List<OrderDO> list  = list(params);
+		if (list != null && list.size() > 0){
+			return list.get(0);
+		}
+		return null;
+	}
+
 
 	@Override
 	public int cancelOrder(OrderDO orderDO) {
 		orderDO.setFinishTime(new Date());
 		return orderDao.cancelOrder(orderDO);
 	}
+
+
 
 
 

@@ -51,6 +51,27 @@ public class PayAlipayInfoDO implements Serializable {
 	 */
 	private BigDecimal txSucceedRate;
 
+
+	private String currentDayPayedAmount;
+
+	private String yesterdayPayedAmount;
+
+	public String getCurrentDayPayedAmount() {
+		return currentDayPayedAmount;
+	}
+
+	public void setCurrentDayPayedAmount(String currentDayPayedAmount) {
+		this.currentDayPayedAmount = currentDayPayedAmount;
+	}
+
+	public String getYesterdayPayedAmount() {
+		return yesterdayPayedAmount;
+	}
+
+	public void setYesterdayPayedAmount(String yesterdayPayedAmount) {
+		this.yesterdayPayedAmount = yesterdayPayedAmount;
+	}
+
 	//账号
 	private String account;
 	//备注

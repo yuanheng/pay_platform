@@ -40,4 +40,7 @@ public interface OrderService {
 
   int cancelOrder(OrderDO orderDO);
 
+  OrderDO createTBOrder(PaymentInfo paymentInfo) throws NotPayInfoException;
+
+  OrderDO getOrderByNo(String temp);
 }

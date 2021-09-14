@@ -83,16 +83,20 @@ function load() {
                         title: '地址'
                     },
                     {
-                        field: 'remark',
-                        title: '备注'
-                    },
-                    {
                         field: 'totalTxTimes',
                         title: '总单数'
                     },
                     {
                         field: 'succeedTxTimes',
                         title: '成功单数'
+                    },
+                    {
+                        field: 'yesterdayPayedAmount',
+                        title: '昨日收款（元）'
+                    },
+                    {
+                        field: 'currentDayPayedAmount',
+                        title: '今日收款（元）'
                     },
                     {
                         field: 'totalReceivedAmount',

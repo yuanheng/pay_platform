@@ -9,6 +9,24 @@ public class StatisticsInfo implements Serializable {
   private Integer totalOrderNum;
   private Integer payedTotalOrderNum;
 
+  private Integer currentDayAmount;
+  private Integer yesterdayAmount;
+
+  public Integer getCurrentDayAmount() {
+    return currentDayAmount;
+  }
+
+  public void setCurrentDayAmount(Integer currentDayAmount) {
+    this.currentDayAmount = currentDayAmount;
+  }
+
+  public Integer getYesterdayAmount() {
+    return yesterdayAmount;
+  }
+
+  public void setYesterdayAmount(Integer yesterdayAmount) {
+    this.yesterdayAmount = yesterdayAmount;
+  }
 
   public Integer getTotalAmount() {
     return totalAmount;

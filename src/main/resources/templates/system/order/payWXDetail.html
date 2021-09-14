@@ -11,7 +11,7 @@
 		width: 100%;
 		text-align: center;
 		margin-top: 10px;
-		color: #1677ff;
+		color: #07c160;
 		font-size: 25px;
 	}
 	.img_box {
@@ -60,7 +60,7 @@
 	}
 	.img_title {
 		color: #fff;
-		background: #1677ff;
+		background: #07c160;
 		width: 94%;
 		margin: 0 auto;
 		height: 330px;
@@ -81,11 +81,10 @@
 	}
 	.alipay_logo{
 		display: inline-block;
-		width: 20px;
 		height: 20px;
 	}
 	.scan_info {
-		color: #1677ff;
+		color: #07c160;
 		font-size: 13px;
 		display: inline-block;
 		margin-left: 10px;
@@ -142,8 +141,8 @@
 	#btn_code{
 		text-align: center;
 		display: inline-block;
-		border: 1px solid #00a3ff;
-		background-color: #00A3FF;
+		border: 1px solid #07c160;
+		background-color: #07c160;
 		color: #fff;
 		border-radius: 1px;
 		width: 60px;
@@ -164,7 +163,7 @@
 <div th:if="${flag eq 'success'}">
 	<input type="hidden" id="url" th:value="${payInfo.remark}">
 	<input type="hidden" id="random_code_node" th:value="${randomCode}">
-	<h1 class="title">打开支付宝扫一扫</h1>
+	<h1 class="title">打开微信扫一扫</h1>
 	<div class="order_info">
 		<div>
 			订单号：<span th:text="${order.merchantOrderNo}"></span>
@@ -181,9 +180,6 @@
 			<a href="#" id="btn_code">复制</a>
 		</div>
 	</div>
-	<div class="btn">
-		<a class="" href="javascript:void(0)" onclick="finished()">点击去付款</a>
-	</div>
 	<div class="img_box_bg">
 		<div class="img_title">
 			<p>请按照指定金额付款</p>
@@ -195,8 +191,8 @@
 		</div>
 
 		<div class="pay_info_box">
-			<div><img class="alipay_logo" src="/img/alipay.png">
-				<div class="scan_info">打开支付宝扫一扫</div>
+			<div><img class="alipay_logo" src="/img/wx.png">
+				<div class="scan_info">打开微信扫一扫</div>
 			</div>
 			<p class="daifu">代付收款码请放心支付</p>
 			<p>【付款倒计时 】10分钟</p>
@@ -208,24 +204,16 @@
 			<p>继续付款百分之百成功</p>
 			<p class="interrupt">扫码遇到提示点击继续付款，必成功</p>
 			<p>为了保证支付成功</p>
-			<p class="transfer">更多人选择支付宝转账</p>
-			<p class="transfer">请下拉页面点击按钮去付款</p>
+			<p class="stop">请用手机截屏发送至微信，识别二维码进行付款</p>
 		</div>
-
 	</div>
 
 	<div class="info">
-		<p>收款人：<span class="interrupt"  th:text="${payInfo.name}"></span></p>
+		<p >收款人：<span class="interrupt"  th:text="${payInfo.name}"></span></p>
 		<p>账号：<span th:text="${payInfo.account}"></span></p>
 		<p>转账金额：<span class="interrupt" th:text="${reallyAmount}"></span>元</p>
 	</div>
-
-
-
-
-	<div class="footer">
-
-	</div>
+	<div class="footer"></div>
 
 	<script src="/js/qrcode.js"></script>
 	<script src="/js/clipboard.min.js"></script>

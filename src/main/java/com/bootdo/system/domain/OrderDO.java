@@ -2,6 +2,7 @@ package com.bootdo.system.domain;
 
 
 import cn.hutool.json.JSONUtil;
+import com.bootdo.app.model.PaymentInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +51,9 @@ public class OrderDO implements Serializable {
 
     private Payment payment;
 
-    @Data
+
+
+  @Data
     public static class Payment {
         private String account;
         private String address;

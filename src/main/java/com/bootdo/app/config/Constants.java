@@ -1,12 +1,19 @@
 package com.bootdo.app.config;
 
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.bootdo.app.util.DateUtil;
+
+import java.util.*;
 
 public class Constants {
+
+    public final static String PAY_TB_ORDER_KEY_IDS = "pay_tb_order_key_ids";
+
+
+    public final static String PAY_TB_ORDER_KEY = "pay_tb_order_key_{mid}:{id}";
+
+    public final static String TB_PAYINFO_KEY= "tb_payinfo_{amount}";
+
 
     public final static String MERCHANT_NO_KEY = "merchant_no_key:{merchantNo}";
 
@@ -107,5 +114,29 @@ public class Constants {
 
     public static String getPayInfoKey(String type, Long userId, Integer id) {
         return Constants.PAYMENTINFO_LIST.replace("{payType}",type) + "_" + userId + ":" + id;
+    }
+
+    public static String getTodayKey(String key) {
+        String today = DateUtil.toString(new Date(), null);
+        key = key + "_"+  today;
+        return key;
+    }
+
+    public static String getYesterdatKey(String key) {
+        String today = DateUtil.toString(new Date(new Date().getTime() - 24 * 60 * 60 * 1000), null);
+        key = key + "_"+  today;
+        return key;
+    }
+
+    public static String getPayTbOrderKey(String mid, String id){
+        return Constants.PAY_TB_ORDER_KEY.replace("{mid}",mid).replace("{id}",id);
+    }
+
+    public static String getTbPayinfoKey(String amount){
+        return Constants.TB_PAYINFO_KEY.replace("{amount}",amount);
+    }
+
+    public static String getPayTbOrderKeyFlag(String mid, String id){
+        return Constants.PAY_TB_ORDER_KEY.replace("{mid}",mid).replace("{id}",id) + "_flag";
     }
 }

@@ -1,5 +1,6 @@
 package com.bootdo.system.controller;
 
+import com.bootdo.app.config.Constants;
 import com.bootdo.app.model.StatisticsInfo;
 import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.RoleTypeEnum;
@@ -59,21 +60,33 @@ public class MainController extends BaseController {
         // 统计信息
         UserDO user = ShiroUtils.getUser();
         final Long userId = user.getUserId();
-
         // 看当前登录人是啥角色
         final RoleTypeEnum currentRoleEnum = roleService.distinguishByLoginInfo(user);
-
         StatisticInfoDO statInfoDO = new StatisticInfoDO().emptyInstance(-1);
         statInfoDO.setCurrentRoleEnum(currentRoleEnum);
-
         // 做对应统计
         if (currentRoleEnum == RoleTypeEnum.MERCHANT) {
             MerchantDO merchantDO = merchantService.getByMid(userId);
             String merchantStatisticsInfoKey = "merchantStatisticsInfoKey_" + merchantDO.getMerchantNo();
             if (redisUtils.hasKey(merchantStatisticsInfoKey)) {
                 StatisticsInfo statisticsInfo = (StatisticsInfo) redisUtils.get(merchantStatisticsInfoKey);
+                String currentDayPayedAmountKey = Constants.getTodayKey(merchantStatisticsInfoKey);
+                if (redisUtils.hasKey(currentDayPayedAmountKey)) {
+                    Integer amount = (Integer) redisUtils.get(currentDayPayedAmountKey);
+                    statisticsInfo.setCurrentDayAmount(amount);
+                } else {
+                    statisticsInfo.setCurrentDayAmount(0);
+                }
+                String yesterdayPayedAmountKey = Constants.getYesterdatKey(merchantStatisticsInfoKey);
+                if (redisUtils.hasKey(yesterdayPayedAmountKey)) {
+                    Integer amount = (Integer) redisUtils.get(yesterdayPayedAmountKey);
+                    statisticsInfo.setYesterdayAmount(amount);
+                } else {
+                    statisticsInfo.setYesterdayAmount(0);
+                }
                 return statisticsInfo;
             }
+
         }
 
         return new StatisticsInfo();

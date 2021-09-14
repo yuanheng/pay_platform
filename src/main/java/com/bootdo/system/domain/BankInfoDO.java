@@ -57,6 +57,25 @@ public class BankInfoDO implements Serializable {
     //备注
     private String remark;
 
+    private String currentDayPayedAmount;
+
+    private String yesterdayPayedAmount;
+
+    public String getCurrentDayPayedAmount() {
+        return currentDayPayedAmount;
+    }
+
+    public void setCurrentDayPayedAmount(String currentDayPayedAmount) {
+        this.currentDayPayedAmount = currentDayPayedAmount;
+    }
+
+    public String getYesterdayPayedAmount() {
+        return yesterdayPayedAmount;
+    }
+
+    public void setYesterdayPayedAmount(String yesterdayPayedAmount) {
+        this.yesterdayPayedAmount = yesterdayPayedAmount;
+    }
 
     public Long getId() {
         return id;
