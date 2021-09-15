@@ -7,12 +7,14 @@ import java.util.*;
 
 public class Constants {
 
+    public static final String TB_PAYINFO_PREFIX = "tb_payinfo_";
+
     public final static String PAY_TB_ORDER_KEY_IDS = "pay_tb_order_key_ids";
 
 
     public final static String PAY_TB_ORDER_KEY = "pay_tb_order_key_{mid}:{id}";
 
-    public final static String TB_PAYINFO_KEY= "tb_payinfo_{amount}";
+    public final static String TB_PAYINFO_KEY= String.format("%s{amount}", TB_PAYINFO_PREFIX);
 
 
     public final static String MERCHANT_NO_KEY = "merchant_no_key:{merchantNo}";
