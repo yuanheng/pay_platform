@@ -1,5 +1,6 @@
 package com.bootdo.system.service.impl;
 
+import com.bootdo.system.dto.TbCodeStatusDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +52,10 @@ public class TbOrderServiceImpl implements TbOrderService {
 	public int batchRemove(Integer[] ids){
 		return tbOrderDao.batchRemove(ids);
 	}
-	
+
+	@Override
+	public List<TbCodeStatusDTO> statCodeStatus() {
+		return tbOrderDao.statCodeStatus();
+	}
+
 }

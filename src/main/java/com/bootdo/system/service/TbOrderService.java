@@ -1,6 +1,7 @@
 package com.bootdo.system.service;
 
 import com.bootdo.system.domain.TbOrderDO;
+import com.bootdo.system.dto.TbCodeStatusDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -27,4 +28,10 @@ public interface TbOrderService {
 	int remove(Integer id);
 	
 	int batchRemove(Integer[] ids);
+
+	/**
+	 * 统计码子的状态数量情况
+	 * @return
+	 */
+	List<TbCodeStatusDTO> statCodeStatus();
 }
