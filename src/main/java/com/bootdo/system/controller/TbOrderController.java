@@ -4,8 +4,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.bootdo.app.config.Constants;
+import com.bootdo.app.util.AmountUtil;
 import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.StatusEnum;
+import com.bootdo.common.config.Constant;
 import com.bootdo.common.utils.ShiroUtils;
 import com.bootdo.system.domain.UserDO;
 import com.bootdo.system.dto.TbCodeStatusDTO;
@@ -41,34 +43,60 @@ import com.bootdo.common.utils.R;
 @Controller
 @RequestMapping("/system/tbOrder")
 public class TbOrderController {
-	@Autowired
 	private TbOrderService tbOrderService;
-	@Autowired
 	private RedisUtils redisUtils;
 
-	@GetMapping()
+	@Autowired
+    public void setTbOrderService(TbOrderService tbOrderService) {
+        this.tbOrderService = tbOrderService;
+    }
+
+    @Autowired
+    public void setRedisUtils(RedisUtils redisUtils) {
+        this.redisUtils = redisUtils;
+    }
+
+    @GetMapping()
 	@RequiresPermissions("system:tbOrder:tbOrder")
 	String TbOrder(Model model){
-		final List<TbCodeStatusDTO> statusCountList = tbOrderService.statCodeStatus();
-		Map<String, List<TbCodeStatusDTO>> statusMap = statusCountList.stream()
-				.filter(e -> StringUtils.isNotEmpty(e.getStatus()))
-				.collect(Collectors.groupingBy(TbCodeStatusDTO::getStatus));
-		statusMap.entrySet().forEach(e -> e.getValue()
-				.forEach(ex -> ex.setStatus(StatusEnum.getStatusEnumByKey(ex.getStatus()).getTypeDesc())));
 		List<TbCodeStatusDTO> list = Lists.newLinkedList();
-		for (Map.Entry<String, List<TbCodeStatusDTO>> entry : statusMap.entrySet()) {
-			List<TbCodeStatusDTO> value = entry.getValue();
-			if (!CollectionUtils.isEmpty(value)) {
-				try {
-					value.sort(Comparator.comparing(e -> Long.parseLong(e.getAmount())));
-				} catch (Exception e) {
-					log.error("数值转化异常，影响显示排序，不影响使用");
-				}
-				list.addAll(value);
-			}
-		}
-		model.addAttribute("codeStatusInfo", list);
-	    return "system/tbOrder/tbOrder";
+		final String gnrMatchExp = String.format("%s*", Constants.TB_PAYINFO_PREFIX);
+		final Set keys = redisUtils.keys(gnrMatchExp);
+        if (!CollectionUtils.isEmpty(keys)) {
+            keys.forEach(e -> {
+                long count = redisUtils.lGetListSize(String.valueOf(e));
+                final String _k = String.valueOf(e);
+                final String amount = _k.substring(_k.lastIndexOf("_") + 1, _k.length());
+                list.add(new TbCodeStatusDTO(AmountUtil.changeF2Y(amount),
+						StatusEnum.ENABLE.getTypeDesc(), String.valueOf(count)));
+            });
+//            final List<TbCodeStatusDTO> statusCountList = tbOrderService.statCodeStatus();
+//            Map<String, List<TbCodeStatusDTO>> statusMap = statusCountList.stream()
+//                    .filter(e -> StringUtils.isNotEmpty(e.getStatus()))
+//                    .collect(Collectors.groupingBy(TbCodeStatusDTO::getStatus));
+//            statusMap.entrySet().forEach(e -> e.getValue()
+//                    .forEach(ex -> ex.setStatus(StatusEnum.getStatusEnumByKey(ex.getStatus()).getTypeDesc())));
+//            for (Map.Entry<String, List<TbCodeStatusDTO>> entry : statusMap.entrySet()) {
+//                List<TbCodeStatusDTO> value = entry.getValue();
+//                if (!CollectionUtils.isEmpty(value)) {
+//                    try {
+//                        value.sort(Comparator.comparing(e -> Long.parseLong(e.getAmount())));
+//                    } catch (Exception e) {
+//                        log.error("数值转化异常，影响显示排序，不影响使用");
+//                    }
+//                    list.addAll(value);
+//                }
+//            }
+        }
+        if (!CollectionUtils.isEmpty(list)) {
+            try {
+                list.sort(Comparator.comparing(e -> Double.parseDouble(e.getAmount())));
+            } catch (Exception e) {
+                log.error("数值转化异常，影响显示排序，不影响使用");
+            }
+        }
+        model.addAttribute("codeStatusInfo", list);
+        return "system/tbOrder/tbOrder";
 	}
 
 	@ResponseBody
