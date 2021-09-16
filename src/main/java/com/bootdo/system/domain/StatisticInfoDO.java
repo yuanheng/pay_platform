@@ -1,7 +1,6 @@
 package com.bootdo.system.domain;
 
 import com.bootdo.app.zwlenum.RoleTypeEnum;
-import lombok.ToString;
 
 import java.math.BigDecimal;
 
@@ -11,7 +10,6 @@ import java.math.BigDecimal;
  * @author Prometheus
  * @date 2021/8/22.
  */
-@ToString
 public class StatisticInfoDO implements java.io.Serializable {
 
     private RoleTypeEnum currentRoleEnum;
@@ -105,5 +103,17 @@ public class StatisticInfoDO implements java.io.Serializable {
         this.txSucceedRate = BigDecimal.valueOf(givenValue);
         this.dailyReceivedAmount = BigDecimal.valueOf(givenValue);
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "StatisticInfoDO{" +
+                "currentRoleEnum=" + currentRoleEnum +
+                ", dailyReceivedAmount=" + dailyReceivedAmount +
+                ", totalReceivedAmount=" + totalReceivedAmount +
+                ", totalTxTimes=" + totalTxTimes +
+                ", succeedTxTimes=" + succeedTxTimes +
+                ", txSucceedRate=" + txSucceedRate +
+                '}';
     }
 }

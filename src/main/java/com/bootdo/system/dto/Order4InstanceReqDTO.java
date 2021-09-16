@@ -1,7 +1,6 @@
 package com.bootdo.system.dto;
 
 import com.bootdo.app.model.PaymentInfo;
-import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 

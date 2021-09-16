@@ -2,9 +2,7 @@ package com.bootdo.system.domain;
 
 
 import cn.hutool.json.JSONUtil;
-import com.bootdo.app.model.PaymentInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -51,9 +49,6 @@ public class OrderDO implements Serializable {
 
     private Payment payment;
 
-
-
-  @Data
     public static class Payment {
         private String account;
         private String address;
@@ -63,6 +58,62 @@ public class OrderDO implements Serializable {
         private Long mid;
         private String name;
         private String status;
+
+        public String getAccount() {
+            return account;
+        }
+
+        public void setAccount(String account) {
+            this.account = account;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public String getBankName() {
+            return bankName;
+        }
+
+        public void setBankName(String bankName) {
+            this.bankName = bankName;
+        }
+
+        public String getBranchBankName() {
+            return branchBankName;
+        }
+
+        public void setBranchBankName(String branchBankName) {
+            this.branchBankName = branchBankName;
+        }
+
+        public Long getMid() {
+            return mid;
+        }
+
+        public void setMid(Long mid) {
+            this.mid = mid;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
     }
 
     public Payment getPayment() {
