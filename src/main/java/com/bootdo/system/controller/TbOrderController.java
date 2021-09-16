@@ -1,24 +1,22 @@
 package com.bootdo.system.controller;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.bootdo.app.config.Constants;
 import com.bootdo.app.util.AmountUtil;
 import com.bootdo.app.util.RedisUtils;
 import com.bootdo.app.zwlenum.StatusEnum;
-import com.bootdo.common.config.Constant;
+import com.bootdo.common.utils.PageUtils;
+import com.bootdo.common.utils.Query;
+import com.bootdo.common.utils.R;
 import com.bootdo.common.utils.ShiroUtils;
+import com.bootdo.system.domain.TbOrderDO;
 import com.bootdo.system.domain.UserDO;
 import com.bootdo.system.dto.TbCodeStatusDTO;
+import com.bootdo.system.service.TbOrderService;
 import com.google.common.collect.Lists;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,11 +24,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.bootdo.system.domain.TbOrderDO;
-import com.bootdo.system.service.TbOrderService;
-import com.bootdo.common.utils.PageUtils;
-import com.bootdo.common.utils.Query;
-import com.bootdo.common.utils.R;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -39,7 +37,6 @@ import com.bootdo.common.utils.R;
  * @email 1992lcg@163.com
  * @date 2021-09-08 22:32:27
  */
-@Slf4j
 @Controller
 @RequestMapping("/system/tbOrder")
 public class TbOrderController {
@@ -62,7 +59,7 @@ public class TbOrderController {
 		List<TbCodeStatusDTO> list = Lists.newLinkedList();
 		final String gnrMatchExp = String.format("%s*", Constants.TB_PAYINFO_PREFIX);
 		final Set keys = redisUtils.keys(gnrMatchExp);
-        if (!CollectionUtils.isEmpty(keys)) {
+        if (keys != null && !keys.isEmpty()) {
             keys.forEach(e -> {
                 long count = redisUtils.lGetListSize(String.valueOf(e));
                 final String _k = String.valueOf(e);
@@ -88,11 +85,11 @@ public class TbOrderController {
 //                }
 //            }
         }
-        if (!CollectionUtils.isEmpty(list)) {
+		if (list != null && !list.isEmpty()) {
             try {
                 list.sort(Comparator.comparing(e -> Double.parseDouble(e.getAmount())));
             } catch (Exception e) {
-                log.error("数值转化异常，影响显示排序，不影响使用");
+                System.out.println("数值转化异常，影响显示排序，不影响使用");
             }
         }
         model.addAttribute("codeStatusInfo", list);
