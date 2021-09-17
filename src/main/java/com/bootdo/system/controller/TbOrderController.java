@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ *
+ *
  * @author chglee
  * @email 1992lcg@163.com
  * @date 2021-09-08 22:32:27
@@ -40,10 +42,10 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/system/tbOrder")
 public class TbOrderController {
-    private TbOrderService tbOrderService;
-    private RedisUtils redisUtils;
+	private TbOrderService tbOrderService;
+	private RedisUtils redisUtils;
 
-    @Autowired
+	@Autowired
     public void setTbOrderService(TbOrderService tbOrderService) {
         this.tbOrderService = tbOrderService;
     }
@@ -54,128 +56,129 @@ public class TbOrderController {
     }
 
     @GetMapping()
-    @RequiresPermissions("system:tbOrder:tbOrder")
-    String TbOrder(Model model) {
+	@RequiresPermissions("system:tbOrder:tbOrder")
+	String TbOrder(Model model){
         model.addAttribute("codeStatusInfo", loadCodeStatusFromCache());
         return "system/tbOrder/tbOrder";
-    }
+	}
 
-    private List<TbCodeStatusDTO> loadCodeStatusFromCache() {
-        List<TbCodeStatusDTO> list = Lists.newLinkedList();
-        final String gnrMatchExp = String.format("%s*", Constants.TB_PAYINFO_PREFIX);
-        final Set keys = redisUtils.keys(gnrMatchExp);
-        if (keys != null && !keys.isEmpty()) {
-            keys.forEach(e -> {
-                long count = redisUtils.lGetListSize(String.valueOf(e));
-                final String _k = String.valueOf(e);
-                final String amount = _k.substring(_k.lastIndexOf("_") + 1, _k.length());
-                list.add(new TbCodeStatusDTO(AmountUtil.changeF2Y(amount),
-                        StatusEnum.ENABLE.getTypeDesc(), String.valueOf(count)));
-            });
-        }
-        if (list != null && !list.isEmpty()) {
-            try {
-                list.sort(Comparator.comparing(e -> Double.parseDouble(e.getAmount())));
-            } catch (Exception e) {
-                System.out.println("数值转化异常，影响显示排序，不影响使用");
-            }
-        }
-        return list;
-    }
+	private List<TbCodeStatusDTO> loadCodeStatusFromCache() {
+		List<TbCodeStatusDTO> list = Lists.newLinkedList();
+		final String gnrMatchExp = String.format("%s*", Constants.TB_PAYINFO_PREFIX);
+		final Set keys = redisUtils.keys(gnrMatchExp);
+		if (keys != null && !keys.isEmpty()) {
+			keys.forEach(e -> {
+				long count = redisUtils.lGetListSize(String.valueOf(e));
+				final String _k = String.valueOf(e);
+				final String amount = _k.substring(_k.lastIndexOf("_") + 1, _k.length());
+				list.add(new TbCodeStatusDTO(AmountUtil.changeF2Y(amount),
+						StatusEnum.ENABLE.getTypeDesc(), String.valueOf(count)));
+			});
+		}
+		if (list != null && !list.isEmpty()) {
+			try {
+				list.sort(Comparator.comparing(e -> Double.parseDouble(e.getAmount())));
+			} catch (Exception e) {
+				System.out.println("数值转化异常，影响显示排序，不影响使用");
+			}
+		}
+		return list;
+	}
 
-    @ResponseBody
-    @PostMapping("/refreshCodeStatus")
-    @RequiresPermissions("system:tbOrder:tbOrder")
-    public List<TbCodeStatusDTO> refreshCodeStatus() {
-        return loadCodeStatusFromCache();
-    }
+	@ResponseBody
+	@PostMapping("/refreshCodeStatus")
+	@RequiresPermissions("system:tbOrder:tbOrder")
+	public List<TbCodeStatusDTO> refreshCodeStatus(){
+		return loadCodeStatusFromCache();
+	}
 
-    @ResponseBody
-    @GetMapping("/list")
-    @RequiresPermissions("system:tbOrder:tbOrder")
-    public PageUtils list(@RequestParam Map<String, Object> params) {
-        //查询列表数据
+	@ResponseBody
+	@GetMapping("/list")
+	@RequiresPermissions("system:tbOrder:tbOrder")
+	public PageUtils list(@RequestParam Map<String, Object> params){
+		//查询列表数据
         Query query = new Query(params);
-        List<TbOrderDO> tbOrderList = tbOrderService.list(query);
-        int total = tbOrderService.count(query);
-        PageUtils pageUtils = new PageUtils(tbOrderList, total);
-        return pageUtils;
-    }
+		List<TbOrderDO> tbOrderList = tbOrderService.list(query);
+		int total = tbOrderService.count(query);
+		PageUtils pageUtils = new PageUtils(tbOrderList, total);
+		return pageUtils;
+	}
 
-    @GetMapping("/add")
-    @RequiresPermissions("system:tbOrder:add")
-    String add() {
-        return "system/tbOrder/add";
-    }
+	@GetMapping("/add")
+	@RequiresPermissions("system:tbOrder:add")
+	String add(){
+	    return "system/tbOrder/add";
+	}
 
-    @GetMapping("/edit/{id}")
-    @RequiresPermissions("system:tbOrder:edit")
-    String edit(@PathVariable("id") Integer id, Model model) {
-        TbOrderDO tbOrder = tbOrderService.get(id);
-        model.addAttribute("tbOrder", tbOrder);
-        return "system/tbOrder/edit";
-    }
+	@GetMapping("/edit/{id}")
+	@RequiresPermissions("system:tbOrder:edit")
+	String edit(@PathVariable("id") Integer id,Model model){
+		TbOrderDO tbOrder = tbOrderService.get(id);
+		model.addAttribute("tbOrder", tbOrder);
+	    return "system/tbOrder/edit";
+	}
 
-    /**
-     * 保存
-     */
-    @ResponseBody
-    @PostMapping("/save")
-    @RequiresPermissions("system:tbOrder:add")
-    public R save(TbOrderDO tbOrder) {
-        tbOrder.setCreateTime(new Date());
-        UserDO currentUser = ShiroUtils.getUser();
-        tbOrder.setMid(currentUser.getUserId());
-        tbOrder.setStatus(StatusEnum.DISABLE.getKey());
-        if (tbOrderService.save(tbOrder) > 0) {
-            return R.ok();
-        }
-        return R.error();
-    }
+	/**
+	 * 保存
+	 */
+	@ResponseBody
+	@PostMapping("/save")
+	@RequiresPermissions("system:tbOrder:add")
+	public R save( TbOrderDO tbOrder){
+		tbOrder.setCreateTime(new Date());
+		UserDO currentUser = ShiroUtils.getUser();
+		tbOrder.setMid(currentUser.getUserId());
+		tbOrder.setStatus(StatusEnum.DISABLE.getKey());
+		if(tbOrderService.save(tbOrder)>0){
+			return R.ok();
+		}
+		return R.error();
+	}
+	/**
+	 * 修改
+	 */
+	@ResponseBody
+	@RequestMapping("/update")
+	@RequiresPermissions("system:tbOrder:edit")
+	public R update( TbOrderDO tbOrder){
+		tbOrderService.update(tbOrder);
+		return R.ok();
+	}
 
-    /**
-     * 修改
-     */
-    @ResponseBody
-    @RequestMapping("/update")
-    @RequiresPermissions("system:tbOrder:edit")
-    public R update(TbOrderDO tbOrder) {
-        tbOrderService.update(tbOrder);
-        return R.ok();
-    }
+	/**
+	 * 删除
+	 */
+	@PostMapping( "/remove")
+	@ResponseBody
+	@RequiresPermissions("system:tbOrder:remove")
+	public R remove( Integer id){
+		if(tbOrderService.remove(id)>0){
+		return R.ok();
+		}
+		return R.error();
+	}
 
-    /**
-     * 删除
-     */
-    @PostMapping("/remove")
-    @ResponseBody
-    @RequiresPermissions("system:tbOrder:remove")
-    public R remove(Integer id) {
-        if (tbOrderService.remove(id) > 0) {
-            return R.ok();
-        }
-        return R.error();
-    }
-
-    /**
-     * 删除
-     */
-    @PostMapping("/batchRemove")
-    @ResponseBody
-    @RequiresPermissions("system:tbOrder:batchRemove")
-    public R remove(@RequestParam("ids[]") Integer[] ids) {
-        tbOrderService.batchRemove(ids);
-        return R.ok();
-    }
+	/**
+	 * 删除
+	 */
+	@PostMapping( "/batchRemove")
+	@ResponseBody
+	@RequiresPermissions("system:tbOrder:batchRemove")
+	public R remove(@RequestParam("ids[]") Integer[] ids){
+		tbOrderService.batchRemove(ids);
+		return R.ok();
+	}
 
 
-    /**
-     * 启用禁用
-     */
-    @PostMapping("/changeStatus")
-    @ResponseBody
-    @RequiresPermissions("system:tbOrder:edit")
-    public R changStatus(Integer id, String status) {
+
+
+	/**
+	 * 启用禁用
+	 */
+	@PostMapping( "/changeStatus")
+	@ResponseBody
+	@RequiresPermissions("system:tbOrder:edit")
+	public R changStatus(Integer id, String status){
         TbOrderDO tbOrderDO = tbOrderService.get(id);
         tbOrderDO.setStatus(StatusEnum.getStatusEnumByKey(status).getKey());
         String key = Constants.getPayTbOrderKey(tbOrderDO.getMid() + "", tbOrderDO.getId() + "");
@@ -192,7 +195,7 @@ public class TbOrderController {
         redisUtils.set(key, tbOrderDO);
         tbOrderService.update(tbOrderDO);
         return R.ok();
-    }
+	}
 
     private boolean notExist(String key, Integer nid) {
         long size = redisUtils.lGetListSize(key);
