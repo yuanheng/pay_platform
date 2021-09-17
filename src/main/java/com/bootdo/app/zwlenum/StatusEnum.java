@@ -1,7 +1,5 @@
 package com.bootdo.app.zwlenum;
 
-import lombok.Getter;
-
 /**
  * PayTypeEnum
  *
@@ -9,7 +7,6 @@ import lombok.Getter;
  * @version v1.0, 2016年7月6日
  * @since v6.1
  */
-@Getter
 public enum StatusEnum {
   //充值
   ENABLE("enable", "启用"),
@@ -31,6 +28,9 @@ public enum StatusEnum {
     this.key = key;
   }
 
+  public String getTypeDesc() {
+    return typeDesc;
+  }
 
   public static String getTypeDescByType(String type) {
     return StatusEnum.valueOf(type).typeDesc;
