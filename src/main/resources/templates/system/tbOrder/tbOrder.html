@@ -8,18 +8,27 @@
 			<div class="col-sm-3 col-md-4">
 				<h1 style="margin-left: 25px;">码子使用情况</h1></div>
 			<div class="col-sm-3 col-md-4">
-				<button type="button" class="btn  btn-primary" onclick="renewAutoRefresh()">
+				<button type="button" class="btn  btn-primary"  style="background-color: #1a7bb9;"
+						id="_bt_renew_ar" onclick="renewAutoRefresh(this)">
 					<i class="fa" aria-hidden="true"></i>启用自动刷新
 				</button>
 				&nbsp;&nbsp;&nbsp;&nbsp;
-				<button type="button" class="btn  btn-primary" onclick="stopAutoRefresh()">
+				<button type="button" class="btn  btn-primary" id="_bt_stop_ar" onclick="stopAutoRefresh(this)">
 					<i class="fa" aria-hidden="true"></i>停止自动刷新
 				</button>
 			</div>
 		</div>
 		<div class="col-sm-12">
 			<div class="row" style="margin-left: 30px;" id="code_status_area">
-				123123123
+				<div class="col-sm-2 col-md-2" th:each="cd:${codeStatusInfo}">
+					<div class="thumbnail">
+						<div class="caption">
+							<h2>￥<span class="control-label" th:text="${cd.amount}"></span></h2>
+							<h3>数量：<span class="control-label" th:text="${cd.count}"></span></h3>
+							<p style="margin: 0 0 0;">状态：<span th:text="${cd.status}"></span> </p>
+						</div>
+					</div>
+				</div>
 			</div>
 			<hr style="color: #1AB394;">
 			<div class="ibox">
@@ -88,56 +97,61 @@
 	</div>
 	<div th:include="include :: footer"></div>
 	<script type="text/javascript" src="/js/appjs/system/tbOrder/tbOrder.js"></script>
-<script>
-	function refreshCodeStatus() {
-		console.log('刷新码子使用情况');
-		load();
-	}
-	
-	var t1 = window.setInterval('refreshCodeStatus()', 5000);
-	var flag = 1;
-	
-	function stopAutoRefresh() {
-		if (flag == 1) {
-			console.log('停止自动刷新');
-			window.clearInterval(t1);
-			flag = 0;
+	<script type="text/javascript">
+		function refreshCodeStatus() {
+			console.log('刷新码子使用情况');
+			loadCodeStatus();
 		}
-	}
-	
-	function renewAutoRefresh() {
-		if (flag == 0) {
-			console.log('启用自动刷新');
-			t1 = window.setInterval('refreshCodeStatus()', 10000);
-			flag = 1;
-		}
-	}
 
-	function load() {
-		$.ajax({
-			url: "/system/tbOrder/refreshCodeStatus",
-			type: "post",
-			data: {},
-			success: function (r) {
-				if (r != '' && r.length > 0) {
-					var _html = '';
-					var _prefix= '<div class="col-sm-2 col-md-2"><div class="thumbnail"><div class="caption">';
-					var _suffix = '</div></div></div>';
-					for (let i = 0; i < r.length; i++) {
-						var n = r[i];
-						_html += _prefix;
-						_html += '<h2>￥<span class="control-label">' + n.amount + '</span></h2>';
-						_html += '<h3>数量：<span class="control-label">' + n.count + '</span></h3>';
-						_html += '<p style="margin: 0 0 0;">状态：<span>' + n.status + '</span> </p>';
-						_html += _suffix;
-					}
-					$('#code_status_area').html(_html);
-				} else {
-					layer.msg('暂无可用收款码，可手动停止自动刷新');
-				}
+		$('#_bt_renew_ar').hide();
+		var t1 = window.setInterval('refreshCodeStatus()', 5000);
+		var flag = 1;
+
+		function stopAutoRefresh(ele) {
+			if (flag == 1) {
+				console.log('停止自动刷新');
+				window.clearInterval(t1);
+				flag = 0;
+				$(ele).hide();
+				$('#_bt_renew_ar').show();
 			}
-		});
-	}
-</script>
+		}
+
+		function renewAutoRefresh(ele) {
+			if (flag == 0) {
+				console.log('启用自动刷新');
+				t1 = window.setInterval('refreshCodeStatus()', 10000);
+				flag = 1;
+				$(ele).hide();
+				$('#_bt_stop_ar').show();
+			}
+		}
+
+		function loadCodeStatus() {
+			$.ajax({
+				url: "/system/tbOrder/refreshCodeStatus",
+				type: "post",
+				data: {},
+				success: function (r) {
+					if (r != '' && r.length > 0) {
+						var _html = '';
+						var _prefix= '<div class="col-sm-2 col-md-2"><div class="thumbnail"><div class="caption">';
+						var _suffix = '</div></div></div>';
+						for (let i = 0; i < r.length; i++) {
+							var n = r[i];
+							_html += _prefix;
+							_html += '<h2>￥<span class="control-label">' + n.amount + '</span></h2>';
+							_html += '<h3>数量：<span class="control-label">' + n.count + '</span></h3>';
+							_html += '<p style="margin: 0 0 0;">状态：<span>' + n.status + '</span> </p>';
+							_html += _suffix;
+						}
+						$('#code_status_area').html(_html);
+					} else {
+						layer.msg('暂无可用收款码，可手动停止自动刷新');
+					}
+				}
+			});
+		}
+	</script>
 </body>
 </html>

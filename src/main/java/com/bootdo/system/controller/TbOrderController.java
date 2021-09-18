@@ -24,11 +24,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -177,19 +179,44 @@ public class TbOrderController {
 	@ResponseBody
 	@RequiresPermissions("system:tbOrder:edit")
 	public R changStatus(Integer id, String status){
-		TbOrderDO tbOrderDO = tbOrderService.get(id);
-		tbOrderDO.setStatus(StatusEnum.getStatusEnumByKey(status).getKey());
-		tbOrderService.update(tbOrderDO);
-		String key = Constants.getPayTbOrderKey(tbOrderDO.getMid()+"", tbOrderDO.getId()+"");
-		redisUtils.set(key, tbOrderDO);
-		String amount = tbOrderDO.getAmount();
-		Integer tempAmount = Integer.parseInt(amount) * 100;
-		String tbPayinfosKey = Constants.getTbPayinfoKey(tempAmount+"");
-		if (tbOrderDO.getStatus().equals(StatusEnum.ENABLE.getKey())) {
-			redisUtils.addPaymentInfo(tbPayinfosKey, tbOrderDO);
-			return R.ok();
-		}
-		return R.ok();
+        TbOrderDO tbOrderDO = tbOrderService.get(id);
+        tbOrderDO.setStatus(StatusEnum.getStatusEnumByKey(status).getKey());
+        String key = Constants.getPayTbOrderKey(tbOrderDO.getMid() + "", tbOrderDO.getId() + "");
+        String amount = tbOrderDO.getAmount();
+        Integer tempAmount = Integer.parseInt(amount) * 100;
+        String tbPayinfosKey = Constants.getTbPayinfoKey(tempAmount + "");
+        if (tbOrderDO.getStatus().equals(StatusEnum.ENABLE.getKey())) {
+            if (notExist(tbPayinfosKey, tbOrderDO.getId())) {
+                redisUtils.addPaymentInfo(tbPayinfosKey, tbOrderDO);
+            } else {
+                return R.error("已存在，请勿重复添加。");
+            }
+        }
+        redisUtils.set(key, tbOrderDO);
+        tbOrderService.update(tbOrderDO);
+        return R.ok();
 	}
+
+    private boolean notExist(String key, Integer nid) {
+        long size = redisUtils.lGetListSize(key);
+        if (size == 0) {
+            return true;
+        }
+        List<Object> contentList = redisUtils.lGet(key, 0, size - 1);
+        List<TbOrderDO> existenceList = new ArrayList<>(contentList.size());
+        contentList.forEach(e -> {
+            TbOrderDO o = (TbOrderDO) e;
+            existenceList.add(o);
+        });
+        if (existenceList != null && !existenceList.isEmpty()) {
+            final Set<Integer> idSet = existenceList.stream().filter(e -> e.getId() != null)
+                    .map(TbOrderDO::getId).collect(Collectors.toSet());
+            if (idSet.contains(nid)) {
+                return false;
+            }
+            return true;
+        }
+        return true;
+    }
 
 }
