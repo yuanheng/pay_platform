@@ -19,6 +19,7 @@
 			<if test="roleId != null and roleId == 61">and mid = #{mid}</if>
 			<if test="createTime != null and createTime != ''">and create_time &gt; #{createTime}</if>
 			<if test="finishTime != null and finishTime != ''">and create_time &lt; #{finishTime}</if>
+			<if test="paymentInfo != null and paymentInfo != ''">and payment_info like concat ('%',#{paymentInfo},'%')</if>
 		</where>
         <choose>
             <when test="sort != null and sort.trim() != ''">

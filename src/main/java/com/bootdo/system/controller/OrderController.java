@@ -157,10 +157,7 @@ public class OrderController {
         OrderDO orderDO = orderService.get(id);
         Assert.notNull(orderDO, "不存在的订单，请确认");
         if (orderDO.getStatus().equals(OrderStatusEnum.PRE_PAY.getKey())){
-            // 更新订单状态
-            orderDO.setStatus(OrderStatusEnum.FINISHED_PAY.getKey());
-            orderDO.setFinishTime(new Date());
-            orderService.update(orderDO);
+
             String paymentInfo = orderDO.getPaymentInfo();
             JSONObject payJson = JSONObject.parseObject(paymentInfo);
             Integer tbOrderId = payJson.getInteger("id");
@@ -169,9 +166,13 @@ public class OrderController {
             tempTbOrder.setStatus(StatusEnum.FINISHED.getKey());
             tempTbOrder.setEndTime(new Date());
             tbOrderService.update(tempTbOrder);
+
+            // 更新订单状态
+            orderDO.setStatus(OrderStatusEnum.FINISHED_PAY.getKey());
+            orderDO.setFinishTime(new Date());
             orderService.notifyMerchant(orderDO);
+            orderService.update(orderDO);
             if (orderDO.getStatus().equals(OrderStatusEnum.CALLBACK_SUCCESS.getKey())){
-                orderService.update(orderDO);
                 // 触发统计
                 staticsSuccessOrder(orderDO);
             }
@@ -179,8 +180,6 @@ public class OrderController {
         } else {
             return R.error("已经处理过");
         }
-
-
 
     }
 

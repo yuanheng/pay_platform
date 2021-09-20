@@ -37,7 +37,8 @@ function load() {
                         merchantOrderNo: $('#searchMechantOrderNo').val(),
                         status: $('#status').val(),
                         createTime: $('#createTime').val(),
-                        finishTime: $('#finishTime').val()
+                        finishTime: $('#finishTime').val(),
+                        paymentInfo: $('#remark').val()
                     };
                 },
                 columns: [

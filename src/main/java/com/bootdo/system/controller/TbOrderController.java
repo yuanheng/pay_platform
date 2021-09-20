@@ -161,11 +161,31 @@ public class TbOrderController {
 	/**
 	 * 删除
 	 */
-	@PostMapping( "/batchRemove")
+	@PostMapping( "/batchEnable")
 	@ResponseBody
-	@RequiresPermissions("system:tbOrder:batchRemove")
-	public R remove(@RequestParam("ids[]") Integer[] ids){
-		tbOrderService.batchRemove(ids);
+	@RequiresPermissions("system:tbOrder:edit")
+	public R batchEnable(@RequestParam("ids[]") Integer[] ids){
+		for (Integer id : ids) {
+			TbOrderDO tbOrderDO = tbOrderService.get(id);
+			if (tbOrderDO.getStatus().equals(StatusEnum.FINISHED.getKey()) || tbOrderDO.getStatus().equals(StatusEnum.LOSE.getKey())) {
+				continue;
+			}
+			String key = Constants.getPayTbOrderKey(tbOrderDO.getMid() + "", tbOrderDO.getId() + "");
+			String amount = tbOrderDO.getAmount();
+			Integer tempAmount = Integer.parseInt(amount) * 100;
+			String tbPayinfosKey = Constants.getTbPayinfoKey(tempAmount + "");
+			if (tbOrderDO.getStatus().equals(StatusEnum.DISABLE.getKey())) {
+				tbOrderDO.setStatus(StatusEnum.ENABLE.getKey());
+				if (notExist(tbPayinfosKey, tbOrderDO.getId())) {
+					redisUtils.addPaymentInfo(tbPayinfosKey, tbOrderDO);
+				}
+			} else {
+				tbOrderDO.setStatus(StatusEnum.DISABLE.getKey());
+			}
+			redisUtils.set(key, tbOrderDO);
+			tbOrderService.update(tbOrderDO);
+		}
+
 		return R.ok();
 	}
 
@@ -180,18 +200,24 @@ public class TbOrderController {
 	@RequiresPermissions("system:tbOrder:edit")
 	public R changStatus(Integer id, String status){
         TbOrderDO tbOrderDO = tbOrderService.get(id);
-        tbOrderDO.setStatus(StatusEnum.getStatusEnumByKey(status).getKey());
+        if (tbOrderDO.getStatus().equals(StatusEnum.FINISHED.getKey()) || tbOrderDO.getStatus().equals(StatusEnum.LOSE.getKey())) {
+					return R.error("订单已经被支付或者过期，不能启用。");
+				}
+
         String key = Constants.getPayTbOrderKey(tbOrderDO.getMid() + "", tbOrderDO.getId() + "");
         String amount = tbOrderDO.getAmount();
         Integer tempAmount = Integer.parseInt(amount) * 100;
         String tbPayinfosKey = Constants.getTbPayinfoKey(tempAmount + "");
-        if (tbOrderDO.getStatus().equals(StatusEnum.ENABLE.getKey())) {
+        if (tbOrderDO.getStatus().equals(StatusEnum.DISABLE.getKey())) {
+					  tbOrderDO.setStatus(StatusEnum.ENABLE.getKey());
             if (notExist(tbPayinfosKey, tbOrderDO.getId())) {
                 redisUtils.addPaymentInfo(tbPayinfosKey, tbOrderDO);
             } else {
                 return R.error("已存在，请勿重复添加。");
             }
-        }
+        } else {
+					tbOrderDO.setStatus(StatusEnum.DISABLE.getKey());
+				}
         redisUtils.set(key, tbOrderDO);
         tbOrderService.update(tbOrderDO);
         return R.ok();

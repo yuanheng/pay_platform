@@ -12,6 +12,7 @@ public enum StatusEnum {
   ENABLE("enable", "启用"),
   DISABLE("disable", "禁用"),
   DELETED("delete", "删除"),
+  LOSE("lose", "失效"),
   FINISHED("finish", "完成");
 
 

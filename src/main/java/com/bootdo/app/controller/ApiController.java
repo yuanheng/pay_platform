@@ -12,12 +12,16 @@ import com.bootdo.app.util.Encript;
 import com.bootdo.app.util.NumberUtil;
 import com.bootdo.app.util.RedisUtils;
 
+import com.bootdo.app.zwlenum.OrderStatusEnum;
 import com.bootdo.app.zwlenum.PayTypeEnum;
+
 import com.bootdo.common.utils.StringUtils;
 import com.bootdo.system.domain.MerchantDO;
 import com.bootdo.system.domain.OrderDO;
 import com.bootdo.system.service.MerchantService;
 import com.bootdo.system.service.OrderService;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +81,8 @@ public class ApiController {
                 title = "请用网银转账付款";
             } else if (order.getPayType().equals(PayTypeEnum.WECHAT_CODE.getKey())) {
                 title = "请用微信扫码付款";
-                returnVM = "payWXDetail";
+                model.addAttribute("payUrl","http://bb.hyhxsma.top:6869/wxPay/wapPay?amount="+order.getAmount()+"&orderNo="+orderNo);
+                returnVM = "wxH5";
             }  else  if (order.getPayType().equals(PayTypeEnum.APLIPAY_CODE.getKey()) || order.getPayType().equals(PayTypeEnum.TABO_CODE.getKey())) {
                 JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
                 model.addAttribute("payInfo", payInfoJSON);
@@ -138,6 +143,7 @@ public class ApiController {
             OrderDO order = null;
             if (type.equals(PayTypeEnum.WECHAT_CODE.getKey())) {
                 order = orderService.createWechatOrder(paymentInfo);
+
             } else if (type.equals(PayTypeEnum.BANK_CODE.getKey())) {
                 order = orderService.createBankOrder(paymentInfo);
             } else if (type.equals(PayTypeEnum.APLIPAY_CODE.getKey()) || type.equals(PayTypeEnum.TABO_CODE.getKey())) {
@@ -322,13 +328,6 @@ public class ApiController {
         return merchantPayInfo;
     }
 
-    @RequestMapping(value = "/callback")
-    @ResponseBody
-    public String createOrder(String sign, String merchantNo, String amount, String merchantOrderNo) throws Exception {
-        logger.info("callbak success sign={},merchantNo={},amount={},merchantOrderNo={}", sign, merchantNo, amount, merchantOrderNo, merchantOrderNo);
-        return "OK";
-    }
-
     public void staticsOrder(String orderNo) {
         String key = Constants.getOrderKey(orderNo);
         OrderDO orderDO = (OrderDO) redisUtils.get(key);
@@ -369,6 +368,70 @@ public class ApiController {
     }
 
 
+
+    @RequestMapping(value = "/callback")
+    @ResponseBody
+    public String callback(String sign, String orderNo, String randomStr) throws Exception {
+        logger.info("callbak success sign={},merchantNo={},amount={},merchantOrderNo={}", sign, orderNo);
+
+        String tempSign = getSign(orderNo,randomStr);
+
+        if (!sign.equals(tempSign)){
+            return "ERROR";
+        }
+        OrderDO orderDO = orderService.getOrderByNo(orderNo);
+        if (orderDO.getStatus().equals(OrderStatusEnum.PRE_PAY.getKey())){
+            // 更新订单状态
+            orderDO.setStatus(OrderStatusEnum.FINISHED_PAY.getKey());
+            orderDO.setFinishTime(new Date());
+            orderService.notifyMerchant(orderDO);
+            orderService.update(orderDO);
+            if (orderDO.getStatus().equals(OrderStatusEnum.CALLBACK_SUCCESS.getKey())){
+                // 触发统计
+                staticsSuccessOrder(orderDO);
+            }
+            return "OK";
+        } else {
+           return "ERROR";
+        }
+
+    }
+
+
+    public void staticsSuccessOrder (OrderDO orderDO){
+        String payInfo = orderDO.getPaymentInfo();
+        JSONObject payInfoJSON = JSONObject.parseObject(payInfo);
+        String type = orderDO.getPayType();
+        String payId = payInfoJSON.getString("id");
+        //String payStatisticsInfoKey = "payStatisticsInfoKey_" + orderDO.getMid() + "_" + type + ":" + payId;
+        // updateStatisticsInfo(payStatisticsInfoKey,orderDO);
+        // updateStatisticsInfoCuccrentDay(payStatisticsInfoKey,orderDO.getAmount());
+        String merchantStatisticsInfoKey = "merchantStatisticsInfoKey_" + orderDO.getMerchantNo();
+        updateStatisticsInfo(merchantStatisticsInfoKey,orderDO);
+        updateStatisticsInfoCuccrentDay(merchantStatisticsInfoKey,orderDO.getAmount());
+    }
+
+    private void updateStatisticsInfoCuccrentDay(String key, String amount) {
+        key = Constants.getTodayKey(key);
+        if (redisUtils.hasKey(key)) {
+            try {
+                distributedLock.getLock(key);
+                Integer tempAmount = (Integer) redisUtils.get(key);
+                redisUtils.set(key,Integer.parseInt(amount)+tempAmount);
+            } finally {
+                distributedLock.releaseLock(key);
+            }
+        } else {
+            try {
+                distributedLock.getLock(key);
+                redisUtils.set(key,Integer.parseInt(amount));
+            } finally {
+                distributedLock.releaseLock(key);
+            }
+        }
+    }
+
+
     private String getPamras(String url, String key){
         Map<String,String> params = getParameter(url);
         return params.get(key);
@@ -392,5 +455,10 @@ public class ApiController {
             e.printStackTrace();
         }
         return map;
+    }
+
+    private String getSign(String orderNo, String randomStr) {
+        String signstr = "orderNo="+orderNo+"&randomStr="+randomStr+"&secretKey=dingbs5188";
+        return Encript.md5(signstr);
     }
 }

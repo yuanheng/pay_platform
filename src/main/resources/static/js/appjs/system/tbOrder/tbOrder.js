@@ -142,7 +142,7 @@ function remove(id) {
 
 function resetPwd(id) {
 }
-function batchRemove() {
+function batchEnable() {
 	var rows = $('#exampleTable').bootstrapTable('getSelections'); // 返回所有选择的行，当没有选择的记录时，返回一个空数组
 	if (rows.length == 0) {
 		layer.msg("请选择要删除的数据");
@@ -162,7 +162,7 @@ function batchRemove() {
 			data : {
 				"ids" : ids
 			},
-			url : prefix + '/batchRemove',
+			url : prefix + '/batchEnable',
 			success : function(r) {
 				if (r.code == 0) {
 					layer.msg(r.msg);
