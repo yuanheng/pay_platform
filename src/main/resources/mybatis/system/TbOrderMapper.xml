@@ -9,14 +9,19 @@
 		<result property="count" column="count" />
 	</resultMap>
 
+	<sql id="Base_Column_Id">
+		`id`,`no`,`amount`,`account`,`create_time`,`validity`,`status`,`mid`,`remark`,`end_time`,`url`,`extra`
+	</sql>
+
 	<select id="get" resultType="com.bootdo.system.domain.TbOrderDO">
-		select `id`,`no`,`amount`,`account`,`create_time`,`validity`,`status`,`mid`,`remark`,`end_time`,`url`,`extra` from rs_tb_order where id = #{value}
+		select <include refid="Base_Column_Id" />
+		 from rs_tb_order where id = #{value}
 	</select>
 
 	<select id="list" resultType="com.bootdo.system.domain.TbOrderDO">
-		select `id`,`no`,`amount`,`account`,`create_time`,`validity`,`status`,`mid`,`remark`,`end_time`,`url`,`extra` from rs_tb_order
+		select <include refid="Base_Column_Id" />
+		 from rs_tb_order
         <where>
-
 		  		  <if test="no != null and no != ''"> and no = #{no} </if>
 		  		  <if test="amount != null and amount != ''"> and amount = #{amount} </if>
 		  		  <if test="account != null and account != ''"> and account = #{account} </if>

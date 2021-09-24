@@ -98,4 +98,5 @@ public class TestDemo {
   public void md5(){
     System.out.println(Encript.md5("admin"));
   }
+
 }
