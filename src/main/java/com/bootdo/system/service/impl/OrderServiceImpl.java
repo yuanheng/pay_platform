@@ -11,6 +11,7 @@ import com.bootdo.app.zwlenum.OrderStatusEnum;
 import com.bootdo.app.zwlenum.PayTypeEnum;
 import com.bootdo.app.zwlenum.StatusEnum;
 import com.bootdo.system.domain.*;
+import com.bootdo.system.service.TbOrderService;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
@@ -36,7 +37,10 @@ public class OrderServiceImpl implements OrderService {
 	private OrderDao orderDao;
 	@Autowired
 	private RedisUtils redisUtils;
-	
+
+	@Autowired
+	private TbOrderService tbOrderService;
+
 	@Override
 	public OrderDO get(Integer id){
 		return orderDao.get(id);
@@ -75,53 +79,27 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public OrderDO createWechatOrder(PaymentInfo paymentInfo) throws NotPayInfoException {
 
-		boolean flag = false;
-		Integer num = 1;
-		while (!flag) {
-			Object payInfoObj = redisUtils.getPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.WECHAT_CODE.getKey()));
-			if (payInfoObj == null) {
-				throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
-			}
+		PayWechatInfoDO payWechatInfoDO = new PayWechatInfoDO();
+		payWechatInfoDO.setMid(1L);
+		OrderDO order = new OrderDO();
+		order.setMid(payWechatInfoDO.getMid());
+		order.setMerchantNo(paymentInfo.getMerchantNo());
+		order.setOrderNo(OrderCodeUtil.getOrderCode(null));
+		order.setCreateTime(new Date());
+		order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
+		order.setAmount(paymentInfo.getAmount());
+		order.setReallyAmount(paymentInfo.getAmount());
+		String randomCode = (int)((Math.random()*9+1)*100000) + "";
+		JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(payWechatInfoDO));
+		jsonObject.put("randomCode", randomCode);
+		order.setPaymentInfo(JSONObject.toJSONString(jsonObject));
+		order.setPayType(paymentInfo.getType());
+		order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
+		order.setRemark(paymentInfo.getRemark());
+		save(order);
+		redisUtils.addPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.WECHAT_CODE.getKey()) ,payWechatInfoDO);
+		return  order;
 
-			PayWechatInfoDO payWechatInfoDO = (PayWechatInfoDO) payInfoObj;
-			Long userid = payWechatInfoDO.getMid();
-			String key = Constants.getPayInfoKey(PayTypeEnum.WECHAT_CODE.getKey(),userid,payWechatInfoDO.getId().intValue());
-			if (redisUtils.hasKey(key)) {
-				PayWechatInfoDO tempPayWechatInfoDO = (PayWechatInfoDO) redisUtils.get(key);
-				if (tempPayWechatInfoDO.getStatus().equals(StatusEnum.ENABLE.getKey())) {
-					OrderDO order = new OrderDO();
-					order.setMid(payWechatInfoDO.getMid());
-					order.setMerchantNo(paymentInfo.getMerchantNo());
-					order.setOrderNo(OrderCodeUtil.getOrderCode(null));
-					order.setCreateTime(new Date());
-					order.setStatus(OrderStatusEnum.PRE_PAY.getKey());
-					order.setAmount(paymentInfo.getAmount());
-					order.setReallyAmount(paymentInfo.getAmount());
-					String randomCode = (int)((Math.random()*9+1)*100000) + "";
-					JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(payWechatInfoDO));
-					jsonObject.put("randomCode", randomCode);
-					order.setPaymentInfo(JSONObject.toJSONString(jsonObject));
-					order.setPayType(paymentInfo.getType());
-					order.setMerchantOrderNo(paymentInfo.getMerchantOrderNo());
-					order.setRemark(paymentInfo.getRemark());
-					save(order);
-					redisUtils.addPaymentInfo(Constants.PAYMENTINFO_LIST.replace("{payType}", PayTypeEnum.WECHAT_CODE.getKey()) ,payWechatInfoDO);
-					return  order;
-				} else {
-					if (num > 5) {
-						throw new  NotPayInfoException("暂无可用收款方式 " + paymentInfo.getType());
-					}
-					num ++;
-					try {
-						Thread.sleep(500);
-					}catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-
-		return  null;
 	}
 
 	@Override
@@ -277,7 +255,14 @@ public class OrderServiceImpl implements OrderService {
 			TbOrderDO tbOrderDO = (TbOrderDO) tbPayObject;
 			Long userid = tbOrderDO.getMid();
 			String key = Constants.getPayTbOrderKey(userid+"",tbOrderDO.getId()+"");
-			if (redisUtils.hasKey(key)) {
+			Long createTime = tbOrderDO.getCreateTime().getTime();
+			Long currentTime = System.currentTimeMillis();
+			boolean temp = (currentTime - createTime) > 22 * 60 * 60 * 1000;
+			if (temp) {
+					tbOrderDO.setStatus(StatusEnum.LOSE.getKey());
+					tbOrderService.update(tbOrderDO);
+			}
+			if (redisUtils.hasKey(key) && !temp) {
 				TbOrderDO tempTbOrderDO = (TbOrderDO) redisUtils.get(key);
 				if (tempTbOrderDO.getStatus().equals(StatusEnum.ENABLE.getKey())) {
 					OrderDO order = new OrderDO();
