@@ -15,6 +15,7 @@ public class Constant {
     public static int OA_NOTIFY_READ_YES = 1;
 
     public static final String SYMBOL_COMMA = ",";
+    public static final String SYMBOL_DOT = ".";
 
     /**
      * 常规肯定

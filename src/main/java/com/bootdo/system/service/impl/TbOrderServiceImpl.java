@@ -58,4 +58,9 @@ public class TbOrderServiceImpl implements TbOrderService {
 		return tbOrderDao.statCodeStatus();
 	}
 
+	@Override
+	public TbOrderDO queryByEntireProperties(TbOrderDO orderDO) {
+		return null;
+	}
+
 }

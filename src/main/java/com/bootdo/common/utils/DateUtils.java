@@ -33,7 +33,7 @@ public class DateUtils {
     }
 
     public static Date newDate(String str) throws Exception{
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat(DATE_TIME_PATTERN);
         return df.parse(str);
     }
 

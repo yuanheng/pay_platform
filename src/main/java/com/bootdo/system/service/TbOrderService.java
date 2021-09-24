@@ -34,4 +34,11 @@ public interface TbOrderService {
 	 * @return
 	 */
 	List<TbCodeStatusDTO> statCodeStatus();
+
+	/**
+	 * 根据所有属性查询是否已存在
+	 * @param orderDO tb订单信息
+	 * @return 已存在的tb订单信息
+	 */
+    TbOrderDO queryByEntireProperties(TbOrderDO orderDO);
 }
