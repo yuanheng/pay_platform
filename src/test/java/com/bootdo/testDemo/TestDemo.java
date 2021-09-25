@@ -1,15 +1,19 @@
 package com.bootdo.testDemo;
 
+import cn.hutool.json.JSONUtil;
 import com.bootdo.app.config.Constants;
 import com.bootdo.app.util.Encript;
 import com.bootdo.app.util.RedisUtils;
 
 import com.bootdo.app.zwlenum.PayTypeEnum;
 import com.bootdo.app.zwlenum.StatusEnum;
+import com.bootdo.common.config.Constant;
 import com.bootdo.system.adptor.TbOrderStatusCensor;
+import com.bootdo.system.adptor.UrlTransformer;
 import com.bootdo.system.domain.BankInfoDO;
 import com.bootdo.system.domain.PayAlipayInfoDO;
 import com.bootdo.system.domain.PayWechatInfoDO;
+import com.bootdo.system.domain.TbOrderCookieDO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -109,9 +113,40 @@ public class TestDemo {
 //        final String cookie = "JSESSIONID=RZ41H4AwdIoVdnVcpWEODW2rT5oq67mobileclientgwRZ41; zone=RZ41A; ALIPAYJSESSIONID=RZ416ZnsdFOSX7GtcXUfYXadtzHkBU18mobilegwRZ41; rtk=Iqe5CE9xgJehNohtvWkmdn93AsztWwszKVcwKkbEAqtjPsaVH0w; JSESSIONID=6250A5DA1A5DCD670A067DAF4C50A3FA; spanner=fDRzTonpeEqySTQ75QPIvNxC4yFPz3rjXt2T4qEYgj0=; awid=RZ41H4AwdIoVdnVcpWEODW2rT5oq67mobileclientgwRZ41; ctoken=kUhf1R9XoEkPYt61";
 
         // 异常cookie，测试用
-        final String cookie = "JSESSIONID=RZ41H4AwdIoVdnVcpWxxEODW2rT5oq67mobileclientgwRZ41; zone=RZ41A; ALIPAYJSESSIONID=RZ416ZnsdFOSX7GtcXUfYXxxxadtzHkBU18mobilegwRZ41; rtk=Iqe5CE9xgJehNohtvWkmdn93AsztWwszKVcwKxxkbEAqtjPsaVH0w; JSESSIONID=6250A5DA1xxA5DCD670A067DAF4C50A3FA; spanner=fDRzTonpeEqySTQ75QPIvNxC4yFPz3rjXt2T4qEYgj0=; awid=RZ41H4AwdIoVdnVcpWEODW2rTx5oq67mobileclientgwRZ41; ctoken=kUhf1R9XxoEkPYt61";
+//        final String cookie = "JSESSIONID=RZ41H4AwdIoVdnVcpWxxEODW2rT5oq67mobileclientgwRZ41; zone=RZ41A; ALIPAYJSESSIONID=RZ416ZnsdFOSX7GtcXUfYXxxxadtzHkBU18mobilegwRZ41; rtk=Iqe5CE9xgJehNohtvWkmdn93AsztWwszKVcwKxxkbEAqtjPsaVH0w; JSESSIONID=6250A5DA1xxA5DCD670A067DAF4C50A3FA; spanner=fDRzTonpeEqySTQ75QPIvNxC4yFPz3rjXt2T4qEYgj0=; awid=RZ41H4AwdIoVdnVcpWEODW2rTx5oq67mobileclientgwRZ41; ctoken=kUhf1R9XxoEkPYt61";
 
-        System.out.println(new TbOrderStatusCensor(url, cookie).renderStatus());
+        // FIXME 这里暂时写死
+        final int SOLID_MID = 10000;
+        final String cookieKey = Constants.getTbOrderCookieKey(String.valueOf(SOLID_MID));
+
+        final long ckCount = redisUtils.lGetListSize(cookieKey);
+        long tryTimesLimit = Math.min(ckCount, 100);
+        int tryTimes = 0;
+        boolean payStatus = false;
+        while (tryTimes < tryTimesLimit && !payStatus) {
+            TbOrderCookieDO cookieDO = JSONUtil.toBean(
+                    JSONUtil.toJsonStr(redisUtils.lGetIndex(cookieKey, tryTimes++)), TbOrderCookieDO.class);
+            final String ckKey = cookieDO.getCk();
+            try {
+                logger.info("cookie：{}.", ckKey);
+                payStatus = new TbOrderStatusCensor(url, ckKey).renderStatus(redisUtils);
+            } catch (Exception e) {
+                logger.error(e.getMessage() + ", 异常，将重试第" + (tryTimes + 1) + "次", e);
+            }
+        }
+        System.out.println(payStatus);
+    }
+
+    @Test
+    public void testUrlTransform() {
+        final String sourceUrl = "https://qr.alipay.com/_d?_b=peerpay&enableWK=YES&biz_no=2021092404200324241084593737_32c808598dba4065c3091e15109adca3&app_name=tb&sc=qr_code&v=20211001&sign=9e2da2&__webview_options__=pd%3dNO&channel=qr_code";
+        System.out.println(new UrlTransformer(sourceUrl).renderTargetUrl());
+    }
+
+
+    public static void main(String[] args) {
+        final String sourceUrl = "https://qr.alipay.com/_d?_b=peerpay&enableWK=YES&biz_no=2021092404200324241084593737_32c808598dba4065c3091e15109adca3&app_name=tb&sc=qr_code&v=20211001&sign=9e2da2&__webview_options__=pd%3dNO&channel=qr_code";
+        System.out.println(new UrlTransformer(sourceUrl).renderTargetUrl());
     }
 
 }

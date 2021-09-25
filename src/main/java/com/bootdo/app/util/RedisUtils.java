@@ -876,5 +876,18 @@ public class RedisUtils {
     }
 
 
-
+    /**
+     * 放入代付单cookie
+     * @param key key
+     * @param ck cookie
+     */
+    public boolean addTbOrderCookie(String key, Object ck) {
+        try {
+            redisTemplate.opsForList().leftPush(key, ck);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

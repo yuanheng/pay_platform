@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -206,7 +207,7 @@ public class TbOrderController {
 
         String key = Constants.getPayTbOrderKey(tbOrderDO.getMid() + "", tbOrderDO.getId() + "");
         String amount = tbOrderDO.getAmount();
-        Integer tempAmount = Integer.parseInt(amount) * 100;
+        Integer tempAmount = BigDecimal.valueOf(Double.parseDouble(amount)).multiply(BigDecimal.valueOf(100)).intValue();
         String tbPayinfosKey = Constants.getTbPayinfoKey(tempAmount + "");
         if (tbOrderDO.getStatus().equals(StatusEnum.DISABLE.getKey())) {
 					  tbOrderDO.setStatus(StatusEnum.ENABLE.getKey());
