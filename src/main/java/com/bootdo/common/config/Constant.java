@@ -18,6 +18,9 @@ public class Constant {
 
     public static final String SYMBOL_COMMA = ",";
     public static final String SYMBOL_DOT = ".";
+    public static final String SYMBOL_Q = "?";
+    public static final String SYMBOL_AMPERSAND = "&";
+    public static final String SYMBOL_EQUAL = "=";
 
     /**
      * 常规肯定
@@ -49,7 +52,6 @@ public class Constant {
     public static String CACHE_TYPE_REDIS = "redis";
 
     public static String LOG_ERROR = "error";
-
 
     public static final String SYMBOL_OF_QUOTATION = "\"";
 

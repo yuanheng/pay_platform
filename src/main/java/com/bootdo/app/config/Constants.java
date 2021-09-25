@@ -16,6 +16,7 @@ public class Constants {
 
     public final static String TB_PAYINFO_KEY= String.format("%s{amount}", TB_PAYINFO_PREFIX);
 
+    public final static String TB_ORDER_COOKIE_KEY = String.format("%s{mid}", "tb_order_cookie_");
 
     public final static String MERCHANT_NO_KEY = "merchant_no_key:{merchantNo}";
 
@@ -140,5 +141,9 @@ public class Constants {
 
     public static String getPayTbOrderKeyFlag(String mid, String id){
         return Constants.PAY_TB_ORDER_KEY.replace("{mid}",mid).replace("{id}",id) + "_flag";
+    }
+
+    public static String getTbOrderCookieKey(String mid) {
+        return TB_ORDER_COOKIE_KEY.replace("{mid}", mid);
     }
 }

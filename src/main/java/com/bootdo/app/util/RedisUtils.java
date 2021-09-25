@@ -1,7 +1,6 @@
 package com.bootdo.app.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -20,7 +19,7 @@ public class RedisUtils {
 
 
     /**
-     * 放入支付方式
+     * 获取支付方式
      *
      * @param key   键
      * @return true成功 false失败
@@ -32,6 +31,38 @@ public class RedisUtils {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * 获取代付单cookie
+     *
+     * @param key   键
+     * @return true成功 false失败
+     */
+    public Object getCookieInfo(String key) {
+        try {
+            Object object = redisTemplate.opsForList().rightPop(key);
+            return object;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 放入代付单cookie
+     *
+     * @param key   键
+     * @return true成功 false失败
+     */
+    public boolean addCookieInfo(String key, Object cookieInfo) {
+        try {
+            redisTemplate.opsForList().leftPush(key, cookieInfo);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -874,7 +905,5 @@ public class RedisUtils {
         Set keys = redisTemplate.keys(keyPattern + "*");
         return keys;
     }
-
-
 
 }

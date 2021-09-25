@@ -1,9 +1,14 @@
 package com.bootdo.system.adptor;
 
+import com.bootdo.app.util.RedisUtils;
+import com.bootdo.common.utils.JSONUtils;
 import com.bootdo.system.utils.DomUtil;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -23,10 +28,17 @@ public class TbOrderStatusCensor {
      */
     private static final String STATUS_MARK = "\"peerPayNoticeInfo\"";
 
+    private static final String STATUS_KEY = "peerPayNoticeInfo";
+
     /**
      * 付款成功标识
      */
     private static final String SUCCEED_MARK = "已有人帮TA付款";
+
+    /**
+     * 订单已取消标识
+     */
+    private static final String CANCELLED_MARK = "订单已取消";
 
     /**
      * 登录用户的COOKIE
@@ -38,6 +50,8 @@ public class TbOrderStatusCensor {
      */
     private String tbPayUrl;
 
+    private RedisUtils redisUtils;
+
     public TbOrderStatusCensor() {
     }
 
@@ -48,24 +62,43 @@ public class TbOrderStatusCensor {
         this.cookie = cookie;
     }
 
-    public boolean renderStatus() {
-        Document pageDoc = DomUtil.getDoc(this.tbPayUrl, formHeaders(this.cookie));
-        final String docStr = pageDoc.toString();
-        final int firstIndex = docStr.indexOf(STATUS_MARK);
-        if (firstIndex == -1) {
-            final String errMsg = "登录异常，未能正确获取代付单页，请确认.";
-            LOGGER.error(errMsg);
-            throw new IllegalArgumentException(errMsg);
-        }
-        int indent = firstIndex + STATUS_MARK.length();
-        final int offset = 10;
-        final String cutoff = docStr.substring(indent + 2, indent + offset);
-        if (cutoff.contains(SUCCEED_MARK)) {
-            LOGGER.info("已付款成功");
-            return true;
-        } else {
-            LOGGER.info("未付款或订单已取消");
-            return false;
+    public boolean renderStatus(RedisUtils redisUtils) {
+        try {
+            Assert.isTrue(redisUtils != null, "redisUtils句柄空了.");
+            Document pageDoc = DomUtil.getDoc(this.tbPayUrl, formHeaders(this.cookie));
+            Elements scriptEles = pageDoc.getElementsByTag("script");
+            if (scriptEles.isEmpty()) {
+                final String errMsg = "登录异常，未能正确获取代付单页，请确认.";
+                throw new IllegalArgumentException(errMsg);
+            }
+            Element element = scriptEles.get(5);
+            if (element == null) {
+                final String errMsg = "登录异常，未能正确获取代付单状态，请确认.";
+                throw new IllegalArgumentException(errMsg);
+            }
+            final String text = element.html();
+            final String mark = "var _data = ";
+            if (!text.contains(mark)) {
+                final String errMsg = "登录异常，未能正确获取代付单状态，请确认.";
+                throw new IllegalArgumentException(errMsg);
+            }
+            final String textMiddle = Splitter.on(mark).splitToList(text).get(1);
+            final String jsonStr = Splitter.on("||").splitToList(textMiddle).get(0);
+            final Map<String, Object> properties = JSONUtils.jsonToMap(jsonStr);
+            final String payStatus = String.valueOf(properties.getOrDefault(STATUS_KEY, "unknown"));
+            if (payStatus.equals(SUCCEED_MARK)) {
+                LOGGER.info("已付款成功");
+                return true;
+            } else {
+                if (payStatus.equals(CANCELLED_MARK)) {
+                    LOGGER.info("订单已取消");
+                } else {
+                    LOGGER.info("等待付款");
+                }
+                return false;
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
         }
     }
 
