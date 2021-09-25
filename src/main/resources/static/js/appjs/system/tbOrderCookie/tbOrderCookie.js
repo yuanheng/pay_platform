@@ -63,7 +63,13 @@ function load() {
 								field: 'createTime',
 								title: '创建时间',
 								width: 190
-							}]
+							},
+							{
+								field: 'updatedTime',
+								title: '更新时间',
+								width: 190
+							}
+						]
 					});
 }
 

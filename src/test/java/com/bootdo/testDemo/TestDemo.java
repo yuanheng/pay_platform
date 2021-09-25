@@ -128,7 +128,7 @@ public class TestDemo {
             Object o = redisUtils.getCookieInfo(cookieKey);
             if (o == null) {
                 triedTimes++;
-                logger.warn("池子是空的，将继续尝试第{}次.", triedTimes + 1);
+                logger.warn("池子是空的，将继续尝试第{}次...", triedTimes + 1);
                 continue;
             }
             TbOrderCookieDO cookieDO = JSONUtil.toBean(JSONUtil.toJsonStr(o), TbOrderCookieDO.class);
@@ -139,7 +139,7 @@ public class TestDemo {
                 cookieDO.setUpdatedTime(new Date());
                 redisUtils.addCookieInfo(cookieKey, JSONUtils.beanToJson(cookieDO));
             } catch (Exception e) {
-                logger.error(e.getMessage() + ", 异常，将重试第" + (triedTimes + 1) + "次", e);
+                logger.error(e.getMessage() + "。将重试第" + (triedTimes + 1) + "次...", e);
             } finally {
                 triedTimes++;
             }
