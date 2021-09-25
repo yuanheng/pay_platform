@@ -1,6 +1,5 @@
 package com.bootdo.system.domain;
 
-import com.bootdo.app.util.DateUtil;
 import com.bootdo.common.utils.DateUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -24,12 +23,23 @@ public class TbOrderCookieDO implements Serializable {
     @JsonFormat(pattern = DateUtils.DATE_TIME_PATTERN, timezone = "GMT+08:00")
     private Date createTime;
 
+    @JsonFormat(pattern = DateUtils.DATE_TIME_PATTERN, timezone = "GMT+08:00")
+    private Date updatedTime;
+
     public Date getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Date getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 
     public String getCk() {

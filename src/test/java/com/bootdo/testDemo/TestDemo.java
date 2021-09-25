@@ -4,10 +4,9 @@ import cn.hutool.json.JSONUtil;
 import com.bootdo.app.config.Constants;
 import com.bootdo.app.util.Encript;
 import com.bootdo.app.util.RedisUtils;
-
 import com.bootdo.app.zwlenum.PayTypeEnum;
 import com.bootdo.app.zwlenum.StatusEnum;
-import com.bootdo.common.config.Constant;
+import com.bootdo.common.utils.JSONUtils;
 import com.bootdo.system.adptor.TbOrderStatusCensor;
 import com.bootdo.system.adptor.UrlTransformer;
 import com.bootdo.system.domain.BankInfoDO;
@@ -22,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
 
 
 @RestController()
@@ -119,19 +120,28 @@ public class TestDemo {
         final int SOLID_MID = 10000;
         final String cookieKey = Constants.getTbOrderCookieKey(String.valueOf(SOLID_MID));
 
-        final long ckCount = redisUtils.lGetListSize(cookieKey);
-        long tryTimesLimit = Math.min(ckCount, 100);
-        int tryTimes = 0;
+        // 重试次数
+        final long tryTimesLimit = 10;
+        int triedTimes = 0;
         boolean payStatus = false;
-        while (tryTimes < tryTimesLimit && !payStatus) {
-            TbOrderCookieDO cookieDO = JSONUtil.toBean(
-                    JSONUtil.toJsonStr(redisUtils.lGetIndex(cookieKey, tryTimes++)), TbOrderCookieDO.class);
+        while (triedTimes < tryTimesLimit && !payStatus) {
+            Object o = redisUtils.getCookieInfo(cookieKey);
+            if (o == null) {
+                triedTimes++;
+                logger.warn("池子是空的，将继续尝试第{}次.", triedTimes + 1);
+                continue;
+            }
+            TbOrderCookieDO cookieDO = JSONUtil.toBean(JSONUtil.toJsonStr(o), TbOrderCookieDO.class);
             final String ckKey = cookieDO.getCk();
             try {
                 logger.info("cookie：{}.", ckKey);
                 payStatus = new TbOrderStatusCensor(url, ckKey).renderStatus(redisUtils);
+                cookieDO.setUpdatedTime(new Date());
+                redisUtils.addCookieInfo(cookieKey, JSONUtils.beanToJson(cookieDO));
             } catch (Exception e) {
-                logger.error(e.getMessage() + ", 异常，将重试第" + (tryTimes + 1) + "次", e);
+                logger.error(e.getMessage() + ", 异常，将重试第" + (triedTimes + 1) + "次", e);
+            } finally {
+                triedTimes++;
             }
         }
         System.out.println(payStatus);

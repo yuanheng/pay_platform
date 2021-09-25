@@ -88,7 +88,7 @@ public class TbOrderCookieController {
             // 暂时使用固定商户维护cookie
             final String ckCacheKey = Constants.getTbOrderCookieKey(SOLID_MID + "");
             orderCookieDO.setCreateTime(new Date());
-            redisUtils.addTbOrderCookie(ckCacheKey, JSONUtils.beanToJson(orderCookieDO));
+            redisUtils.addCookieInfo(ckCacheKey, JSONUtils.beanToJson(orderCookieDO));
             return R.ok();
         } catch (Exception e) {
             e.printStackTrace();
